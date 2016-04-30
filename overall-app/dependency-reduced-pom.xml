@@ -44,7 +44,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>com.pet.king.MyClass</mainClass>
+                  <mainClass>main.java.com.pet.king.MyClass</mainClass>
                 </transformer>
               </transformers>
             </configuration>

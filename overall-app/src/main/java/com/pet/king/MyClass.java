@@ -1,5 +1,5 @@
 
-package com.pet.king;
+package main.java.com.pet.king;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,10 +17,9 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
-import com.pet.king.car.Car;
-import com.pet.king.car.GenericTester;
-
 import hu.overall.lib.HeavyComputer;
+import main.java.com.pet.king.car.Car;
+import main.java.com.pet.king.car.GenericTester;
 
 @Trait(name = "Peter", names = { "Noni", "Fl�ri" })
 @TraitDefault(27)

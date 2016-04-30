@@ -1,4 +1,4 @@
-package com.pet.king.car;
+package main.java.com.pet.king.car;
 
 public class GenericTester {
 

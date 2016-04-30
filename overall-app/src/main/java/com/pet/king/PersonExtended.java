@@ -1,4 +1,4 @@
-package com.pet.king;
+package main.java.com.pet.king;
 
 import java.util.ArrayList;
 import java.util.List;
