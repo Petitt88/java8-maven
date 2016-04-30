@@ -1,0 +1,129 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.pet.king</groupId>
+	<artifactId>overall-app</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>overall-app</name>
+	<url>http://maven.apache.org</url>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<build>
+		<!-- Customize the name of the generated jar file -->
+		<!-- <finalName>java-tutorial-goodies</finalName> -->
+		<sourceDirectory>src</sourceDirectory>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.3</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+			<!-- This plugin makes the output jar executable (injects the entry class 
+				into the META-INF/MANIFEST.MF file) -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>2.4.3</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<transformers>
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<mainClass>com.pet.king.MyClass</mainClass>
+								</transformer>
+							</transformers>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+
+		<!-- overriding the resources from the super POM -->
+		<resources>
+			<!-- This one is in the super POM, keep it -->
+			<resource>
+				<directory>${project.basedir}/src/main/resources</directory>
+			</resource>
+
+			<!-- Include the "legacy" HeavyComputer -->
+			<resource>
+				<directory>${project.basedir}/src/main/lib</directory>
+			</resource>
+
+			<resource>
+				<targetPath>META-INF/external</targetPath>
+				<filtering>false</filtering>
+				<directory>${basedir}/src/main/external-resources</directory>
+				<!-- <includes> -->
+				<!-- <include>configuration.xml</include> -->
+				<!-- </includes> -->
+				<excludes>
+					<exclude>**/*.properties</exclude>
+				</excludes>
+			</resource>
+		</resources>
+	</build>
+
+	<reporting>
+		<outputDirectory>${basedir}/target/site</outputDirectory>
+		<plugins>
+			<plugin>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>2.0.1</version>
+				<reportSets>
+					<reportSet></reportSet>
+				</reportSets>
+			</plugin>
+		</plugins>
+	</reporting>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Comes from the local repo and got to the local repo from the project-repo! 
+			This is how to use external dependency jar files: gotta install them to the 
+			local repo. When building the project for the very 1st time, maven under 
+			the covers installs the overall-lib.jar from the project-repo (specified 
+			below) to the local repo! This is why this works. And this is the magic how 
+			to install a custom jar into a project-repo: http://blog.valdaris.com/post/custom-jar -->
+
+		<!-- mvn install:install-file -DlocalRepositoryPath=repo -DcreateChecksum=true 
+			-Dpackaging=jar -Dfile="lib/overall-lib-0.0.1.jar" -DgroupId=overall-lib 
+			-DartifactId=overall-lib -Dversion="0.0.1" -e -->
+
+		<!-- This dependency specification makes maven install the jar from the 
+			project-repo to the local-repo. -->
+		<dependency>
+			<groupId>overall-lib</groupId>
+			<artifactId>overall-lib</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>repo</id>
+			<url>file://${basedir}/repo</url>
+		</repository>
+	</repositories>
+</project>
+

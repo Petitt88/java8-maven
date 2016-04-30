@@ -1,0 +1,26 @@
+package com.pet.king;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.FIELD, ElementType.METHOD, ElementType.TYPE })
+@Inherited
+public @interface Trait {
+
+	String name();
+
+	int order() default 0;
+
+	String[] names();
+}
+
+@interface TraitDefault {
+	// this is the default value. We can use the annotation
+	// - either: TraitDefault(5)
+	// - or: TraitDefault(value = 5)
+	int value();
+}
