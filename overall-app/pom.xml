@@ -23,8 +23,12 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.3</version>
 				<configuration>
+					<compilerArgument>-parameters</compilerArgument>
 					<source>1.8</source>
 					<target>1.8</target>
+					<!-- <annotationProcessors> -->
+					<!-- <proc>com.javacodegeeks.advanced.processor.MutatingAnnotationProcessor</proc> -->
+					<!-- </annotationProcessors> -->
 				</configuration>
 			</plugin>
 			<!-- This plugin makes the output jar executable (injects the entry class 
