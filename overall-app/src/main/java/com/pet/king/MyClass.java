@@ -4,7 +4,9 @@ package main.java.com.pet.king;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -43,7 +45,7 @@ public class MyClass {
 		}
 
 		mc.futureTest();
-		mc.genericTest();
+		mc.genericTest(new ArrayList<String>());
 		mc.reflectionTest("K.P.");
 
 		mc.callLib();
@@ -202,7 +204,11 @@ public class MyClass {
 		// Collections.emptyList()
 	}
 
-	private void genericTest() {
+	private void genericTest(List<? extends String> list) {
+		//int length = list.get(0).length();
+		Type clazz = list.getClass().getGenericSuperclass();
+		System.out.println("Generic super class: " + clazz.toString());
+
 		GenericTester genTest = new GenericTester();
 		genTest.LogGenericInfo("Peter", String.class);
 		genTest.LogGenericInfo(27, Integer.class);
@@ -211,6 +217,7 @@ public class MyClass {
 	private void reflectionTest(String parameter1) {
 		try {
 			final Method method = MyClass.class.getDeclaredMethod("reflectionTest", String.class);
+			// this will print out "parameter1" only if the java compiler is invoked with the "-parameters" argument
 			Arrays.stream(method.getParameters()).map(p -> "ParameterName: " + p.getName()).forEach(System.out::println);
 		} catch (NoSuchMethodException | SecurityException e) {
 			e.printStackTrace();
@@ -218,9 +225,5 @@ public class MyClass {
 		System.err.println("ERROR - just kidding -:), only for demonstration purposes.");
 	}
 
-	void lookAtThisGenericArgument(List<? extends String> list) {
-		int length = list.get(0).length();
-	}
-
-	// try-with-resource: those classes can be used that implement that AutoCloseable interface
+	// try-with-resource: those classes can be used that implement the AutoCloseable interface
 }
