@@ -24,7 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import com.pet.king.app.car.Car;
 import com.pet.king.app.car.GenericTester;
 
-// import com.pet.king.util.SuperCalculator;
+import com.pet.king.util.SuperCalculator;
 
 import hu.overall.lib.HeavyComputer;
 
@@ -62,9 +62,9 @@ public class MyClass {
 
 		boolean empty = StringUtils.isEmpty("alma");
 
-		// SuperCalculator calc = new SuperCalculator();
-		// Number result = calc.calc(1, 20);
-		// System.out.println(String.format("Calculated from lib dependency: %s", result));
+		SuperCalculator calc = new SuperCalculator();
+		Number result = calc.calc(1, 20);
+		System.out.println(String.format("Calculated from lib dependency (through parent POM): %s", result));
 	}
 
 	private void nestedClasses() {

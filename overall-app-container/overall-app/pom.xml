@@ -138,11 +138,11 @@
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
 
-<!-- 		<dependency> -->
-<!-- 			<groupId>com.pet.king</groupId> -->
-<!-- 			<artifactId>overall-util</artifactId> -->
+		<dependency>
+			<groupId>com.pet.king</groupId>
+			<artifactId>overall-util</artifactId>
 <!-- 			<version>0.0.1-SNAPSHOT</version> -->
-<!-- 		</dependency> -->
+		</dependency>
 	</dependencies>
 
 </project>
