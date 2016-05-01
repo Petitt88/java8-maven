@@ -2,6 +2,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
+	<parent>
+		<groupId>com.pet.king</groupId>
+		<artifactId>overall-app-container</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+
 	<groupId>com.pet.king</groupId>
 	<artifactId>overall-app</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
@@ -14,23 +20,24 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
+	<!-- for the "build" lifecycle -->
 	<build>
 		<!-- Customize the name of the generated jar file -->
 		<!-- <finalName>java-tutorial-goodies</finalName> -->
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.3</version>
-				<configuration>
-					<compilerArgument>-parameters</compilerArgument>
-					<source>1.8</source>
-					<target>1.8</target>
-					<!-- <annotationProcessors> -->
-					<!-- <proc>com.javacodegeeks.advanced.processor.MutatingAnnotationProcessor</proc> -->
-					<!-- </annotationProcessors> -->
-				</configuration>
-			</plugin>
+			<!-- "pluginManagement" element is set in the parent POM, which means 
+				this modules inherits the parent's settings -->
+			<!-- <plugin> -->
+			<!-- <artifactId>maven-compiler-plugin</artifactId> -->
+			<!-- <version>3.3</version> -->
+			<!-- <configuration> -->
+			<!-- <compilerArgument>-parameters</compilerArgument> -->
+			<!-- <source>1.8</source> -->
+			<!-- <target>1.8</target> -->
+			<!-- </configuration> -->
+			<!-- </plugin> -->
+
 			<!-- This plugin makes the output jar executable (injects the entry class 
 				into the META-INF/MANIFEST.MF file) -->
 			<plugin>
@@ -82,6 +89,7 @@
 		</resources>
 	</build>
 
+	<!-- for the "site" lifecycle - generating javadocs for exaple -->
 	<reporting>
 		<outputDirectory>${basedir}/target/site</outputDirectory>
 		<plugins>
@@ -95,12 +103,17 @@
 		</plugins>
 	</reporting>
 
+	<repositories>
+		<repository>
+			<id>repo</id>
+			<url>file://${basedir}/repo</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
-			<scope>test</scope>
 		</dependency>
 
 		<!-- Comes from the local repo and got to the local repo from the project-repo! 
@@ -123,11 +136,5 @@
 		</dependency>
 	</dependencies>
 
-	<repositories>
-		<repository>
-			<id>repo</id>
-			<url>file://${basedir}/repo</url>
-		</repository>
-	</repositories>
 </project>
 
