@@ -1,5 +1,5 @@
 
-package main.java.com.pet.king;
+package com.pet.king.app;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,9 +19,14 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
+import org.apache.commons.lang3.StringUtils;
+
+import com.pet.king.app.car.Car;
+import com.pet.king.app.car.GenericTester;
+
+// import com.pet.king.util.SuperCalculator;
+
 import hu.overall.lib.HeavyComputer;
-import main.java.com.pet.king.car.Car;
-import main.java.com.pet.king.car.GenericTester;
 
 @Trait(name = "Peter", names = { "Noni", "Fl�ri" })
 @TraitDefault(27)
@@ -53,7 +58,13 @@ public class MyClass {
 
 	private void callLib() {
 		String calculated = new HeavyComputer().computeFromNumbers(1, 2, 3, 4, 5, 6);
-		System.out.println(String.format("Calculated from lib: %s", calculated));
+		System.out.println(String.format("Calculated from external lib: %s", calculated));
+
+		boolean empty = StringUtils.isEmpty("alma");
+
+		// SuperCalculator calc = new SuperCalculator();
+		// Number result = calc.calc(1, 20);
+		// System.out.println(String.format("Calculated from lib dependency: %s", result));
 	}
 
 	private void nestedClasses() {
@@ -205,7 +216,7 @@ public class MyClass {
 	}
 
 	private void genericTest(List<? extends String> list) {
-		//int length = list.get(0).length();
+		// int length = list.get(0).length();
 		Type clazz = list.getClass().getGenericSuperclass();
 		System.out.println("Generic super class: " + clazz.toString());
 

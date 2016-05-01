@@ -8,9 +8,7 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
-	<groupId>com.pet.king</groupId>
 	<artifactId>overall-app</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>overall-app</name>
@@ -54,7 +52,7 @@
 							<transformers>
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>main.java.com.pet.king.MyClass</mainClass>
+									<mainClass>com.pet.king.app.MyClass</mainClass>
 								</transformer>
 							</transformers>
 						</configuration>
@@ -134,6 +132,17 @@
 			<artifactId>overall-lib</artifactId>
 			<version>1.0.0</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
+
+<!-- 		<dependency> -->
+<!-- 			<groupId>com.pet.king</groupId> -->
+<!-- 			<artifactId>overall-util</artifactId> -->
+<!-- 			<version>0.0.1-SNAPSHOT</version> -->
+<!-- 		</dependency> -->
 	</dependencies>
 
 </project>

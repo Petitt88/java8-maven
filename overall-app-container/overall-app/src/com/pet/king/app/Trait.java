@@ -1,4 +1,4 @@
-package main.java.com.pet.king;
+package com.pet.king.app;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;

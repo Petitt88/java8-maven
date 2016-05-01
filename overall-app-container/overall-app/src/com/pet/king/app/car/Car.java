@@ -1,10 +1,10 @@
-package main.java.com.pet.king.car;
+package com.pet.king.app.car;
 
 import java.util.Optional;
 
-import main.java.com.pet.king.InterfaceMindBlowUp;
-import main.java.com.pet.king.Person;
-import main.java.com.pet.king.PersonExtended;
+import com.pet.king.app.InterfaceMindBlowUp;
+import com.pet.king.app.Person;
+import com.pet.king.app.PersonExtended;
 
 
 public class Car extends Person {

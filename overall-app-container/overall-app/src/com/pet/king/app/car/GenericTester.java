@@ -1,4 +1,4 @@
-package main.java.com.pet.king.car;
+package com.pet.king.app.car;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

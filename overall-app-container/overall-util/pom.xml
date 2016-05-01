@@ -10,9 +10,7 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 
-	<groupId>com.pet.king</groupId>
 	<artifactId>overall-util</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 
 	<name>overall-util</name>
 	<url>http://maven.apache.org</url>

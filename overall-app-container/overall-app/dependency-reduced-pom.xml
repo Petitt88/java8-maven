@@ -6,10 +6,8 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.pet.king</groupId>
   <artifactId>overall-app</artifactId>
   <name>overall-app</name>
-  <version>0.0.1-SNAPSHOT</version>
   <url>http://maven.apache.org</url>
   <build>
     <sourceDirectory>src</sourceDirectory>
@@ -41,7 +39,7 @@
             <configuration>
               <transformers>
                 <transformer>
-                  <mainClass>main.java.com.pet.king.MyClass</mainClass>
+                  <mainClass>com.pet.king.app.MyClass</mainClass>
                 </transformer>
               </transformers>
             </configuration>

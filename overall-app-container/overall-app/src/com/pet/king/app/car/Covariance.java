@@ -1,4 +1,4 @@
-package main.java.com.pet.king.car;
+package com.pet.king.app.car;
 
 class Parent {
 	public Object toObject(Number number) {

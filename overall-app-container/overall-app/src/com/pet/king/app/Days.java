@@ -1,4 +1,4 @@
-package main.java.com.pet.king;
+package com.pet.king.app;
 
 import java.util.EnumSet;
 import java.util.Set;

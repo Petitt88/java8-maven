@@ -1,4 +1,4 @@
-package main.java.com.pet.king;
+package com.pet.king.app;
 
 public class Person {
 
