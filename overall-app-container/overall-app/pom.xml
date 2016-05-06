@@ -125,12 +125,19 @@
 			-Dpackaging=jar -Dfile="lib/overall-lib-0.0.1.jar" -DgroupId=overall-lib 
 			-DartifactId=overall-lib -Dversion="0.0.1" -e -->
 
-		<!-- This dependency specification makes maven install the jar from the 
-			project-repo to the local-repo. -->
+		<!-- Dependency on an external jar file. This dependency specification 
+			makes maven install the jar from the project-repo to the local-repo. -->
 		<dependency>
 			<groupId>overall-lib</groupId>
 			<artifactId>overall-lib</artifactId>
 			<version>1.0.0</version>
+		</dependency>
+
+		<!-- Dependency on the overall-util jar, from this same Maven parent project. -->
+		<dependency>
+			<groupId>com.pet.king</groupId>
+			<artifactId>overall-util</artifactId>
+			<!-- <version>0.0.1-SNAPSHOT</version> -->
 		</dependency>
 
 		<dependency>
@@ -138,11 +145,6 @@
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
 
-		<dependency>
-			<groupId>com.pet.king</groupId>
-			<artifactId>overall-util</artifactId>
-<!-- 			<version>0.0.1-SNAPSHOT</version> -->
-		</dependency>
 	</dependencies>
 
 </project>
