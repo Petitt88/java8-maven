@@ -1,4 +1,4 @@
-package org.pet;
+package org.pet.helpers;
 
 import hu.overall.lib.HeavyComputer;
 
