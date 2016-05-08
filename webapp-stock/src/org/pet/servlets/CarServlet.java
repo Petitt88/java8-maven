@@ -22,7 +22,7 @@ public class CarServlet extends HttpServlet {
 	// @Inject - can inject Java pojo classes
 	@Inject
 	private Car car;
-	
+
 	@EJB
 	MyEjb myEjb;
 
@@ -32,7 +32,10 @@ public class CarServlet extends HttpServlet {
 		this.car.setName("Opel");
 		this.car.setPlateNumber("XXX-001");
 
+		String message = this.myEjb.getMessage();
+
 		request.setAttribute("car", car);
+		request.setAttribute("message", message);
 		request.getRequestDispatcher("Views/car.jsp").forward(request, response);
 	}
 

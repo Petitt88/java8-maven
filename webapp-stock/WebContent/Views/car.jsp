@@ -11,12 +11,12 @@
 
 	<p>Car.jsp</p>
 
-	<%--
 	<%
-	// Car car = (Car) request.getAttribute("car"); // if (car == null) {
-	// car = new Car(); // }
+		// Car car = (Car) request.getAttribute("car"); // if (car == null) {
+		// car = new Car(); // }
+
+		String message = (String)request.getAttribute("message");
 	%>
-	--%>
 
 	<jsp:useBean id="car" scope="request" class="org.pet.models.Car">
 		<%-- happens to run when the "car" object is not present in the request object and the jsp creates the instance.
@@ -38,6 +38,8 @@
 	<div>
 		The plate number is: (via jstl jsp:getProperty):
 		<jsp:getProperty property="plateNumber" name="car" /></div>
+		
+		${message}
 
 </body>
 </html>
