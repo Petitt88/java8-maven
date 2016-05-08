@@ -7,13 +7,26 @@
 		<welcome-file>index.html</welcome-file>
 	</welcome-file-list>
 
-<!-- 	<servlet> -->
-<!-- 		<servlet-name>HomeServlet</servlet-name> -->
-<!-- 		<servlet-class>org.pet.servlets.HomeServlet</servlet-class> -->
-<!-- 	</servlet> -->
-<!-- 	<servlet-mapping> -->
-<!-- 		<servlet-name>HomeServlet</servlet-name> -->
-<!-- 		<url-pattern>/home2</url-pattern> -->
-<!-- 	</servlet-mapping> -->
+	<!-- <servlet> -->
+	<!-- <servlet-name>HomeServlet</servlet-name> -->
+	<!-- <servlet-class>org.pet.servlets.HomeServlet</servlet-class> -->
+	<!-- </servlet> -->
+	<!-- <servlet-mapping> -->
+	<!-- <servlet-name>HomeServlet</servlet-name> -->
+	<!-- <url-pattern>/home2</url-pattern> -->
+	<!-- </servlet-mapping> -->
+
+	<servlet>
+		<servlet-name>aboutJsp</servlet-name>
+		<jsp-file>/Views/about.jsp</jsp-file>
+		<init-param>
+			<param-name>param1</param-name>
+			<param-value>jsp init param from web.xml</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>aboutJsp</servlet-name>
+		<url-pattern>/Views/about.jsp</url-pattern>
+	</servlet-mapping>
 
 </web-app>
