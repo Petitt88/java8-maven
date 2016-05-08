@@ -54,7 +54,9 @@ public class HomeServlet extends HttpServlet {
 		String car = this.getServletConfig().getInitParameter("car");
 		writer.println("Car from ServletConfig is: " + car);
 		
-		
+		// will send 3XX redirect back to the browser
+		// will make the browser send a 2nd call, targeting the about.jsp resource
+		//response.sendRedirect("Views/about.jsp");
 
 		this.calculateAndWrite(writer);
 	}
