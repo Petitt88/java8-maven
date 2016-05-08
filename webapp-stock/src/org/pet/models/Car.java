@@ -1,5 +1,9 @@
 package org.pet.models;
 
+import javax.enterprise.context.RequestScoped;
+
+@RequestScoped
+//@ApplicationScoped
 public class Car {
 	private String name;
 	private String plateNumber;

@@ -1,8 +1,6 @@
-<%@page import="com.sun.xml.internal.bind.v2.runtime.Name"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="ISO-8859-1"%>
-
-<%@ page import="org.pet.models.Car "%>
+<%@ page import="org.pet.models.Car"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -10,6 +8,8 @@
 <title>Insert title here</title>
 </head>
 <body>
+
+	<p>Car.jsp</p>
 
 	<%--
 	<%
@@ -21,13 +21,13 @@
 	<jsp:useBean id="car" scope="request" class="org.pet.models.Car">
 		<%-- happens to run when the "car" object is not present in the request object and the jsp creates the instance.
 			This is kinda like default parameterization.
-		--%>
+		 --%>
 		<jsp:setProperty property="name" name="car" value="-" />
 		<jsp:setProperty property="plateNumber" name="car" value="-" />
 
 		<%-- Would set the "plateNumber" from the request parameter. --%>
 		<%-- 		<jsp:setProperty property="plateNumber" name="car" param="request_param_name" /> --%>
-		
+
 		<%-- Sets all of the properties from the request. --%>
 		<%-- 		<jsp:setProperty property="*" name="car" />  --%>
 	</jsp:useBean>
