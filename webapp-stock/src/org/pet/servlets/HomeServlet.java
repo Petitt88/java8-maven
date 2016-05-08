@@ -20,18 +20,7 @@ import org.pet.helpers.Calculator;
 // @WebServlet("/home")
 @WebServlet(urlPatterns = { "/home" }, initParams = { @WebInitParam(name = "car", value = "Peugeot") })
 public class HomeServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
 
-	/**
-	 * @see HttpServlet#HttpServlet()
-	 */
-	public HomeServlet() {
-		super();
-	}
-
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// response.setContentLength(arg0);

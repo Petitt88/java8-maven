@@ -23,12 +23,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.pet.king.app.car.Car;
 import com.pet.king.app.car.GenericTester;
-
 import com.pet.king.util.SuperCalculator;
 
 import hu.overall.lib.HeavyComputer;
 
-@Trait(name = "Peter", names = { "Noni", "Fl�ri" })
+@Trait(name = "Pet", names = { "Non", "Flor" })
 @TraitDefault(27)
 public class MyClass {
 
@@ -166,6 +165,8 @@ public class MyClass {
 		// executor.invokeAll(tasks)
 		// executor.invokeAny(tasks)
 
+		//Stream.of(future).map(a -> a.get()).forEach(System.out::println);
+		
 		// IntStream.range(startInclusive, endExclusive)
 		// IntStream.of(values)
 		try {
@@ -213,6 +214,7 @@ public class MyClass {
 		// Collections.synchronizedList(list) // prefer to use the concurrent
 		// package over this
 		// Collections.emptyList()
+		//Files.readAllLines(path)
 	}
 
 	private void genericTest(List<? extends String> list) {

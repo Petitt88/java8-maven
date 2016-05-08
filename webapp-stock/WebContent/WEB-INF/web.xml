@@ -6,6 +6,7 @@
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
 	</welcome-file-list>
+
 	<servlet>
 		<servlet-name>aboutJsp</servlet-name>
 		<jsp-file>/Views/about.jsp</jsp-file>
@@ -14,8 +15,17 @@
 			<param-value>jsp init param from web.xml</param-value>
 		</init-param>
 	</servlet>
+
 	<servlet-mapping>
 		<servlet-name>aboutJsp</servlet-name>
 		<url-pattern>/Views/about.jsp</url-pattern>
 	</servlet-mapping>
+
+	<!-- ServletContext parameters -->
+	<context-param>
+		<description>Location to store uploaded file</description>
+		<param-name>file-upload</param-name>
+		<param-value>c:\apache-tomcat-5.5.29\webapps\data\</param-value>
+	</context-param>
+
 </web-app>

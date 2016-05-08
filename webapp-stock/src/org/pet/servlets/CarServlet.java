@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.pet.businesslogic.MyEjb;
 import org.pet.models.Car;
 
-@WebServlet("/car")
+@WebServlet(name = "car", urlPatterns = { "/car" })
 public class CarServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 

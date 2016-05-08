@@ -10,8 +10,7 @@ public interface InterfaceMindBlowUp {
 	/** public abstract implicitly */
 	void performAction();
 
-	// nested classes, interfaces or enumerations are implicitly public and
-	// static
+	// nested classes, interfaces or enumerations are implicitly public and static
 
 	enum InnerEnum {
 		E1, E2
@@ -38,7 +37,6 @@ interface FileInterface {
 	public String readLines() throws IOException;
 }
 
-
 // Functional interfaces:
 // Supplier, Function,
-// Consumer, Runnable 
+// Consumer, Runnable

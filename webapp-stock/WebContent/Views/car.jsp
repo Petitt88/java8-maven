@@ -15,7 +15,7 @@
 		// Car car = (Car) request.getAttribute("car"); // if (car == null) {
 		// car = new Car(); // }
 
-		String message = (String)request.getAttribute("message");
+		String message = (String) request.getAttribute("message");
 	%>
 
 	<jsp:useBean id="car" scope="request" class="org.pet.models.Car">
@@ -38,8 +38,12 @@
 	<div>
 		The plate number is: (via jstl jsp:getProperty):
 		<jsp:getProperty property="plateNumber" name="car" /></div>
-		
-		${message}
+
+	<div>${requestScope.message}</div>
+	<div>${message}</div>
+	
+	<!-- won't work -->
+	<div>apple: ${request.getAttribute("message")}</div>
 
 </body>
 </html>
