@@ -20,12 +20,15 @@ public class CarServlet extends HttpServlet {
 	// resource injection vs dependency injection: http://stackoverflow.com/questions/30060876/what-is-difference-between-resource-injection-and-dependency-injection-cdi-in
 	// @Resource vs @Inject
 	// @Inject - can inject Java pojo classes
+	// @Resource is for resources like "UserTransaction"
 	@Inject
 	private Car car;
 
 	@EJB
 	MyEjb myEjb;
-
+	
+	//@GET - to specify the method invoked on GET requests (we are no longer tied to the doGet
+	//@POST
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
 		// Car car = new Car();
