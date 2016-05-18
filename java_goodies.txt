@@ -1,0 +1,122 @@
+**********Java***********
+
+ClassLoaders:
+
+There are three types of built-in Class Loaders in Java:
+1. Bootstrap Class Loader – It loads JDK internal classes, typically loads rt.jar and other core classes for example java.lang.* package classes
+2. Extensions Class Loader – It loads classes from the JDK extensions directory, usually $JAVA_HOME/lib/ext directory.
+3. System Class Loader – It loads classes from the current classpath that can be set while invoking a program using -cp or -classpath command line options.
+
+The flow of "loadClass()" is as follows:
+
+1. Verify class name.
+2. Check to see if the class requested has already been loaded.
+3. Check to see if the class is a "system" class.
+4. Attempt to fetch the class from the parent class loader
+5. Attempt to fetch the class from this class loader's repository.
+6. Define the class for the VM.
+7. Resolve the class.
+8. Return the class to the caller.
+
+
+
+
+
+**********Maven**********
+
+a plugin is a collection of goals with a general common purpose
+
+mvn archetype:generate - plugin:goal: execute the "generate" goal of the "archetype plugin"
+
+mvn package - Rather than a goal, this is a phase
+A phase is a step in the build lifecycle, which is an ordered sequence of phases. When a phase is given, Maven will execute every phase in the sequence up to and including the one defined. For example, if we execute the compile phase, the phases that actually get executed are:
+
+validate
+generate-sources
+process-sources
+generate-resources
+process-resources
+compile
+
+Lifecycles:
+ - clean: cleans up artifacts created by prior builds
+ - build: (and its default phases are:)	validate: validate the project is correct and all necessary information is available
+										compile: compile the source code of the project
+										test: test the compiled source code using a suitable unit testing framework. These tests should not require the code be packaged or deployed
+										package: take the compiled code and package it in its distributable format, such as a JAR.
+										integration-test: process and deploy the package if necessary into an environment where integration tests can be run
+										verify: run any checks to verify the package is valid and meets quality criteria
+										install: install the package into the local repository, for use as a dependency in other projects locally
+										deploy: done in an integration or release environment, copies the final package to the remote repository for sharing with other developers and projects.
+- site: generates site documentation for this project
+
+An interesting thing to note is that phases and goals may be executed in sequence:
+	mvn clean dependency:copy-dependencies package - This command will clean the project, copy dependencies, and package the project (executing all phases up to package, of course).
+
+A Build Lifecycle is Made Up of Phases
+A Build Phase is Made Up of Plugin Goals
+
+
+To install an external jar into a project-repository:
+mvn install:install-file -DlocalRepositoryPath=repo -DcreateChecksum=true -Dpackaging=jar -Dfile="lib/overall-lib-0.0.1.jar" -DgroupId=overall-lib -DartifactId=overall-lib -Dversion="0.0.1" -e
+
+When creating a maven multi-project app (parent's packaging is "pom") it is very important to always build the parent pom.
+That will build all of the modules individually and resolve the dependencies (ensuring the correct order of the build of projects).
+As soon as a modules starts depending on another, that module cannot be built from its pom. The parent pom will be the only one that can build it from that point on.
+
+
+
+
+
+**********Tomcat**********
+
+tomcat-users.xml:
+<role rolename="admin-gui"/>
+<role rolename="manager-gui"/>
+<user username="admin" password="admin" roles="admin-gui,manager-gui"/>
+
+
+
+
+**********Servlet**********
+
+Request, Response objects - created per access
+Servlet itself: not per access, shared accross different threads (1 thread / user)
+HttpSession: 1 session object / user, machine - user specific
+ServletContext - shared accross users (application-level) - 1 instance per application
+
+GenericService	- init(ServletConfig) - for the very 1st request only
+	|
+HTTPServlet		- servlet() - at every request
+	|
+MyServlet		- doGet, doPost (at every request)
+
+
+Filter interface:
+
+void init(FilterConfig paramFilterConfig) – When container initializes the Filter, this is the method that gets invoked. This method is called only once in the lifecycle of filter and we should initialize any resources in this method. FilterConfig is used by container to provide init parameters and servlet context object to the Filter. We can throw ServletException in this method.
+doFilter(ServletRequest paramServletRequest, ServletResponse paramServletResponse, FilterChain paramFilterChain) – This is the method invoked every time by container when it has to apply filter to a resource. Container provides request and response object references to filter as argument. FilterChain is used to invoke the next filter in the chain. This is a great example of Chain of Responsibility Pattern.
+void destroy() – When container offloads the Filter instance, it invokes the destroy() method. This is the method where we can close any resources opened by filter. This method is called only once in the lifetime of filter.
+
+I can listen to events:
+- ServletContextListener
+- ServletContextAttributeListener
+- HttpSessionListener
+- HttpSessionAttributeListener
+
+
+
+
+**********TODO**********
+
+1. read more JSP resources:
+	- jsp custom tags (jspx, tagx)
+	- apache tiles
+
+2. JAX-RS, JAX-WS (both with and without Maven)
+
+3. JDBC, JPA, Hibernate, EclipseLink examples
+
+4. Spring
+
+5. Unit test, jUnit, Mockito
