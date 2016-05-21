@@ -11,7 +11,7 @@ public class HelloBodyTag extends SimpleTagSupport {
 	public void doTag() throws JspException {
 		JspWriter out = getJspContext().getOut();
 		try {
-			out.println("<h1>Hello, ");
+			out.println("<span>Hello, ");
 			JspFragment body = getJspBody();
 			if (body != null) {
 				// Print the body content as it is
@@ -19,7 +19,7 @@ public class HelloBodyTag extends SimpleTagSupport {
 			} else {
 				out.println("everybody");
 			}
-			out.println("!</h1>");
+			out.println(", goddammit!</span>");
 		} catch (java.io.IOException ex) {
 			throw new JspException("Error in HelloTag ", ex);
 		}

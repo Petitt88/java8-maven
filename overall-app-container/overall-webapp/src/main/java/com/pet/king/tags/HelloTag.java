@@ -20,9 +20,9 @@ public class HelloTag extends SimpleTagSupport {
 		JspWriter out = getJspContext().getOut();
 		try {
 			if (name != null) {
-				out.println("<h1>Hello, " + name + "!</h1>");
+				out.println("<span>Hello, " + name + "!</span>");
 			} else {
-				out.println("<h1>Hello, everybody!</h1>");
+				out.println("<span>Hello, everybody!</span>");
 			}
 		} catch (java.io.IOException ex) {
 			throw new JspException("Error in HelloAttributeTag ", ex);

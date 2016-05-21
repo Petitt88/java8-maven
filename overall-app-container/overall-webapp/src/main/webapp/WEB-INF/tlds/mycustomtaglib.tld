@@ -3,9 +3,12 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd">
 
+	<!-- Descriptor file to define the java tag handlers. If tag-files are to 
+		be reused in other projects and lets say this compiles down to a jar file, 
+		the individual .tag files must also be defined here as <tag-file> attributes. -->
 	<tlib-version>1.0</tlib-version>
 	<short-name>kp</short-name>
-	<uri>mycustomtag</uri>
+	<uri>java_taghandlers</uri>
 
 	<tag>
 		<name>hello</name>
@@ -25,6 +28,12 @@
 		<tag-class>com.pet.king.tags.HelloBodyTag</tag-class>
 		<body-content>scriptless</body-content>
 	</tag>
+
+	<!-- Not necessary. Only when we want to reuse the tag-file through a jar. -->
+	<tag-file>
+		<name>banana</name>
+		<path>/WEB-INF/tags/banana.tag</path>
+	</tag-file>
 
 	<function>
 		<name>getSum</name>

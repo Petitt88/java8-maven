@@ -107,6 +107,33 @@ I can listen to events:
 
 
 
+**********JSP***********
+
+7.1 What Are Custom Tags?
+	Custom tags, also known as tag extensions, are JSP elements that allow custom logic and output provided by other Java components to be inserted into JSP pages. 
+	The logic provided through a custom tag is implemented by a Java object known as a tag handler. When OC4J encounters a custom tag in a JSP during translation, it generates code to obtain and 
+	interact with the tag handler. Custom tags are included in a JSP page using XML syntax. Tags may or may not contain a body. Tags can also contain XML attributes that match properties in the corresponding tag handler.
+
+With the advent of JSP 2.0, you now have two options for creating custom tags:
+
+Tag handlers
+	Tags that require the creation of tag handler classes come in two types: Classic and simple.
+	Classic tag handlers have been available since JSP 1.1. Classic tags are considered somewhat cumbersome to write, in part because of the complexity of the Java interfaces used to implement each tag's corresponding tag handler class. They are also dependent on Java expressions for dynamic attribute values. However, these tag handlers are the only option if Java scriplets or expressions must be used in the tag body
+	Simple tag handlers are new in JSP 2.0, and offer a much simpler lifecycle and interface than classic tag handlers. Tag bodies accept JSP expression language (EL) expressions, allowing completely script-free tag development.
+
+Tag files
+	Also new in JSP 2.0, tag files are revolutionary in that they allow tag libraries to be implemented completely in JSP or XML syntax, without the need to create and compile tag handler classes. Instead, tag files are translated into simple tag handlers by the OC4J JSP container and then compiled. Because of their ease of implementation, tag files offer an attractive alternative to writing tag handlers.
+
+A tag file is a source file that contains a fragment of JSP code that is reusable as a custom tag. Tag files allow you to create custom tags using JSP syntax. 
+Just as a JSP page gets translated into a servlet class and then compiled, a tag file gets translated into a tag handler and then compiled.
+
+
+
+
+
+
+
+
 **********TODO**********
 
 1. read more JSP resources:
