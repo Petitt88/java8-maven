@@ -131,7 +131,8 @@ public class MyClass {
 			System.out.println(String.format("Optional value is: %s", optNoGo.get().intValue()));
 		}
 
-		Integer optGo = car.parseOptional("333").orElse(new Integer(333));
+		Integer optGo = car.parseOptional(null).orElse(new Integer(666));
+		System.out.println(String.format("orElse optional value is: %s", optGo));
 	}
 
 	@Override
