@@ -71,16 +71,19 @@ public class MyClass {
 
 		Person.Pocket pocket = person.new Pocket();
 		Person.PocketStatic pocketStatic = new Person.PocketStatic();
-
-		PersonExtended personExt = new PersonExtended();
-		personExt.simpleProt();
-		personExt.boss();
-		personExt.bossProt();
 	}
 
 	void enumTest() {
 		EnumTester tester = new EnumTester();
 		tester.test();
+	}
+
+	void visibilityTest() {
+		PersonExtended personExt = new PersonExtended();
+		personExt.simpleProt();
+		personExt.boss();
+		// cam invoke package-private and protected members (from the same package)
+		personExt.bossProt();
 	}
 
 	protected void interfaceTest() throws IOException {
@@ -106,6 +109,8 @@ public class MyClass {
 		// Collections.emptySet()
 		// Collections.unmodifiableList(list)
 		// IntStream.of(values)
+		// Collectors.toSet();
+		// Collectors.toList();
 
 		boolean isEquals = InterfaceMindBlowUp.CONSTANT_VALUE.equals("alma");
 
@@ -121,10 +126,12 @@ public class MyClass {
 
 		}
 
-		Optional<Integer> res2 = car.parseOptional("333");
-		if (res2.isPresent()) {
-			System.out.println(String.format("Optional value is: %s", res2.get().intValue()));
+		Optional<Integer> optNoGo = car.parseOptional("333");
+		if (optNoGo.isPresent()) {
+			System.out.println(String.format("Optional value is: %s", optNoGo.get().intValue()));
 		}
+
+		Integer optGo = car.parseOptional("333").orElse(new Integer(333));
 	}
 
 	@Override
@@ -165,8 +172,8 @@ public class MyClass {
 		// executor.invokeAll(tasks)
 		// executor.invokeAny(tasks)
 
-		//Stream.of(future).map(a -> a.get()).forEach(System.out::println);
-		
+		// Stream.of(future).map(a -> a.get()).forEach(System.out::println);
+
 		// IntStream.range(startInclusive, endExclusive)
 		// IntStream.of(values)
 		try {
@@ -214,7 +221,7 @@ public class MyClass {
 		// Collections.synchronizedList(list) // prefer to use the concurrent
 		// package over this
 		// Collections.emptyList()
-		//Files.readAllLines(path)
+		// Files.readAllLines(path)
 	}
 
 	private void genericTest(List<? extends String> list) {

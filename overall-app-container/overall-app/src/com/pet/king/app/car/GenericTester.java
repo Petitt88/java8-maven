@@ -5,6 +5,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.pet.king.app.Person;
+
 public class GenericTester {
 
 	private final List<String> list = new ArrayList<>();
@@ -21,5 +23,8 @@ public class GenericTester {
 
 	public <T> void LogGenericInfo(T param, Class<T> info) {
 		System.out.println("Generic type is: " + info.getCanonicalName());
+
+		// cannot see protected members here (in different package)
+		// OtherPerson op = new OtherPerson();
 	}
 }
