@@ -65,15 +65,14 @@
 		<resources>
 			<!-- This one is in the super POM, keep it -->
 			<resource>
+				<!-- Everything inside the resouces/META-INF folder gets copied into 
+					the jar's META-INF folder -->
 				<directory>${project.basedir}/src/main/resources</directory>
 			</resource>
 
-			<!-- Include the "legacy" HeavyComputer -->
 			<resource>
-				<directory>${project.basedir}/src/main/lib</directory>
-			</resource>
-
-			<resource>
+				<!-- Everything inside the external-resources folder gets copied into 
+					the jar's META-INF/external folder -->
 				<targetPath>META-INF/external</targetPath>
 				<filtering>false</filtering>
 				<directory>${basedir}/src/main/external-resources</directory>
