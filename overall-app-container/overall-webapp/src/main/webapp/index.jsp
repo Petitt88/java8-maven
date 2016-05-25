@@ -35,7 +35,8 @@
 
 	${name}
 	<br />
-	<c:out value="This is how you format in EL, ${name}!" />
+	<c:out value="This is how you format in EL, ${pageScope.name} (pageScope.variable) or just ${name} (variable)!" />
+	<!-- Won't work since nameNonEl is not on any of the page scope -->
 	<br /> ${nameNonEL}
 
 	<c:set var="str"
