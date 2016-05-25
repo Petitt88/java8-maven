@@ -133,6 +133,8 @@ public class MyClass {
 
 		Integer optGo = car.parseOptional(null).orElse(new Integer(666));
 		System.out.println(String.format("orElse optional value is: %s", optGo));
+		
+		Optional.of(4).filter(a -> a.intValue() == 4).flatMap(a -> Optional.of(String.format("Monad(%s) - Optional", a))).ifPresent(System.out::println);
 	}
 
 	@Override
