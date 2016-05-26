@@ -36,7 +36,7 @@ public class XmlExample {
 				// JAXBContext context = JAXBContext.newInstance("com.pet.king.app.xml");
 				JAXBContext context = JAXBContext.newInstance(Root.class);
 				Marshaller marshaller = context.createMarshaller();
-				marshaller.marshal(root, new File("root.xml"));
+				marshaller.marshal(root.get(), new File("root.xml"));
 				System.out.println("root.xml successfully create via JAXB");
 			} catch (JAXBException e) {
 				e.printStackTrace();
