@@ -130,6 +130,19 @@ Just as a JSP page gets translated into a servlet class and then compiled, a tag
 
 
 
+********Streams*********
+
+The parallel streams use the default ForkJoinPool which by default has one less threads as you have processors, as returned by Runtime.getRuntime().availableProcessors() (so parallel streams use all your processors because they also use the main thread):
+For applications that require separate or custom pools, a ForkJoinPool may be constructed with a given target parallelism level; by default, equal to the number of available processors.
+
+Streams should be used with high caution when processing intensive computation tasks. In particular, by default, all streams will use the same ForkJoinPool, configured to use as many threads as there are cores in the computer on which the program is running.
+If evaluation of one parallel stream results in a very long running task, this may be split into as many long running sub-tasks that will be distributed to each thread in the pool. From there, no other parallel stream can be processed because all threads will be occupied. So, for computation intensive stream evaluation, one should always use a specific ForkJoinPool in order not to block other streams.
+
+List<SomeClass> list = // A list of objects
+Stream<SomeClass> stream = list.parallelStream().map(this::veryLongProcessing);
+Callable<List<Integer>> task = () -> stream.collect(toList());
+ForkJoinPool forkJoinPool = new ForkJoinPool(4);
+List<SomeClass> newList = forkJoinPool.submit(task).get();
 
 
 
@@ -137,7 +150,6 @@ Just as a JSP page gets translated into a servlet class and then compiled, a tag
 **********TODO**********
 
 1. read more JSP resources:
-	- jsp custom tags (jspx, tagx)
 	- apache tiles
 
 2. JAX-RS, JAX-WS (both with and without Maven)

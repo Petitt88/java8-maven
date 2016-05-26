@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -21,6 +22,7 @@ import java.util.function.IntFunction;
 import java.util.function.IntUnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -209,6 +211,48 @@ public class MyClass {
 		IntStream stream = IntStream.of(1, 2, 3, 4, 5);
 		IntStream newStream = calculate(stream, 3, 4);
 		System.out.println(newStream.boxed().collect(Collectors.toList()));
+
+		// iterate: 1st element is "1", next elements are the "previous + 1"
+		// limit: take only the first 4 elements
+		// reduce: applying an operation to each element of the list, resulting in the combination of this element and the result of the same operation applied to the previous element
+		Integer res = Stream
+				.iterate(1, x -> x + 3)
+				// to demonstrate how streams are evaluated - elements are only iterated once!
+				.peek(System.out::println)
+				.limit(4)
+				.reduce((prev, i) -> {
+					System.out.println(String.format("%s %s", prev, i));
+					return prev + i;
+				})
+				.orElse(2);
+		System.out.println(String.format("Integer stream magic result is: %s", res));
+
+		/*
+		 * Streams should be used with high caution when processing intensive computation tasks. In particular,
+		 * by default, all streams will use the SAME! ForkJoinPool (which happens to be ForkJoinPool.commonPool()),
+		 * configured to use as many threads as there are cores in the computer on which the program is running.
+		 * 
+		 * If evaluation of one parallel stream results in a very long running task, this may be split into as many long
+		 * running sub-tasks that will be distributed to each thread in the pool. From there, no other parallel stream can
+		 * be processed because all threads will be occupied. So, for computation intensive stream evaluation, one
+		 * should always use a specific ForkJoinPool in order not to block other streams.
+		 * 
+		 * This way, other parallel streams (using their own ForkJoinPool) will not be blocked by this one. 
+		 * In other words, we would need a pool of ForkJoinPool in order to avoid this problem.
+		 * 
+		 * If a program is to be run inside a container, one must be very careful when using parallel streams.
+		 * Never use the default pool in such a situation unless you know for sure that the container can handle it. 
+		 * In a Java EE container, do not use parallel streams.
+		 */
+		try {
+			List<Integer> list = Arrays.asList(1, 2, 3, 4, 5);
+			Stream<Integer> listStream = list.parallelStream().map(/* this::veryLongProcessing */ a -> a);
+			Callable<List<Integer>> task = () -> listStream.collect(Collectors.toList());
+			ForkJoinPool forkJoinPool = new ForkJoinPool(4);
+			List<Integer> newList = forkJoinPool.submit(task).get();
+		} catch (InterruptedException | ExecutionException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private IntStream calculate(IntStream stream, int a, int b) {
