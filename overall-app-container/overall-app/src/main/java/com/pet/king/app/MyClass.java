@@ -28,6 +28,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.pet.king.app.car.Car;
 import com.pet.king.app.car.GenericTester;
+import com.pet.king.app.car.Tuple;
+import com.pet.king.app.car.TupleGeneric;
 import com.pet.king.util.SuperCalculator;
 
 import hu.overall.lib.HeavyComputer;
@@ -57,6 +59,7 @@ public class MyClass {
 		mc.genericTest(new ArrayList<String>());
 		mc.reflectionTest("K.P.");
 		mc.streamAndCurryingTest();
+		mc.instanceOfTest();
 
 		mc.callLib();
 	}
@@ -80,19 +83,22 @@ public class MyClass {
 	}
 
 	void enumTest() {
+		System.out.println("-----------------enumTest-----------------");
 		EnumTester tester = new EnumTester();
 		tester.test();
 	}
 
 	void visibilityTest() {
+		System.out.println("-----------------visibilityTest-----------------");
 		PersonExtended personExt = new PersonExtended();
 		personExt.simpleProt();
 		personExt.boss();
-		// cam invoke package-private and protected members (from the same package)
+		// can invoke package-private and protected members (from the same package)
 		personExt.bossProt();
 	}
 
-	protected void interfaceTest() throws IOException {
+	void interfaceTest() throws IOException {
+		System.out.println("-----------------interfaceTest-----------------");
 		InterfaceMindBlowUp ifOldFashioned = new InterfaceMindBlowUp() {
 			@Override
 			public void performAction() {
@@ -124,7 +130,8 @@ public class MyClass {
 		ifInnerClassObj.toString();
 	}
 
-	public void optionalTest() {
+	void optionalTest() {
+		System.out.println("-----------------optionalTest-----------------");
 		Car car = new Car();
 		// must check for null
 		Integer res = car.parse("3");
@@ -153,7 +160,8 @@ public class MyClass {
 		String[] sArr = /* new String[] */ { "apple", "android" };
 	}
 
-	private void threadTest() {
+	void threadTest() {
+		System.out.println("-----------------threadTest-----------------");
 		int alma = 2;
 		Thread thread = new Thread(() -> {
 			System.out.println(String.format("Alma variable is currently now: \"%s\"", alma));
@@ -167,7 +175,8 @@ public class MyClass {
 		}
 	}
 
-	private void executorTest() throws InterruptedException, ExecutionException {
+	void executorTest() throws InterruptedException, ExecutionException {
+		System.out.println("-----------------streamAndCurryingTest-----------------");
 		Person p = new Person();
 		p.setAge(21);
 
@@ -201,7 +210,15 @@ public class MyClass {
 		}
 	}
 
-	private void streamAndCurryingTest() {
+	private IntStream calculate(IntStream stream, int a, int b) {
+		// x is b,
+		// y is a
+		// z is the iterator variable (always the last lambda's parameter)
+		return stream.map(((IntFunction<IntFunction<IntUnaryOperator>>) x -> y -> z -> x + y * z).apply(b).apply(a));
+	}
+
+	void streamAndCurryingTest() {
+		System.out.println("-----------------streamAndCurryingTest-----------------");
 		// IntStream.range(startInclusive, endExclusive)
 		// IntStream.of(values)
 
@@ -214,7 +231,8 @@ public class MyClass {
 
 		// iterate: 1st element is "1", next elements are the "previous + 1"
 		// limit: take only the first 4 elements
-		// reduce: applying an operation to each element of the list, resulting in the combination of this element and the result of the same operation applied to the previous element
+		// reduce: applying an operation to each element of the list, resulting in the combination of this element and the 
+		//		   result of the same operation applied to the previous element operation applied to the previous element
 		Integer res = Stream
 				.iterate(1, x -> x + 3)
 				// to demonstrate how streams are evaluated - elements are only iterated once!
@@ -246,7 +264,7 @@ public class MyClass {
 		 */
 		try {
 			List<Integer> list = Arrays.asList(1, 2, 3, 4, 5);
-			Stream<Integer> listStream = list.parallelStream().map(/* this::veryLongProcessing */ a -> a);
+			Stream<Integer> listStream = list.parallelStream().map(/*this::veryLongProcessing*/ a -> a);
 			Callable<List<Integer>> task = () -> listStream.collect(Collectors.toList());
 			ForkJoinPool forkJoinPool = new ForkJoinPool(4);
 			List<Integer> newList = forkJoinPool.submit(task).get();
@@ -255,14 +273,18 @@ public class MyClass {
 		}
 	}
 
-	private IntStream calculate(IntStream stream, int a, int b) {
-		// x is b,
-		// y is a
-		// z is the iterator variable (always the last lambda's parameter)
-		return stream.map(((IntFunction<IntFunction<IntUnaryOperator>>) x -> y -> z -> x + y * z).apply(b).apply(a));
+	void instanceOfTest() {
+		System.out.println("-----------------testInstanceOf-----------------");
+
+		Tuple tuple = new Tuple(15, "Peter");
+		System.out.println(tuple instanceof Tuple);
+
+		TupleGeneric<Integer, String> tupleGen1 = new TupleGeneric<Integer, String>(15, "Peter");
+		System.out.println(tupleGen1 instanceof TupleGeneric);
 	}
 
-	private void futureTest() {
+	void futureTest() {
+		System.out.println("-----------------futureTest-----------------");
 		CompletableFuture<Void> cfNoResult = CompletableFuture.runAsync(() -> {
 			// Thread.sleep(10000);
 			System.out.println("I'm async - start");
@@ -295,7 +317,8 @@ public class MyClass {
 		// Files.readAllLines(path)
 	}
 
-	private void genericTest(List<? extends String> list) {
+	void genericTest(List<? extends String> list) {
+		System.out.println("-----------------genericTest-----------------");
 		// int length = list.get(0).length();
 		Type clazz = list.getClass().getGenericSuperclass();
 		System.out.println("Generic super class: " + clazz.toString());
@@ -305,7 +328,8 @@ public class MyClass {
 		genTest.LogGenericInfo(27, Integer.class);
 	}
 
-	private void reflectionTest(String parameter1) {
+	void reflectionTest(String parameter1) {
+		System.out.println("-----------------reflectionTest-----------------");
 		try {
 			final Method method = MyClass.class.getDeclaredMethod("reflectionTest", String.class);
 			// this will print out "parameter1" only if the java compiler is invoked with the "-parameters" argument
