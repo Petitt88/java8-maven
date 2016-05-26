@@ -63,7 +63,7 @@ public class MyClass {
 
 		mc.callLib();
 		
-		//new XmlExample().execute();
+		new XmlExample().execute();
 	}
 
 	private void callLib() {

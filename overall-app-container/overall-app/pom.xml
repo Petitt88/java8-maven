@@ -59,6 +59,32 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<!-- <plugin> -->
+			<!-- jaxb plugin - maven generates JAXB classes from the specified xsd -->
+			<!-- <groupId>org.jvnet.jaxb2.maven2</groupId> -->
+			<!-- <artifactId>maven-jaxb2-plugin</artifactId> -->
+			<!-- <executions> -->
+			<!-- <execution> -->
+			<!-- <goals> -->
+			<!-- <goal>generate</goal> -->
+			<!-- </goals> -->
+			<!-- <configuration> -->
+			<!-- the package for the generated java classes -->
+			<!-- <generatePackage>com.pet.king.app.xml</generatePackage> -->
+			<!-- If the following not specified all xsd in resources are included -->
+			<!-- <schemaIncludes> -->
+			<!-- This is from the /src/main/resources/ folder -->
+			<!-- <include>CustomersOrders.xsd</include> -->
+			<!-- </schemaIncludes> -->
+			<!-- if you don't want old output -->
+			<!-- <removeOldOutput>true</removeOldOutput> -->
+			<!-- if you want verbosity -->
+			<!-- verbose>true</verbose -->
+			<!-- </configuration> -->
+			<!-- </execution> -->
+			<!-- </executions> -->
+			<!-- </plugin> -->
 		</plugins>
 
 		<!-- overriding the resources from the super POM -->
@@ -150,7 +176,7 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
+			<groupId>javax.xml</groupId>
 			<artifactId>jaxb-impl</artifactId>
 		</dependency>
 
