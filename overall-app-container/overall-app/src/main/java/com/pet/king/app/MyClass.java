@@ -62,6 +62,8 @@ public class MyClass {
 		mc.instanceOfTest();
 
 		mc.callLib();
+		
+		//new XmlExample().execute();
 	}
 
 	private void callLib() {

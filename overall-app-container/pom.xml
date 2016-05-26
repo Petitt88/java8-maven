@@ -93,10 +93,17 @@
 			</dependency>
 
 			<dependency>
+				<groupId>com.sun.xml.bind</groupId>
+				<artifactId>jaxb-impl</artifactId>
+				<version>2.2.11</version>
+			</dependency>
+
+			<dependency>
 				<groupId>com.pet.king</groupId>
 				<artifactId>overall-util</artifactId>
 				<version>0.0.1-SNAPSHOT</version>
 			</dependency>
+
 		</dependencies>
 	</dependencyManagement>
 
