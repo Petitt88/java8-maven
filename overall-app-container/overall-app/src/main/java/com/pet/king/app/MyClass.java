@@ -17,6 +17,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.function.IntFunction;
+import java.util.function.IntUnaryOperator;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.apache.commons.lang3.StringUtils;
@@ -51,6 +54,7 @@ public class MyClass {
 		mc.futureTest();
 		mc.genericTest(new ArrayList<String>());
 		mc.reflectionTest("K.P.");
+		mc.streamAndCurryingTest();
 
 		mc.callLib();
 	}
@@ -133,8 +137,11 @@ public class MyClass {
 
 		Integer optGo = car.parseOptional(null).orElse(new Integer(666));
 		System.out.println(String.format("orElse optional value is: %s", optGo));
-		
-		Optional.of(4).filter(a -> a.intValue() == 4).flatMap(a -> Optional.of(String.format("Monad(%s) - Optional", a))).ifPresent(System.out::println);
+
+		Optional.of(4)
+				.filter(a -> a.intValue() == 4)
+				.flatMap(a -> Optional.of(String.format("Monad(%s) - Optional", a)))
+				.ifPresent(System.out::println);
 	}
 
 	@Override
@@ -177,8 +184,6 @@ public class MyClass {
 
 		// Stream.of(future).map(a -> a.get()).forEach(System.out::println);
 
-		// IntStream.range(startInclusive, endExclusive)
-		// IntStream.of(values)
 		try {
 			System.out.println("attempt to shutdown executor");
 			executor.shutdown();
@@ -192,6 +197,26 @@ public class MyClass {
 			executor.shutdownNow();
 			System.out.println("shutdown finished");
 		}
+	}
+
+	private void streamAndCurryingTest() {
+		// IntStream.range(startInclusive, endExclusive)
+		// IntStream.of(values)
+
+		// IntStream alma = IntStream.of(1, 2, 4);
+		// alma.boxed().collect(Collectors.toSet());
+
+		IntStream stream = IntStream.of(1, 2, 3, 4, 5);
+		IntStream newStream = calculate(stream, 3, 4);
+		System.out.println(newStream.boxed().collect(Collectors.toList()));
+	}
+
+	private IntStream calculate(IntStream stream, int a, int b) {
+		// x is b,
+		// y is a
+		// z is the iterator variable
+		// (right to left parameterization)
+		return stream.map(((IntFunction<IntFunction<IntUnaryOperator>>) x -> y -> z -> x + y * z).apply(b).apply(a));
 	}
 
 	private void futureTest() {
