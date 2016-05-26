@@ -214,8 +214,7 @@ public class MyClass {
 	private IntStream calculate(IntStream stream, int a, int b) {
 		// x is b,
 		// y is a
-		// z is the iterator variable
-		// (right to left parameterization)
+		// z is the iterator variable (always the last lambda's parameter)
 		return stream.map(((IntFunction<IntFunction<IntUnaryOperator>>) x -> y -> z -> x + y * z).apply(b).apply(a));
 	}
 
