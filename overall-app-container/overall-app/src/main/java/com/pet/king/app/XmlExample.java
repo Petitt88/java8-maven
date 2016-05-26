@@ -33,10 +33,13 @@ public class XmlExample {
 
 		root.ifPresent(r -> {
 			try {
-				// JAXBContext context = JAXBContext.newInstance("com.pet.king.app.xml");
-				JAXBContext context = JAXBContext.newInstance(Root.class);
+				// JAXBContext context = JAXBContext.newInstance(Root.class);
+
+				// JAXB needs the context path specified which happens to be the package name of the generated java classes from the xsd
+				JAXBContext context = JAXBContext.newInstance("com.pet.king.app.xml");
 				Marshaller marshaller = context.createMarshaller();
 				marshaller.marshal(root.get(), new File("root.xml"));
+
 				System.out.println("root.xml successfully create via JAXB");
 			} catch (JAXBException e) {
 				e.printStackTrace();
