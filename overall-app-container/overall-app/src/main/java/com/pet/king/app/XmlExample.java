@@ -3,12 +3,14 @@ package com.pet.king.app;
 import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 
@@ -41,6 +43,10 @@ public class XmlExample {
 				marshaller.marshal(root.get(), new File("root.xml"));
 
 				System.out.println("root.xml successfully create via JAXB");
+
+				Unmarshaller unmarshaller = context.createUnmarshaller();
+				Root root2 = (Root) unmarshaller.unmarshal(new File("root.xml"));
+				System.out.println(String.format("Unmarshalled %s", Objects.toString(root2)));
 			} catch (JAXBException e) {
 				e.printStackTrace();
 			}
