@@ -5,4 +5,26 @@
 	version="3.1">
 
 	<display-name>Archetype Created Web Application</display-name>
+
+	<!-- Jersey config. Not needed, we bootstrap jersey from java code: JAXRSConfiguration 
+		class -->
+	<!-- <servlet> -->
+	<!-- <servlet-name>Jersey Web Application</servlet-name> -->
+	<!-- Have to specify the Jersey servlet container -->
+
+	<!-- <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class> -->
+	<!-- <init-param> -->
+	<!-- we tell Jersey which package to scan for services -->
+
+	<!-- <param-name>jersey.config.server.provider.packages</param-name> -->
+	<!-- <param-value>com.pet.king.api</param-value> -->
+	<!-- </init-param> -->
+	<!-- <load-on-startup>1</load-on-startup> -->
+	<!-- </servlet> -->
+
+	<!-- <servlet-mapping> -->
+	<!-- <servlet-name>Jersey Web Application</servlet-name> -->
+	<!-- <url-pattern>/api/*</url-pattern> -->
+	<!-- </servlet-mapping> -->
+
 </web-app>

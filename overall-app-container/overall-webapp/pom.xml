@@ -12,9 +12,14 @@
 
 	<artifactId>overall-webapp</artifactId>
 
+	<properties>
+		<!-- <failOnMissingWebXml>false</failOnMissingWebXml> -->
+	</properties>
+
 	<packaging>war</packaging>
 	<name>overall-webapp Maven Webapp</name>
 	<url>http://maven.apache.org</url>
+
 	<dependencies>
 
 		<dependency>
@@ -43,6 +48,10 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.glassfish.jersey.containers</groupId>
+			<artifactId>jersey-container-servlet</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>overall-webapp</finalName>
