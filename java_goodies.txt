@@ -7,6 +7,9 @@ There are three types of built-in Class Loaders in Java:
 2. Extensions Class Loader – It loads classes from the JDK extensions directory, usually $JAVA_HOME/lib/ext directory.
 3. System Class Loader – It loads classes from the current classpath that can be set while invoking a program using -cp or -classpath command line options.
 
+We use a custom classloader when we need to extend how the JVM loads the classes. By default it loads from the -classpath (from the folder of the project).
+But in some cases we may want to load a class from a database or from a remote resource (through http!).
+
 The flow of "loadClass()" is as follows:
 
 1. Verify class name.
@@ -17,6 +20,9 @@ The flow of "loadClass()" is as follows:
 6. Define the class for the VM.
 7. Resolve the class.
 8. Return the class to the caller.
+
+Always load the classes once. It's also important to keep a cache because the loadClass() method is called recursively when a class is
+being resolved, and you will need to return the cached result rather than chase it down for another copy.
 
 
 
@@ -126,6 +132,21 @@ Tag files
 
 A tag file is a source file that contains a fragment of JSP code that is reusable as a custom tag. Tag files allow you to create custom tags using JSP syntax. 
 Just as a JSP page gets translated into a servlet class and then compiled, a tag file gets translated into a tag handler and then compiled.
+
+
+<%@ include file="header.html" %>
+Static: adds the content from the value of the file attribute to the current page at translation time. 
+The directive was originally intended for static layout templates, like HTML headers.
+
+<jsp:include page="header.jsp" />
+Dynamic: adds the content from the value of the page attribute to the current page at request time. 
+Was intended more for dynamic content coming from JSPs.
+
+In the latter case we can specify parameters as well:
+<jsp:include page="navMenu.jsp" >
+    <jsp:param name="param1" value="menu" />
+</jsp:include>
+${param.param1} (preferable) or request.getParameter("param1")
 
 
 
