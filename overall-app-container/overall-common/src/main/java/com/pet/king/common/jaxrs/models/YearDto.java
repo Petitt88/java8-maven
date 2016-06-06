@@ -1,4 +1,4 @@
-package com.pet.king.jaxrs.models;
+package com.pet.king.common.jaxrs.models;
 
 public class YearDto {
 
@@ -11,4 +11,10 @@ public class YearDto {
 	public void setYear(int year) {
 		this.year = year;
 	}
+
+	@Override
+	public String toString() {
+		return "YearDto [year=" + year + "]";
+	}
+
 }

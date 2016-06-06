@@ -17,8 +17,8 @@ import javax.ws.rs.core.Response;
 import org.hibernate.validator.constraints.Email;
 
 import com.pet.king.common.jaxrs.models.PersonDto;
+import com.pet.king.common.jaxrs.models.YearDto;
 import com.pet.king.common.jaxrs.validation.Person;
-import com.pet.king.jaxrs.models.YearDto;
 
 // maps to /api/shop
 @Path("shop")
@@ -69,8 +69,9 @@ public class ShopService {
 		// Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 		// validator.validate(person);
 
+		person.setId(LocalDate.now().getDayOfYear());
 		return Response
-				.status(200)
+				.status(201)
 				// .type(MediaType.APPLICATION_JSON)
 				.entity(person)
 				.build();

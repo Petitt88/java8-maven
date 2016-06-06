@@ -14,12 +14,21 @@ public class PersonDto {
 
 	private Integer age;
 	private String name;
+	private Integer id;
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
 	/*
 	 * Note that in this version, firstName and lastName are fields initialized via injection
 	 * and name and age are a resource class property. Constraint annotations on properties are specified in their corresponding getters.
 	 */
-	@NotNull
+	//@NotNull
 	public Integer getAge() {
 		return age;
 	}
@@ -28,7 +37,7 @@ public class PersonDto {
 		this.age = age;
 	}
 
-	@NotNull
+	//@NotNull
 	public String getName() {
 		return name;
 	}
@@ -36,4 +45,10 @@ public class PersonDto {
 	public void setName(String name) {
 		this.name = name;
 	}
+
+	@Override
+	public String toString() {
+		return "PersonDto [age=" + age + ", name=" + name + ", id=" + id + "]";
+	}
+
 }
