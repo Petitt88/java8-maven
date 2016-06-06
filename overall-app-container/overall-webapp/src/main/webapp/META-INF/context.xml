@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+	<Resource name="BeanManager" auth="Container"
+		type="javax.enterprise.inject.spi.BeanManager" factory="org.jboss.weld.resources.ManagerObjectFactory" />
+
+	<!-- Tomcat has a read-only JNDI, so Weld can not automatically bind the 
+		BeanManager extension SPI. To bind the beanManger into JNDI, you shouldd 
+		create /META-INF/context.xml file in webapp’s web folder. The META-INF directory 
+		needs to be on the same level as the WEB-INF directory with the following 
+		content. -->
+</Context>
