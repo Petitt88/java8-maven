@@ -23,6 +23,17 @@
 	<dependencies>
 
 		<dependency>
+			<groupId>com.pet.king</groupId>
+			<artifactId>overall-common</artifactId>
+		</dependency>
+
+		<!-- required for overal-webapp's build -->
+		<dependency>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+		</dependency>
+
+		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
 		</dependency>

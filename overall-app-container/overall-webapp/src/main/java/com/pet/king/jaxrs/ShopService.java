@@ -1,5 +1,7 @@
 package com.pet.king.jaxrs;
 
+import java.time.LocalDate;
+
 import javax.validation.constraints.NotNull;
 import javax.websocket.server.PathParam;
 import javax.ws.rs.Consumes;
@@ -8,14 +10,15 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.hibernate.validator.constraints.Email;
 
-import com.pet.king.jaxrs.models.PersonDto;
+import com.pet.king.common.jaxrs.models.PersonDto;
+import com.pet.king.common.jaxrs.validation.Person;
 import com.pet.king.jaxrs.models.YearDto;
-import com.pet.king.jaxrs.validation.Person;
 
 // maps to /api/shop
 @Path("shop")
@@ -32,9 +35,13 @@ public class ShopService {
 	@Produces(MediaType.APPLICATION_JSON)
 	// NOTE: for some reason PathParam does not work...
 	// in case of reference types the request hits but the associated path-param is always null
-	public Response getYear(@PathParam("year") int year) {
+	public Response getYear(@PathParam("year") Integer year, @QueryParam("plusyear") int plusyear) {
 		YearDto yearDto = new YearDto();
-		yearDto.setYear(year);
+
+		if (year == null)
+			year = new Integer(LocalDate.now().getYear());
+
+		yearDto.setYear(year + plusyear);
 
 		return Response
 				.status(200)

@@ -30,6 +30,7 @@ import com.pet.king.app.car.Car;
 import com.pet.king.app.car.GenericTester;
 import com.pet.king.app.car.Tuple;
 import com.pet.king.app.car.TupleGeneric;
+import com.pet.king.jaxrs.JerseyTest;
 import com.pet.king.util.SuperCalculator;
 
 import hu.overall.lib.HeavyComputer;
@@ -64,6 +65,7 @@ public class MyClass {
 		mc.callLib();
 		
 		new XmlExample().execute();
+		new JerseyTest().execute();
 	}
 
 	private void callLib() {

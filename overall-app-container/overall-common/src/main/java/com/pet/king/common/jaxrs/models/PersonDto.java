@@ -1,4 +1,4 @@
-package com.pet.king.jaxrs.models;
+package com.pet.king.common.jaxrs.models;
 
 import javax.validation.constraints.NotNull;
 

@@ -1,4 +1,4 @@
-package com.pet.king.jaxrs.validation;
+package com.pet.king.common.jaxrs.validation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,7 +10,8 @@ import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 import javax.validation.Payload;
 
-import com.pet.king.jaxrs.models.PersonDto;
+import com.pet.king.common.jaxrs.models.PersonDto;
+
 
 @Target({ ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
