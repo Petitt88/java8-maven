@@ -71,6 +71,10 @@ That will build all of the modules individually and resolve the dependencies (en
 As soon as a modules starts depending on another, that module cannot be built from its pom. The parent pom will be the only one that can build it from that point on.
 
 
+Maven plugins (build and reporting) are configured by specifying a <configuration> element where the child elements of the <configuration> element 
+are mapped to fields, or setters, inside your Mojo (remember that a plug-in consists of one or more Mojos where a Mojo maps to a goal). 
+Say, for example, we had a Mojo that performed a query against a particular URL, with a specified timeout and list of options.
+https://maven.apache.org/guides/mini/guide-configuring-plugins.html
 
 
 
