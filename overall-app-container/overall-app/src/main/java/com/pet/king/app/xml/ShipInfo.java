@@ -65,7 +65,13 @@ public class ShipInfo {
     protected BigDecimal freight;
     @XmlElement(name = "ShipName", required = true)
     protected String shipName;
-    @XmlElement(name = "ShipAddress", required = true)
+    @Override
+	public String toString() {
+		return "ShipInfo [shipVia=" + shipVia + ", freight=" + freight + ", shipName=" + shipName + ", shipAddress=" + shipAddress + ", shipCity=" + shipCity + ", shipRegion=" + shipRegion + ", shipPostalCode=" + shipPostalCode + ", shipCountry="
+				+ shipCountry + ", shippedDate=" + shippedDate + "]";
+	}
+
+	@XmlElement(name = "ShipAddress", required = true)
     protected String shipAddress;
     @XmlElement(name = "ShipCity", required = true)
     protected String shipCity;

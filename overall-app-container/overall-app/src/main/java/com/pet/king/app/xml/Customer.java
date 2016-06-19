@@ -54,7 +54,12 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 })
 public class Customer {
 
-    @XmlElement(name = "CompanyName", required = true)
+    @Override
+	public String toString() {
+		return "Customer [companyName=" + companyName + ", contactName=" + contactName + ", contactTitle=" + contactTitle + ", phone=" + phone + ", fax=" + fax + ", fullAddress=" + fullAddress + ", customerID=" + customerID + "]";
+	}
+
+	@XmlElement(name = "CompanyName", required = true)
     protected String companyName;
     @XmlElement(name = "ContactName", required = true)
     protected String contactName;

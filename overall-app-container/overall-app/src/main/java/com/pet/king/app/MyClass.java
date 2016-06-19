@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
+import java.time.DayOfWeek;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -63,7 +64,7 @@ public class MyClass {
 		mc.instanceOfTest();
 
 		mc.callLib();
-		
+
 		new XmlExample().execute();
 		new JerseyTest().execute();
 	}
@@ -235,8 +236,8 @@ public class MyClass {
 
 		// iterate: 1st element is "1", next elements are the "previous + 1"
 		// limit: take only the first 4 elements
-		// reduce: applying an operation to each element of the list, resulting in the combination of this element and the 
-		//		   result of the same operation applied to the previous element operation applied to the previous element
+		// reduce: applying an operation to each element of the list, resulting in the combination of this element and the
+		// result of the same operation applied to the previous element operation applied to the previous element
 		Integer res = Stream
 				.iterate(1, x -> x + 3)
 				// to demonstrate how streams are evaluated - elements are only iterated once!
@@ -259,16 +260,16 @@ public class MyClass {
 		 * be processed because all threads will be occupied. So, for computation intensive stream evaluation, one
 		 * should always use a specific ForkJoinPool in order not to block other streams.
 		 * 
-		 * This way, other parallel streams (using their own ForkJoinPool) will not be blocked by this one. 
+		 * This way, other parallel streams (using their own ForkJoinPool) will not be blocked by this one.
 		 * In other words, we would need a pool of ForkJoinPool in order to avoid this problem.
 		 * 
 		 * If a program is to be run inside a container, one must be very careful when using parallel streams.
-		 * Never use the default pool in such a situation unless you know for sure that the container can handle it. 
+		 * Never use the default pool in such a situation unless you know for sure that the container can handle it.
 		 * In a Java EE container, do not use parallel streams.
 		 */
 		try {
 			List<Integer> list = Arrays.asList(1, 2, 3, 4, 5);
-			Stream<Integer> listStream = list.parallelStream().map(/*this::veryLongProcessing*/ a -> a);
+			Stream<Integer> listStream = list.parallelStream().map(/* this::veryLongProcessing */ a -> a);
 			Callable<List<Integer>> task = () -> listStream.collect(Collectors.toList());
 			ForkJoinPool forkJoinPool = new ForkJoinPool(4);
 			List<Integer> newList = forkJoinPool.submit(task).get();

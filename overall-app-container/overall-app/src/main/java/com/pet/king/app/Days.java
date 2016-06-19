@@ -64,5 +64,7 @@ class EnumTester {
 		final Set<Days> dayAll = EnumSet.allOf(Days.class);
 
 		System.out.println("FlagEnum test, (value should be 6): " + (FlagEnum.STRONG.id | FlagEnum.MEGA.id));
+
+		boolean weekend = Days.MONDAY.isWeekend();
 	}
 }

@@ -51,7 +51,12 @@ import javax.xml.datatype.XMLGregorianCalendar;
 })
 public class Order {
 
-    @XmlElement(name = "CustomerID", required = true)
+    @Override
+	public String toString() {
+		return "Order [customerID=" + customerID + ", employeeID=" + employeeID + ", orderDate=" + orderDate + ", requiredDate=" + requiredDate + ", shipInfo=" + shipInfo + "]";
+	}
+
+	@XmlElement(name = "CustomerID", required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlSchemaType(name = "token")
     protected String customerID;

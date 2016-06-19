@@ -52,7 +52,12 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 })
 public class Address {
 
-    @XmlElement(name = "Address", required = true)
+    @Override
+	public String toString() {
+		return "Address [address=" + address + ", city=" + city + ", region=" + region + ", postalCode=" + postalCode + ", country=" + country + ", customerID=" + customerID + "]";
+	}
+
+	@XmlElement(name = "Address", required = true)
     protected String address;
     @XmlElement(name = "City", required = true)
     protected String city;

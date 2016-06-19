@@ -82,7 +82,12 @@ public class Root {
         return customers;
     }
 
-    /**
+    @Override
+	public String toString() {
+		return "Root [customers=" + customers + ", orders=" + orders + "]";
+	}
+
+	/**
      * Sets the value of the customers property.
      * 
      * @param value
