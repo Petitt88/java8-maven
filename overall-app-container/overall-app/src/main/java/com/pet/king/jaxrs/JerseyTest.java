@@ -49,7 +49,7 @@ public class JerseyTest {
 					.target("http://localhost:8080/overall-webapp")
 					.path("api/shop/2016?plusyear=20")
 					// .queryParam(name, values)
-					.register(JacksonFeature.class)
+					.register(JacksonFeature.class) // request is json, jackson is needed
 					.request(MediaType.APPLICATION_JSON)
 					// .header(name, value)
 					.get(YearDto.class);
@@ -75,7 +75,7 @@ public class JerseyTest {
 					.path("api/shop")
 					// .register(LoggingFilter.class)
 					// registers json support provided by Jackson
-					.register(JacksonFeature.class)
+					.register(JacksonFeature.class) // request and response are json, jackson is needed
 					.request(MediaType.APPLICATION_JSON)
 					.async()
 					.post(Entity.entity(person, MediaType.APPLICATION_JSON));
@@ -101,7 +101,7 @@ public class JerseyTest {
 					.newClient()
 					.target("http://localhost:8080/overall-webapp")
 					.path("api/shop")
-					.register(JacksonFeature.class)
+					.register(JacksonFeature.class) // request and response are json, jackson is needed
 					.request(MediaType.APPLICATION_JSON, MediaType.TEXT_HTML)
 					.post(Entity.entity(person, MediaType.APPLICATION_JSON));
 

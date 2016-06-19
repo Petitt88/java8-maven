@@ -23,6 +23,8 @@ public class JAXRSConfiguration extends Application {
 		
 		// Create JAX-RS application.
 		final Application application = new ResourceConfig()
+				// register jackson to enable json reqest consuming and response producing
+				// otherwise jersey is only capable of xml handling
 		        .packages("org.glassfish.jersey.examples.jackson")
 		        .register(JacksonFeature.class);
 	}
