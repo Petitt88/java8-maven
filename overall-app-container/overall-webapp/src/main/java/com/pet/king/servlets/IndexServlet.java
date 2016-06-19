@@ -15,12 +15,12 @@ import com.pet.king.services.MagicService;
 public class IndexServlet extends HttpServlet {
 
 	@Inject
-	private MagicService maagicService;
+	private MagicService magicService;
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-		if (this.maagicService == null)
+		if (this.magicService == null)
 			throw new IllegalStateException("magicService is null, CDI is not enabled!");
 
 		req.getRequestDispatcher("index.jsp").forward(req, resp);

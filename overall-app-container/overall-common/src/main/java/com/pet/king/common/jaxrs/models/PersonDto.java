@@ -25,10 +25,11 @@ public class PersonDto {
 	}
 
 	/*
-	 * Note that in this version, firstName and lastName are fields initialized via injection
-	 * and name and age are a resource class property. Constraint annotations on properties are specified in their corresponding getters.
+	 * Note that in this version, firstName and lastName are fields initialized via injection,
+	 * and name and age are a resource class properties. Constraint annotations on properties are specified on their corresponding getters.
+	 * Currently validation annotation are commented out because the com.pet.king.common.jaxrs.validation.PersonValidator takes care of validation.
 	 */
-	//@NotNull
+	// @NotNull
 	public Integer getAge() {
 		return age;
 	}
@@ -37,7 +38,7 @@ public class PersonDto {
 		this.age = age;
 	}
 
-	//@NotNull
+	// @NotNull
 	public String getName() {
 		return name;
 	}
@@ -50,5 +51,4 @@ public class PersonDto {
 	public String toString() {
 		return "PersonDto [age=" + age + ", name=" + name + ", id=" + id + "]";
 	}
-
 }

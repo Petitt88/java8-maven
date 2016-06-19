@@ -99,8 +99,8 @@
 	<build>
 		<finalName>overall-webapp</finalName>
 
-		<!-- Required by Eclipse, with this we can target Servlet 3.1 implementation -->
 		<plugins>
+			<!-- Required by Eclipse, with this we can target Servlet 3.1 implementation -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
