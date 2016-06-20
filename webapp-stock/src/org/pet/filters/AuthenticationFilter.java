@@ -20,8 +20,6 @@ import javax.servlet.http.HttpSession;
 @WebFilter(servletNames = { "car" }, initParams = { @WebInitParam(name = "max", value = "pex") })
 public class AuthenticationFilter implements Filter {
 
-	private ServletContext context;
-
 	@Override
 	public void destroy() {
 	}
@@ -31,11 +29,12 @@ public class AuthenticationFilter implements Filter {
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse res = (HttpServletResponse) response;
 
+		ServletContext context = req.getServletContext();
 		HttpSession session = req.getSession(false);
 
 		if (false) {
 			// logs to the server's logfile
-			this.context.log("Unauthorized access request");
+			context.log("Unauthorized access request");
 			res.sendRedirect("login.html");
 		} else {
 			// pass the request along the filter chain

@@ -12,7 +12,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 
-@WebFilter("/*")
+@WebFilter("/*") // this filter will get invoked on every request
 // @WebFilter("/car")
 public class LoggingFilter implements Filter {
 
