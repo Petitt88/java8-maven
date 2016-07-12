@@ -1,0 +1,278 @@
+@Component
+@Service
+@Repository
+@Controller
+@RestController
+@Scope
+@Bean
+
+@Valid
+@ModelAttribute
+@SessionAttributes("key") 
+@ResponseBody
+@RequestBody
+@PathParam
+@Value - specify default value on properties. Can be arbirtary string or expression e.g. "#{systemProperties.myProp}"
+
+@ControllerAdvice
+@ExceptionHandler
+@ResponseStatus
+
+FileCopyUtils
+
+
+org.springframework.beans.factory.Aware
+Sometimes we need Spring Framework objects in our beans to perform some operations, 
+for example reading ServletConfig and ServletContext parameters or to know the bean definitions loaded by the ApplicationContext. 
+That’s why spring framework provides a bunch of *Aware interfaces that we can implement in our bean classes.
+
+mvn -DskipTests=true clean install
+
+spring.factories: a file that contains auto-configuration classes for everything. These are only included when certain
+	conditions are met thanks to the @ConditionalOnClass annotation which is like the .NET #ifdef
+	
+https://github.com/spring-projects/spring-boot
+https://github.com/spring-projects/spring-boot/tree/master/spring-boot-autoconfigure
+	
+
+Spring:
+	- Dev tools: automatically restarts the server when any change happens to our source files (.java, .jsp)
+				 it is automatically disabled in production: when the app is started via the command line
+
+		- this is achieved by using 2 class loaders: 1 for the libs which never change
+													 1 for our source code which can change
+		- in case of a change the lib classloader remains intact, whereas the source-file classloader is recreated. This ensures performance.
+		
+	- Actuator: provides monitoring capabilities that can be reached via http endpoints or via JMX
+
+		- Endpoints Actuator endpoints allow you to monitor and interact with your application. 
+		  Spring Boot includes a number of built-in endpoints and you can also add your own. 
+		  For example the health endpoint provides basic application health information. 
+		  Run up a basic application and look at /health (and see /mappings for a list of other HTTP endpoints).
+
+		- Metrics Spring Boot Actuator includes a metrics service with “gauge” and “counter” support.
+		  A “gauge” records a single value; and a “counter” records a delta (an increment or decrement). 
+		  Metrics for all HTTP requests are automatically recorded, so if you hit the metrics endpoint should see a sensible response.
+
+		- Audit Spring Boot Actuator has a flexible audit framework that will publish events to an AuditService. 
+		  Once Spring Security is in play it automatically publishes authentication events by default. 
+		  This can be very useful for reporting, and also to implement a lock-out policy based on authentication failures.
+
+		- Process Monitoring In Spring Boot Actuator you can find ApplicationPidFileWriter which creates a file containing the 
+		  application PID (by default in the application directory with a file name of application.pid).
+		  
+		  
+		  
+JDBC:
+		// load the Driver Class
+		Class.forName(props.getProperty("DB_DRIVER_CLASS"));
+
+		// create the connection now
+		con = DriverManager.getConnection(props.getProperty("DB_URL"),
+				props.getProperty("DB_USERNAME"),
+				props.getProperty("DB_PASSWORD"));
+	
+	
+JDBC DataSource:
+	Most of the times we are looking for loose coupling for connectivity so that we can switch databases easily, 
+	connection pooling for transaction management and distributed systems support. JDBC DataSource is the preferred approach 
+	if you are looking for any of these features in your application. 
+	
+	
+Spring DataSoruce implementation: DriverManagerDataSource!
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+
+		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
+		<property name="url" value="jdbc:mysql://localhost:3306/TestDB" />
+		<property name="username" value="pankaj" />
+		<property name="password" value="pankaj123" />
+	</bean>
+	
+	But we still have to write a lot of boilerplate code: opening connection, statements, closing them, reading the resulet set in a for loop.
+	
+	
+Spring JdbcTemplate to the rescue:
+	All we need is to provide the arguments as Object array and implement Callback interfaces such as 
+	PreparedStatementSetter and RowMapper for mapping arguments or converting ResultSet data to bean objects.
+	
+	
+JPA: EntityManager
+Hibernate: Session
+
+
+@Lob @Basic(fetch = FetchType.LAZY)
+@Column(name="content", nullable=false)
+private byte[] content;
+ 
+We have chosen a byte[] to store the content of file. @LobSpecifies that a this persistent property should be persisted as a 
+large object to a database-supported large object type which in our case is longblob. 
+@Basic annotation is an optional annotation, serving here as placeholder to instruct hibernate to lazy load the binary content.
+
+
+Hibernate SQLQuery: not recommended because we loose benefits of 1st level cache
+
+session.save() 				- saves changes to db (insert or update)) but does not add entity to persistent context: doesn't track entity
+							  and further changes at transaction commit won't get saved. 
+							  Works without transaction.
+
+session.saveOrUpdates() 	- adds the entity object to persistent context and track any further changes. 
+							  Any further changes are saved at the time of committing transaction, like persist.
+							  Works without transaction.
+
+session.persis()			- Hibernate persist is similar to save (with transaction) and it adds the entity object to the persistent context, 
+							  so any further changes are tracked. If the object properties are changed before the transaction is committed or 
+							  session is flushed, it will also be saved into database.
+							  Second difference is that we can use persist() method only within the boundary of a transaction, 
+							  so it’s safe and takes care of any cascaded objects.
+							  
+session.update()			- Hibernate update should be used where we know that we are only updating the entity information. 
+							  This operation adds the entity object to persistent context and further changes are tracked and saved when 
+							  transaction is committed.
+							  
+session.merge()				- Hibernate merge can be used to update existing values, however this method create a copy from the passed entity object
+							  and return it. The returned object is part of persistent context and tracked for any changes, 
+							  passed object is not tracked. This is the major difference with merge() from all other methods. 
+							  
+
+							  
+SessionFactory (org.hibernate.SessionFactory): 						SessionFactory is an immutable thread-safe cache of compiled mappings for a 
+																	single database. We can get instance of org.hibernate.Session using SessionFactory.
+																	
+Session (org.hibernate.Session): 									Session is a single-threaded, short-lived object representing a conversation 
+																	between the application and the persistent store. 
+																	It wraps JDBC java.sql.Connection and works as a factory for 
+																	org.hibernate.Transaction.
+																	
+ConnectionProvider (org.hibernate.connection.ConnectionProvider): 	ConnectionProvider is a factory for JDBC connections. It provides abstraction 
+																	between the application and underlying javax.sql.DataSource or 
+																	java.sql.DriverManager. It is not exposed to application, but it can be 
+																	extended by the developer.
+
+TransactionFactory (org.hibernate.TransactionFactory): 				A factory for org.hibernate.Transaction instances.
+
+In its default configuration, the Spring Framework’s transaction infrastructure code only marks a transaction for rollback in the case of runtime,
+unchecked exceptions; that is, when the thrown exception is an instance or subclass of RuntimeException. 
+(Errors will also - by default - result in a rollback). 
+Checked exceptions that are thrown from a transactional method do not result in rollback in the default configuration.
+
+@Transactional: must be applied on public methods to get weaved. Also, only works when invoking the object outside of it - means that invoking 
+				another public method from the invoked public method that has @Transactional would take no effect either
+
+Normally both JPA and Hibernate require an xml config (persistence.xml, hibernate.cfg.xml), but with Spring these can be omitted.
+(Spring scans the package and packages down for @Entity classes.)
+
+@Entity --> @Respository (Dao) --> @Service --> @Controller/@Restcontroller
+
+
+------------------------------------------------
+Spring MVC:
+------------------------------------------------
+
+The WebMvcConfigurerAdapter is for configuring Spring MVC, the replacement of the xml file loaded by the 
+DispatcherServlet for configuring Spring MVC. The WebMvcConfigurerAdapter should be used for a @Configuration class.
+@EnableWebMvc //<mvc:annotation-driven />
+@Configuration
+@ComponentScan({ "com.mkyong.helloworld.web" })
+public class SpringWebConfig extends WebMvcConfigurerAdapter
+
+AbstractAnnotationConfigDispatcherServletInitializer (ServletInitializer) is the replacement of web.xml. Initializes the servlet container.
+public class MyWebInitializer extends
+		AbstractAnnotationConfigDispatcherServletInitializer {
+
+	@Override
+	protected Class<?>[] getRootConfigClasses() {
+		return new Class[] { SpringRootConfig.class };
+	}
+
+	@Override
+	protected Class<?>[] getServletConfigClasses() {
+		return new Class[] { SpringWebConfig.class };
+	}
+
+	@Override
+	protected String[] getServletMappings() {
+		return new String[] { "/" };
+	}
+}
+
+
+WebDataBinder binds custom validators.
+To do this, we create a method in controller and annotate it with @InitBinder which plays the role to identify WebDataBinder method in our controller.
+
+
+Controller:
+
+// this is used to add stuff to spring's model and it ultimately goes into the HttpServletRequest object after the handler executes
+@ModelAttribute("myRequestObject")
+public MyCommandBean addStuffToRequestScope() {
+	System.out.println("Inside of addStuffToRequestScope");
+	MyCommandBean bean = new MyCommandBean("Hello World",42);
+	return bean;
+}
+
+@SessionAttributes("key") - adds the value from the ModelMap that belongs to the specified key to the HttpSession object after the handler executes
+
+@Valid asks spring to validate the associated object(Employee). 
+BindingResult contains the outcome of this validation and any error that might have occurred during this validation. 
+Notice that BindingResult must come right after the validated object else spring won’t be able to validate and an exception been thrown.
+Custom errors can be added to the BindingResult: bindingResult.addError(new FieldError(...));
+
+
+
+
+--------------------------------------
+Microservices
+--------------------------------------
+
+Config service: just a super lightweight service that is used to centralize the configuration data
+
+
+
+--------------------------------------
+Eclipse multi maven project with Spring, TDPraktiker
+--------------------------------------
+1. workspace resolution works, eclipse sees, maven also sees the dependencies being in the same workspace: 
+2. install the dependency into  the local repo with "mvn install" --> update the consumer project via "maven update" then voila, works!
+
+TDPraktiker: parentPom/pom.xml: only for jenkins build
+
+ServletInitializer: necessary in order for Spring to generate web.xml (project is dynamic webproject and packaging is war - app is deployed to an existing serverlet container)
+					Without this the war is either not generated or not works at all (not sure what Gabor said)
+					however probably this can be omitted by using "AbstractAnnotationConfigDispatcherServletInitializer" as demonstrated above
+					
+					
+					
+--------------------------------------
+Spring Security
+--------------------------------------
+
+.formLogin() - injects a Filter to the FilterChain pipeline
+			 - invoked only when url is "loginProcessingUrl()"
+			 - default authenticationProvider is used which uses basic authentication - can be replaced with inMemory, jdbc, or custom
+
+@Autowired
+public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+	// in memory
+	auth.inMemoryAuthentication().withUser("user").password("user");
+
+	// jdbc
+	auth.jdbcAuthentication().dataSource(dataSource)
+			.usersByUsernameQuery("select username,password, enabled from users where username=?")
+			.authoritiesByUsernameQuery("select username, role from user_roles where username=?");
+
+	// custom
+	auth.authenticationProvider(authenticationProvider);
+}
+
+public class CustomAuthenticationProvider implements AuthenticationProvider { ... }
+
+
+--------------------------------------
+Spring Session
+--------------------------------------
+
+Redis can be used by:
+@Configuration
+@EnableRedisHttpSession(maxInactiveIntervalInSeconds=7200)
+public class HttpSessionConfig {
+}
