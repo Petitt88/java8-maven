@@ -77,6 +77,11 @@ Say, for example, we had a Mojo that performed a query against a particular URL,
 https://maven.apache.org/guides/mini/guide-configuring-plugins.html
 
 
+How do you know Jackson 2 is on the classpath? 
+Either run `mvn dependency:tree` or ./gradlew dependencies and you’ll get a detailed tree of dependencies which shows Jackson 2.x. 
+You can also see that it comes from spring-boot-starter-web.
+
+
 
 **********Tomcat**********
 
