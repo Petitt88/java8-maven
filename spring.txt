@@ -7,8 +7,8 @@
 @Bean
 
 @Valid
-@ModelAttribute
-@SessionAttributes("key") 
+@ModelAttribute - this is used to add stuff to spring's model and it ultimately goes into the HttpServletRequest object after the handler executes
+@SessionAttributes("key") - adds the value from the ModelMap that belongs to the specified key to the HttpSession object after the handler executes
 @ResponseBody
 @RequestBody
 @PathParam
@@ -115,11 +115,11 @@ session.save() 				- saves changes to db (insert or update)) but does not add en
 							  and further changes at transaction commit won't get saved. 
 							  Works without transaction.
 
-session.saveOrUpdates() 	- adds the entity object to persistent context and track any further changes. 
+session.saveOrUpdate() 		- adds the entity object to persistent context and track any further changes. 
 							  Any further changes are saved at the time of committing transaction, like persist.
 							  Works without transaction.
 
-session.persis()			- Hibernate persist is similar to save (with transaction) and it adds the entity object to the persistent context, 
+session.persist()			- Hibernate persist is similar to save (with transaction) and it adds the entity object to the persistent context, 
 							  so any further changes are tracked. If the object properties are changed before the transaction is committed or 
 							  session is flushed, it will also be saved into database.
 							  Second difference is that we can use persist() method only within the boundary of a transaction, 
@@ -159,7 +159,7 @@ Checked exceptions that are thrown from a transactional method do not result in 
 				another public method from the invoked public method that has @Transactional would take no effect either
 
 Normally both JPA and Hibernate require an xml config (persistence.xml, hibernate.cfg.xml), but with Spring these can be omitted.
-(Spring scans the package and packages down for @Entity classes.)
+(Spring scans the package and packages down for @Entity classes.) @EnableJpaRepositories("com.acme.repositories")
 
 @Entity --> @Respository (Dao) --> @Service --> @Controller/@Restcontroller
 
@@ -210,21 +210,10 @@ public MyCommandBean addStuffToRequestScope() {
 	return bean;
 }
 
-@SessionAttributes("key") - adds the value from the ModelMap that belongs to the specified key to the HttpSession object after the handler executes
-
 @Valid asks spring to validate the associated object(Employee). 
 BindingResult contains the outcome of this validation and any error that might have occurred during this validation. 
 Notice that BindingResult must come right after the validated object else spring won’t be able to validate and an exception been thrown.
 Custom errors can be added to the BindingResult: bindingResult.addError(new FieldError(...));
-
-
-
-
---------------------------------------
-Microservices
---------------------------------------
-
-Config service: just a super lightweight service that is used to centralize the configuration data
 
 
 
@@ -246,6 +235,9 @@ ServletInitializer: necessary in order for Spring to generate web.xml (project i
 Spring Security
 --------------------------------------
 
+When security is only the classpath, all endpoints by default requires basic authentitcation (including the static resource files).
+CSRF protection is enabled by default.
+
 .formLogin() - injects a Filter to the FilterChain pipeline
 			 - invoked only when url is "loginProcessingUrl()"
 			 - default authenticationProvider is used which uses basic authentication - can be replaced with inMemory, jdbc, or custom
@@ -266,13 +258,422 @@ public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception 
 
 public class CustomAuthenticationProvider implements AuthenticationProvider { ... }
 
+HttpServletRequest.login(String,String) - to programatically log the user in
+HttpServletRequest.logout() - for logout
+
+Annotation based security: @EnableGlobalMethodSecurity
+
+f you’ve used Spring Security before, you’ll know that the framework maintains a chain of filters in order to apply its services. 
+You may want to add your own filters to the stack at particular locations or use a Spring Security filter for 
+which there isn’t currently a namespace configuration option.
+
+
+UsernamePasswordAuthenticationFilter: this reads the "username" and "password" from the request and uses the AuthenticationManager
+	to authenticate the request.
+	
+SecurityContextPersistenceFilter: stores the SecurityContext (user info) into the HttpSession
+	
+UserDetailsService: can be optionally overridden and provide a custom userDetails implementation (reach the db for instance)
+GrantedAuthority: UserDetailsService provides them, usually they are roles
+
+	
+What we need for authentication:
+	- Csrf filter
+	- UsernamePasswordAuthenticationFilter - or a custom filter that reads the credentials and invokes AuthenticationManager.authenticate
+	- custom AuthenticationProvider
+	
+SecurityContextRepository: its job is to store the SecurityContext. The default ones stores it in the HttpSession as an attribute.
+
+We can use a custom filter chain by @Bean FilterChainProxy getFilterChain() {...}
+	There are 3 mandatory security filters that must be included: SecurityContextPersistenceFilter, ExceptionTranslationFilter, FilterSecurityInterceptor
+	
+To use a custom FilterChainProxy:
+	@Bean(name = "springSecurityFilterChain")
+	public FilterChainProxy getFilterChainProxy() {
+		SecurityFilterChain chain = new SecurityFilterChain() {
+
+			@Override
+			public boolean matches(HttpServletRequest request) {
+				// All goes through here
+				return true;
+			}
+
+			@Override
+			public List<Filter> getFilters() {
+				List<Filter> filters = new ArrayList<Filter>();
+
+				filters.add(getCookieAuthenticationFilter());
+				filters.add(getLogoutFilter());
+				filters.add(getUserNamePasswordAuthenticationFilter());
+				filters.add(getSecurityContextHolderAwareRequestFilter());
+				filters.add(getAnonymousAuthenticationFilter());
+				filters.add(getExceptionTranslationFilter());
+				filters.add(getFilterSecurityInterceptor());
+
+				return filters;
+			}
+		};
+    
+		return new FilterChainProxy(chain);
+	}
+	
+Spring Security’s web infrastructure is based entirely on standard servlet filters. 
+It doesn’t use servlets or any other servlet-based frameworks (such as Spring MVC) internally, so it has no strong links 
+to any particular web technology.
+Spring Security maintains a filter chain internally where each of the filters has a particular responsibility 
+and filters are added or removed from the configuration depending on which services are required.
 
 --------------------------------------
 Spring Session
 --------------------------------------
 
+Overrdies the default session provided by the servlet container. We can use Gemfire, Redis, Jdbc, MongoDB transparently to store the session.
+
+We have already mentioned that Spring Session provides transparent integration with HttpSession, but what benefits do we get out of this?
+	Clustered Sessions - Spring Session makes it trivial to support clustered sessions without being tied to an application container 
+					     specific solution.
+						 
+	Multiple Browser Sessions - Spring Session supports managing multiple users' sessions in a single browser instance 
+								(i.e. multiple authenticated accounts similar to Google).
+
+	RESTful APIs - Spring Session allows providing session ids in headers to work with RESTful APIs
+	
+
 Redis can be used by:
 @Configuration
 @EnableRedisHttpSession(maxInactiveIntervalInSeconds=7200)
 public class HttpSessionConfig {
+	@Bean
+    public JedisConnectionFactory connectionFactory() {
+		return new JedisConnectionFactory(); 
+    }
 }
+
+
+JSESSIONID: this is the cookie that hold the id of the user's session
+
+
+--------------------------------------
+Spring Cloud, Microservices
+--------------------------------------
+
+
+Config service: just a super lightweight service that is used to centralize the configuration data 
+	Scenario is that I have multiple microservices and do not want to store config one by one for each service, rather I would store them in a 
+	central config server.
+	
+	@EanbleConfigServer
+	application.properties: spring.cloud.config.server.git.uri=${HOME}/Desktop/config <-- in this folder resides the configs for the various microservices	
+							server.port=8888
+
+Service registry: (Eureka for example)
+				  It is like a phonebook for the cloud.
+				  Just a registry the regisers microservices and enables client side loadbalancing.
+	
+	<dependency>
+		<groupId>org.springframework.cloud</groupId>
+		<artifactId>spring-could-starter-config</artifactId>
+	</dependency>
+	
+	@EnableEurekaServer
+	
+	bootstrap.properties: spring.application.name=eureka-service
+						  spring.cloud.config.uri=http://localhost:8888	<-- config is from the config server
+						  
+	Start the service and visit it in the browser: you'll see a nice console window.
+						  
+MicroService:
+
+	1. config comes from the config server
+	<dependency>
+		<groupId>org.springframework.cloud</groupId>
+		<artifactId>spring-could-starter-config</artifactId>
+	</dependency>
+
+	bootstrap.properties: string.application.name=reservation-service
+						  spring.cloud.config.uri=http://localhost:8888
+
+	2. teach this service to talk to Eureka
+	<dependency>
+		<groupId>org.springframework.cloud</groupId>
+		<artifactId>spring-could-starter-eureka</artifactId>
+	</dependency>
+
+	@EnableDiscoveryClient - now service will get registered in Eureka
+						   - going to Eureka's console will display the this service ("reservation-service", comes from the bootstrap.properties)
+						   
+						   
+Edge service: there are two types:
+				1. Micro proxy: bindlys forward packages outside to the datacenter inside the loadbalancer
+				2. API gateway: transforms the request to the services behind the loadbalancer
+				
+	<dependency>
+		<groupId>org.springframework.cloud</groupId>
+		<artifactId>spring-could-starter-config</artifactId>
+	</dependency>
+				
+	1. Micro proxy: Eureka discovery, Config client, Hystrix (for circuit breakers), Zuul (for micro proxy), Stream Redis, Zipkin (distributed tracing)
+	
+		@EnableDiscoveryClient
+		@EnableZuulProxy - blindly forward the requests from the edge service into the service that we reference in the request's url
+			localhost:9999/reservation-service/reservations: {edge-service}/{serviceId as registered in the service registry}/{url in the referenced service}
+		
+		bootstrap.properties: sptring.application.name=reservation-client
+								spring.cloud.config.uri=http://localhost:8888	<-- config is from the config server
+								
+	2. Api gateway: at this point same the Micro proxy: to test, localhost:9999/reservations/name
+		
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-hateoas</artifactId>
+		</dependency>
+		
+		Hystrix: allows us to specify a fallback path if the microserve request goes wrong
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-boot-starter-hystrix</artifactId>
+		</dependency>
+		@EnableCircuitBreaker
+		
+		@RestController
+		@RequestMapping("/reservations")
+		public class ReservationApiGatewayController {
+
+			@Autowired
+			private RestTemplate restTemplate;
+
+			public Collection<String> getReservationNamesFallback() {
+				return new ArrayList<>();
+			}
+
+			@HystrixCommand(fallbackMethod = "getReservationNamesFallback")
+			@RequestMapping(method = RequestMethod.GET, value = "/names")
+			public Collection<String> getReservationNames() {
+
+				ParameterizedTypeReference<Resources<Reservation>> ptr = new ParameterizedTypeReference<Resources<Reservation>>() {};
+
+				// "reservation-service" indentifies the microservice we are to call
+				// this works if there is 1 service instance or there are multiple instances
+				// however it blows chunks of there is no service, that is why the fallbackMethod specified
+				ResponseEntity<Resources<Reservation>> entity = this.restTemplate.exchange("http://reservation-service/reservations", ptr);
+		
+				return entity
+					.getBody()
+					.getContent()
+					.stream()
+					.map(Reservation::getReservationName)
+					.collapseInCollections(Collectors.toList()));
+			}
+		}
+		
+		When the url gets executed it 
+			1. grabs the serviceId (reservation-service)
+			2. goes to the service registry
+			3. gets all registered instances of reservation-service services from the registry
+			4. invokes one instance via Ribbon (which is a round-robin load-balander, each instance has the same chance to get invoked)
+	
+	
+	This is good for reading, however for writing which requires synchronization is not good.
+	We could use distributed transations but Josh Long urges us not to, it just slows down aggregate system.
+	Instead use messaging: forward to the service on a message bus: job is put into a queue (buffer) and eventually gets picked up by the service.
+	
+	
+	Spring cloud stream: a way of describing messaging based services and compose them outside of the actual code.
+	
+	2.1. continuing the Api gateway: the sender, producer - reservation-client
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-could-starter-stream-redis</artifactId>
+		</dependency>
+		Redis is just one implmenation, we could use "Rabbit and queue" or whatever
+		
+		@EanbleBinding(Source.class) - this enables spring cloud stream, this is the producer
+		
+		@RestController
+		@RequestMapping("/reservations")
+		public class ReservationApiGatewayController {
+		
+			@Autowired
+			private Source source;
+
+			@RequestMapping(method = RequestMethod.POST)
+			public void writeReservation(@RequestBody Reservation r) {
+				Message<String> msg = MessageBuilder<T>.withPayload(r.getReservationName())build();
+				this.source.output().send(msg;)
+			}
+			
+			...
+		}
+		
+		where the request is sent is in the configuration: reservation-client: spring.cloud.stream.bindings.ouput: "reservations"
+														   reservation-service: spring.cloud.stream.bindings.input: "reservations"
+														   
+														   
+	2.2 the consumer, reservation-service
+	
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-could-starter-stream-redis</artifactId>
+		</dependency>
+		
+		@EanbleBinding(Sink.class)
+		@IntegrationComponentScan - using Spring Integration
+		
+		@MessageEndpoint
+		class ReservationProcessor {
+		
+			@ServiceActivator(inputChannel = Sink.INPUT)
+			public void acceptNewReservations(String rn) {
+				this.reservationRepository.save(new Reservation(rn));
+			}
+		}
+		
+
+Hystrix dashboard, H2 console - good stuff, start.spring.io starters
+Spring cloud handles Single Sign on, Oath2 is dead simple
+
+
+********************************
+Spring IO
+********************************
+
+Spring IO Platform brings together the core Spring APIs into a cohesive platform for modern applications. 
+It provides versions of numerous projects in the Spring portfolio along with their dependencies that are tested and known to work together.
+
+Overriding a version using maven
+	<properties>
+		<foo.version>1.1.0.RELEASE</foo.version>
+	</properties>
+	
+	
+	
+********************************
+Spring Data
+********************************
+
+The goal of Spring Data repository abstraction is to significantly reduce the amount of boilerplate code required to implement data 
+access layers for various persistence stores.
+
+Auditing: 
+	We provide @CreatedBy, @LastModifiedBy to capture the user who created or modified the entity as well as 
+	@CreatedDate and @LastModifiedDate to capture the point in time this happened.
+	
+	@Entity
+	@EntityListeners(AuditingEntityListener.class)
+	public class MyEntity { }
+	
+	interface UserRepository extends Repository<User, Long> {
+		// Redeclaration of a CRUD method
+		@Lock(LockModeType.READ);
+		List<User> findAll();
+	}
+	
+
+	
+Autogenerate sqls: CrudRepository, PagingAndSortingRepository
+
+Async query results: @Async
+					 CompletableFuture<User> findOneByFirstname(String firstname)
+					 
+Adding custom behavior to all repositories
+	@NoRepositoryBean
+	public interface MyRepository<T, ID extends Serializable>
+		extends PagingAndSortingRepository<T, ID> {
+
+		void sharedCustomMethod(ID id);
+	}
+	
+	public class MyRepositoryImpl<T, ID extends Serializable> extends SimpleJpaRepository<T, ID> implements MyRepository<T, ID> {
+
+		private final EntityManager entityManager;
+
+		public MyRepositoryImpl(JpaEntityInformation entityInformation, EntityManager entityManager) {
+			super(entityInformation, entityManager);
+
+			// Keep the EntityManager around to used from the newly introduced methods.
+			this.entityManager = entityManager;
+		}
+
+		public void sharedCustomMethod(ID id) {
+			// implementation goes here
+		}
+	}
+	
+	
+The results of query methods can be processed incrementally by using a Java 8 Stream<T> as return type. 
+Instead of simply wrapping the query results in a Stream data store specific methods are used to perform the streaming.	
+	@Query("select u from User u")
+	Stream<User> findAllByCustomQueryAndStream();
+	
+	Stream<User> readAllByFirstnameNotNull();
+	
+	
+@Query("select u from User u where u.firstname = :firstname or u.lastname = :lastname")
+User findByLastnameOrFirstname(@Param("lastname") String lastname, @Param("firstname") String firstname);
+								 
+@Query(value = "SELECT * FROM USERS WHERE LASTNAME = ?1",
+	   countQuery = "SELECT count(*) FROM USERS WHERE LASTNAME = ?1",
+       nativeQuery = true)
+Page<User> findByLastname(String lastname, Pageable pageable);
+
+
+	
+********************************
+Spring Data Rest - good for integration: consumer can easily discover our API - HATEOAS
+********************************
+
+HATEOAS (Hypermedia as the Engine of Application State) is a constraint of the REST application architecture.
+
+A hypermedia-driven site provides information to navigate the site's REST interfaces dynamically by 
+including hypermedia links with the responses. This capability differs from that of SOA-based systems and WSDL-driven interfaces. 
+With SOA, servers and clients usually must access a fixed specification that might be staged somewhere else on the website, on another website, 
+or perhaps distributed by email.
+
+A core principle of HATEOAS is that resources should be discoverable through the publication of links that point to the available resources. 
+There are a few competing de-facto standards of how to represent links in JSON. By default, 
+Spring Data REST uses HAL to render responses. HAL defines links to be contained in a property of the returned document.
+
+
+Spring Data REST officially supports: Spring Data Jpa, Spring Data MongoDB, GemFire, Cassandra, Neo4j
+
+public interface OrderRepository extends CrudRepository<Order, Long> { }. For this repository, Spring Data REST exposes a collection resource at /orders.
+
+curl -v http://localhost:8080/
+
+	< HTTP/1.1 200 OK
+	< Content-Type: application/hal+json
+
+	{ "_links" : {
+		"orders" : {
+		"href" : "http://localhost:8080/orders"
+		},
+		"profile" : {
+		"href" : "http://localhost:8080/api/alps"
+		}
+	  }
+	}
+
+
+
+********************************
+Streaming http requests
+********************************
+
+Return RxJava Observable
+
+
+class Convert<M, R> {
+
+	public R convert(M model, Class<R> aClass) {
+		R result;
+		try {
+			result = aClass.newInstance();
+			org.springframework.beans.BeanUtils.copyProperties(model, result);
+			return result;
+		} catch (InstantiationException | IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+}
+		

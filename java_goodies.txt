@@ -78,7 +78,7 @@ https://maven.apache.org/guides/mini/guide-configuring-plugins.html
 
 
 How do you know Jackson 2 is on the classpath? 
-Either run `mvn dependency:tree` or ./gradlew dependencies and you’ll get a detailed tree of dependencies which shows Jackson 2.x. 
+Either run `mvn dependency:tree` or ./gradlew dependencies and you'll get a detailed tree of dependencies which shows Jackson 2.x. 
 You can also see that it comes from spring-boot-starter-web.
 
 
@@ -177,15 +177,37 @@ List<SomeClass> newList = forkJoinPool.submit(task).get();
 
 
 
+********Java generics*********
+At runtime java forgets its generic information for instance variables. But it retains that information for subclasses!
+
+List<String> x = new ArrayList<>(); - type information gets lost!
+	List<String> x = new ArrayList<>();
+	Class<? extends List> clazz = x.getClass();
+	ParameterizedType type = (ParameterizedType) clazz.getGenericSuperclass();
+	String name = type.getTypeName();
+	System.out.println(name);	// prints out java.util.AbstractList<E>...
+
+List<String> x = new ArrayList<String>() {}; - type information is retained due to we create a generic anonymous subclass of List<String> with to overrides!
+	List<String> x = new ArrayList<String>() {};
+	Class<? extends List> clazz = x.getClass();
+	ParameterizedType type = (ParameterizedType) clazz.getGenericSuperclass();
+	String name = type.getTypeName();
+	System.out.println(name);	// prints out String!
+	
+	This is called the "Type token pattern" - the Spring implementation is ParameterizedTypeReference<T>
+
+
+
+
 **********TODO**********
 
 1. read more JSP resources:
-	- apache tiles
+	- apache tiles	- check
 
-2. JAX-RS, JAX-WS (both with and without Maven)
+2. JAX-RS, JAX-WS (both with and without Maven) - check
 
-3. JDBC, JPA, Hibernate, EclipseLink examples
+3. JDBC, JPA, Hibernate, EclipseLink examples - check
 
-4. Spring
+4. Spring - check
 
 5. Unit test, jUnit, Mockito
