@@ -17,7 +17,17 @@
 	</modules>
 
 	<build>
-		<!-- pluginManagement, so that all modules inherit the settings from here -->
+		<!-- pluginManagement. This is like dependencyManagement, we specify plugin configurations here. Only here.
+		 	Then the module that wants to use a like have to only reference it. Like this: 
+		 	(though any module can override the configurations specified here)
+		 	
+		 	<plugins>
+    			<plugin>
+        			<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+    			</plugin>
+			</plugins>
+		 -->
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -47,8 +57,8 @@
 		</plugins>
 	</build>
 
-	<!-- modules inherit these dependencies though they still need to specify 
-		the deps, but only the groupId and artifactId -->
+	<!-- the dependencies that the modules can use. Versions are managed here. The module if requires a dependency it only needs 
+		to specify the groupId and artifactId. So this acts as sort of a dependency pool. From this pool the modules can declare what they want. -->
 	<dependencyManagement>
 		<dependencies>
 

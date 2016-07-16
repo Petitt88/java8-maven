@@ -108,8 +108,23 @@ We have chosen a byte[] to store the content of file. @LobSpecifies that a this 
 large object to a database-supported large object type which in our case is longblob. 
 @Basic annotation is an optional annotation, serving here as placeholder to instruct hibernate to lazy load the binary content.
 
+Java's transient keyword is used to denote that a field is not to be serialized, whereas JPA's @Transient 
+annotation is used to indicate that a field is not to be persisted in the database, i.e. their semantics are different.
 
 Hibernate SQLQuery: not recommended because we loose benefits of 1st level cache
+
+1st level cache: - at the Session level
+				 - enabled by default
+				 - for the current user
+2nd level cache: - at the JVM level, Session Factory object --> concurrency is a problem
+				 - for all users
+				 - disabled by default
+					- can enable globally (not recommended)
+					- only for certain entities, collections
+					- configurable at the Session level with CacheMode
+				 - cache all properties (default) or only non-lazy
+Query cache: - good for repetitive queries with identical params
+			 - if used, best in conjunection with 2LC
 
 session.save() 				- saves changes to db (insert or update)) but does not add entity to persistent context: doesn't track entity
 							  and further changes at transaction commit won't get saved. 
@@ -156,7 +171,8 @@ unchecked exceptions; that is, when the thrown exception is an instance or subcl
 Checked exceptions that are thrown from a transactional method do not result in rollback in the default configuration.
 
 @Transactional: must be applied on public methods to get weaved. Also, only works when invoking the object outside of it - means that invoking 
-				another public method from the invoked public method that has @Transactional would take no effect either
+				another public method from the invoked public method that has @Transactional would take no effect either.
+				Rolled back automatically only if unchecked RuntimeException is thrown (checked exceptions does not make the transaction rollback)
 
 Normally both JPA and Hibernate require an xml config (persistence.xml, hibernate.cfg.xml), but with Spring these can be omitted.
 (Spring scans the package and packages down for @Entity classes.) @EnableJpaRepositories("com.acme.repositories")
@@ -209,6 +225,20 @@ public MyCommandBean addStuffToRequestScope() {
 	MyCommandBean bean = new MyCommandBean("Hello World",42);
 	return bean;
 }
+	
+	@ModelAttribute refers to a property of the Model object (the M in MVC ;) so let's say we have a form with a form backing object that is called "Person" 
+	Then you can have Spring MVC supply this object to a Controller method by using the @ModelAttribute annotation:
+
+	public String processForm(@ModelAttribute("person") Person person){
+		person.getStuff();
+	}
+	Check here for an example (Spring 2.5), also see "Using @ModelAttribute on a method argument" (Spring 3.1).
+
+	On the other hand the annotation is used to define objects which should be part of a Model. So if you want to have a Person object referenced in the Model you can use the following method:
+	@ModelAttribute("person")
+	public Person getPerson(){
+		return new Person();
+	}
 
 @Valid asks spring to validate the associated object(Employee). 
 BindingResult contains the outcome of this validation and any error that might have occurred during this validation. 
@@ -356,6 +386,14 @@ JSESSIONID: this is the cookie that hold the id of the user's session
 --------------------------------------
 Spring Cloud, Microservices
 --------------------------------------
+
+Eureka, ZooKeeper: service registry and provide network discovery (prefer to use eureka since it is more resilient to failures)
+Hystrix: fallback methods in case of failures - on the edge service, microservices
+Microservice: invoked by the edge service, and they can invoke each other (hystrix needed if invoking other services for the best user experience - avoid showing stacktraces)
+Zuul: egde service implementation: micro proxy, api gateway
+Actuator: monitoring capabilities via jmx and rest api (use with the config server)
+Config server: central store for configurations of the participants of the system
+Hystrix dashboard, Turbine: use for health monitoring
 
 
 Config service: just a super lightweight service that is used to centralize the configuration data 
@@ -652,6 +690,19 @@ curl -v http://localhost:8080/
 		}
 	  }
 	}
+
+
+	
+********************************
+Spring Framework
+********************************
+
+Dependency Injection:
+	@PostConstruct
+	@PreDestroy
+
+
+
 
 
 
