@@ -18,6 +18,8 @@
 @ExceptionHandler
 @ResponseStatus
 
+@Lazy - lazily initialze beans
+
 FileCopyUtils
 
 
@@ -36,12 +38,12 @@ https://github.com/spring-projects/spring-boot/tree/master/spring-boot-autoconfi
 	
 
 Spring:
-	- Dev tools: automatically restarts the server when any change happens to our source files (.java, .jsp)
-				 it is automatically disabled in production: when the app is started via the command line
+	- Dev tools: automatically restarts the server when any change happens to our source files (.java, .jsp) on the local classpath.
+				 It is automatically disabled in production: when the app is started via the command line.
 
-		- this is achieved by using 2 class loaders: 1 for the libs which never change
+		- this is achieved by using 2 class loaders: 1 for the libs, maven dependencies which never change
 													 1 for our source code which can change
-		- in case of a change the lib classloader remains intact, whereas the source-file classloader is recreated. This ensures performance.
+		- in case of a change the lib classloader remains intact, whereas the source-file classloader is recreated. This ensures performance in a microservice world.
 		
 	- Actuator: provides monitoring capabilities that can be reached via http endpoints or via JMX
 
@@ -180,9 +182,9 @@ Normally both JPA and Hibernate require an xml config (persistence.xml, hibernat
 @Entity --> @Respository (Dao) --> @Service --> @Controller/@Restcontroller
 
 
-------------------------------------------------
+********************************
 Spring MVC:
-------------------------------------------------
+********************************
 
 The WebMvcConfigurerAdapter is for configuring Spring MVC, the replacement of the xml file loaded by the 
 DispatcherServlet for configuring Spring MVC. The WebMvcConfigurerAdapter should be used for a @Configuration class.
@@ -243,27 +245,12 @@ public MyCommandBean addStuffToRequestScope() {
 @Valid asks spring to validate the associated object(Employee). 
 BindingResult contains the outcome of this validation and any error that might have occurred during this validation. 
 Notice that BindingResult must come right after the validated object else spring won’t be able to validate and an exception been thrown.
-Custom errors can be added to the BindingResult: bindingResult.addError(new FieldError(...));
-
-
-
---------------------------------------
-Eclipse multi maven project with Spring, TDPraktiker
---------------------------------------
-1. workspace resolution works, eclipse sees, maven also sees the dependencies being in the same workspace: 
-2. install the dependency into  the local repo with "mvn install" --> update the consumer project via "maven update" then voila, works!
-
-TDPraktiker: parentPom/pom.xml: only for jenkins build
-
-ServletInitializer: necessary in order for Spring to generate web.xml (project is dynamic webproject and packaging is war - app is deployed to an existing serverlet container)
-					Without this the war is either not generated or not works at all (not sure what Gabor said)
-					however probably this can be omitted by using "AbstractAnnotationConfigDispatcherServletInitializer" as demonstrated above
+Custom errors can be added to the BindingResult: bindingResult.addError(new FieldError(...));					
 					
 					
-					
---------------------------------------
+********************************
 Spring Security
---------------------------------------
+********************************
 
 When security is only the classpath, all endpoints by default requires basic authentitcation (including the static resource files).
 CSRF protection is enabled by default.
@@ -353,9 +340,10 @@ to any particular web technology.
 Spring Security maintains a filter chain internally where each of the filters has a particular responsibility 
 and filters are added or removed from the configuration depending on which services are required.
 
---------------------------------------
+
+********************************
 Spring Session
---------------------------------------
+********************************
 
 Overrdies the default session provided by the servlet container. We can use Gemfire, Redis, Jdbc, MongoDB transparently to store the session.
 
@@ -383,9 +371,9 @@ public class HttpSessionConfig {
 JSESSIONID: this is the cookie that hold the id of the user's session
 
 
---------------------------------------
+********************************
 Spring Cloud, Microservices
---------------------------------------
+********************************
 
 Eureka, ZooKeeper: service registry and provide network discovery (prefer to use eureka since it is more resilient to failures)
 Hystrix: fallback methods in case of failures - on the edge service, microservices
@@ -394,6 +382,7 @@ Zuul: egde service implementation: micro proxy, api gateway
 Actuator: monitoring capabilities via jmx and rest api (use with the config server)
 Config server: central store for configurations of the participants of the system
 Hystrix dashboard, Turbine: use for health monitoring
+Ribbon: round robin load balancer
 
 
 Config service: just a super lightweight service that is used to centralize the configuration data 
@@ -701,7 +690,29 @@ Dependency Injection:
 	@PostConstruct
 	@PreDestroy
 
+	
+	
+********************************
+Spring Boot
+********************************
 
+Boot priorities:
+	1. Commandline args
+	2. JNDI
+	3. Java System properties		- System.getProperty("path.separator");
+	4. OS Environment variables		- System.getenv();
+	5. Properties files				- application.properties
+	6. @PropertySource				- @PropertySource("classpath:/com/myco/app.properties"), then in the config java file: @Autowired Environment env;
+	7. Defaults
+
+
+	
+********************************
+Useful utils
+********************************
+	
+org.springframework.util.FileSystemUtils
+org.springframework.beans.BeanUtils
 
 
 
@@ -711,6 +722,20 @@ Streaming http requests
 ********************************
 
 Return RxJava Observable
+
+
+********************************
+Eclipse multi maven project with Spring, TDPraktiker
+********************************
+1. workspace resolution works, eclipse sees, maven also sees the dependencies being in the same workspace: 
+2. install the dependency into  the local repo with "mvn install" --> update the consumer project via "maven update" then voila, works!
+
+TDPraktiker: parentPom/pom.xml: only for jenkins build
+
+ServletInitializer: necessary in order for Spring to generate web.xml (project is dynamic webproject and packaging is war - app is deployed to an existing serverlet container)
+					Without this the war is either not generated or not works at all (not sure what Gabor said)
+					however probably this can be omitted by using "AbstractAnnotationConfigDispatcherServletInitializer" as demonstrated above
+
 
 
 class Convert<M, R> {
@@ -727,4 +752,3 @@ class Convert<M, R> {
 		return null;
 	}
 }
-		
