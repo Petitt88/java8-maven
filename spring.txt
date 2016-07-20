@@ -761,6 +761,26 @@ Boot priorities:
 	6. @PropertySource				- @PropertySource("classpath:/com/myco/app.properties"), then in the config java file: @Autowired Environment env;
 	7. Defaults
 
+	
+	
+********************************
+Cloud: IaaS, PaaS, Clound Foundry
+********************************
+
+IaaS support: eIMS can be deployed on a cloud-based infrastructure. With this approach only the hardware is provided and scaling the 
+	application means firing up more virtual machine instances, and after that each instance needs to be configured: 
+	install an operating system, configure the connection to the datafarm, install, the Java runtime and all the necessary packages needed. 
+	IaaS provides only the infrastructure (CPU, RAM, storage) but not the platform.
+	
+PaaS support: through Cloud Foundry which is an open source PaaS implementation. PaaS sits above the infrastructure (IaaS) and provides an 
+	operating system for applications on top of that with all the tooling needed to scale the deployed applications. When scaling the application 
+	is needed we can forget about installing new virtual machines and post-configurations. The application is the new unit of scale here, 
+	we just say we need more instances of this component and the platform will automatically set things up.
+	In a microservices world, where there are more components, we can even tell the system which component needs to be scaled up or down.
+	What this means for the eIMS is that let’s say Alert Management microservice is having increased requests and struggles to serve them. 
+	We can tell the platform that we need more instances of the Alert Management microservice and the platform will handle firing them up.
+	Cloud Foundry is host-agnostic, meaning that it can run on VMWare, AWS, OpenStack, ...
+
 
 	
 ********************************
