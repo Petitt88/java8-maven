@@ -186,6 +186,10 @@ Normally both JPA and Hibernate require an xml config (persistence.xml, hibernat
 Spring MVC:
 ********************************
 
+It looks like the 1st folder inside the src/main/resources gets served automatically. 
+However with @RequestMapping and viewtechnology (like thymeleaf) used together it is possible to manipulate which html gets sent for which request.
+For example: localhost:8080/index.html and localhost:8080 can return the same content!
+
 The WebMvcConfigurerAdapter is for configuring Spring MVC, the replacement of the xml file loaded by the 
 DispatcherServlet for configuring Spring MVC. The WebMvcConfigurerAdapter should be used for a @Configuration class.
 @EnableWebMvc //<mvc:annotation-driven />
@@ -558,6 +562,16 @@ Edge service: there are two types:
 
 Hystrix dashboard, H2 console - good stuff, start.spring.io starters
 Spring cloud handles Single Sign on, Oath2 is dead simple
+
+
+
+********************************
+Spring cloud deployment
+********************************
+
+Cloud Foundry: PaaS platform
+BOSH: how you automate, install and congfigure a CF system (among other things, it does a lot of stuff)
+
 
 
 ********************************
