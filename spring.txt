@@ -14,7 +14,7 @@
 @PathParam
 @Value - specify default value on properties. Can be arbirtary string or expression e.g. "#{systemProperties.myProp}"
 
-@ControllerAdvice
+@ControllerAdvice - it is typically used to define @ExceptionHandler, @InitBinder, and @ModelAttribute methods that apply to all @RequestMapping methods.
 @ExceptionHandler
 @ResponseStatus
 
@@ -681,6 +681,48 @@ curl -v http://localhost:8080/
 	}
 
 
+	
+********************************
+Spring Batch
+********************************
+
+Spring Batch is not a scheduling framework.
+Usage:
+	A typical batch program generally reads a large number of records from a database, file, or queue, processes the data in some fashion, 
+	and then writes back data in a modified form. Spring Batch automates this basic batch iteration, providing the capability to process similar 
+	transactions as a set, typically in an offline environment without any user interaction. 
+	
+Business Scenarios:
+	Commit batch process periodically
+	Concurrent batch processing: parallel processing of a job
+	Staged, enterprise message-driven processing
+	Massively parallel batch processing
+	Manual or scheduled restart after failure
+	Sequential processing of dependent steps (with extensions to workflow-driven batches)
+	Partial processing: skip records (e.g. on rollback)
+	Whole-batch transaction: for cases with a small batch size or existing stored procedures/scripts
+	
+Processing options:
+	1. Normal processing in a batch window during off-line
+	2. Concurrent batch / on-line processing
+	3. Parallel processing of many different batch runs or jobs at the same time
+	4. Partitioning (i.e. processing of many instances of the same job at the same time)
+	
+	1. For simple batch processes running in a separate batch window, where the data being updated is not required by on-line users or other batch processes, 
+		concurrency is not an issue and a single commit can be done at the end of the batch run.
+		
+	2. Batch applications processing data that can simultaneously be updated by on-line users, should not lock any data (either in the database or in files) which 
+		could be required by on-line users for more than a few seconds. Also updates should be committed to the database at the end of every few transaction. 
+		This minimizes the portion of data that is unavailable to other processes and the elapsed time the data is unavailable.
+		
+	3. Parallel processing allows multiple batch runs / jobs to run in parallel to minimize the total elapsed batch processing time. This is not a problem as long 
+		as the jobs are not sharing the same files, db-tables or index spaces. If they do, this service should be implemented using partitioned data. 
+	
+	4. Using partitioning allows multiple versions of large batch applications to run concurrently. The purpose of this is to reduce the elapsed time required to 
+		process long batch jobs. Processes which can be successfully partitioned are those where the input file can be split and/or the main database tables partitioned 
+		to allow the application to run against different sets of data.
+
+	
 	
 ********************************
 Spring Framework
