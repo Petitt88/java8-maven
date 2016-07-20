@@ -20,6 +20,9 @@
 
 @Lazy - lazily initialze beans
 
+@Import - Provides functionality equivalent to the <import/> element in Spring XML. Allows for importing @Configuration classes, ImportSelector and ImportBeanDefinitionRegistrar implementations, 
+		  as well as regular component classes (as of 4.2; analogous to AnnotationConfigApplicationContext.register(java.lang.Class<?>...)).
+
 FileCopyUtils
 
 
@@ -735,6 +738,27 @@ Processing options:
 	4. Using partitioning allows multiple versions of large batch applications to run concurrently. The purpose of this is to reduce the elapsed time required to 
 		process long batch jobs. Processes which can be successfully partitioned are those where the input file can be split and/or the main database tables partitioned 
 		to allow the application to run against different sets of data.
+
+		
+Job: A Job is an entity that encapsulates an entire batch process. It contains one or more steps.
+JobIstance: JobInstance = Job + identifying JobParameters. A JobInstance refers to the concept of a logical job run.
+JobExecution: A JobExecution refers to the technical concept of a single attempt to run a Job.
+Setp: ItemReader + ItemProcessor + ItemWriter
+StepExecution: represents a single attempt to execute a Step
+JobRepository: JobRepository is the persistence mechanism for all of the Stereotypes mentioned above.
+JobLauncher represents a simple interface for launching a Job with a given set of JobParameters.
+ItemReader is an abstraction that represents the retrieval of input for a Step, one item at a time. When the ItemReader has exhausted the items it can provide, it will indicate this by returning null.
+ItemWriter is an abstraction that represents the output of a Step, one batch or chunk of items at a time.
+ItemProcessor is an abstraction that represents the business processing of an item. While the ItemReader reads one item, and the ItemWriter writes them, the ItemProcessor 
+	provides access to transform or apply other business processing. If, while processing the item, it is determined that the item is not valid, returning null indicates that the item should not be written out.
+	
+One key issue when executing a batch job concerns the behavior of a Job when it is restarted. The launching of a Job is considered to be a 'restart' if a JobExecution already exists for the particular JobInstance.
+
+In-Memory Repository: There are scenarios in which you may not want to persist your domain objects to the database.
+	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+		<property name="transactionManager" ref="transactionManager"/>
+	</bean>
+	
 
 	
 	
