@@ -766,6 +766,12 @@ In-Memory Repository: There are scenarios in which you may not want to persist y
 Spring Framework
 ********************************
 
+The syntax ${x:${y}} is Spring property shorthand for ${x} != null ? ${x} : ${y}.
+eureka:
+  instance:
+    metadataMap:
+      instanceId: ${spring.application.name}:${spring.application.instance_id:${server.port}}
+
 Dependency Injection:
 	@PostConstruct
 	@PreDestroy
@@ -785,6 +791,23 @@ Boot priorities:
 	6. @PropertySource				- @PropertySource("classpath:/com/myco/app.properties"), then in the config java file: @Autowired Environment env;
 	7. Defaults
 
+	
+	
+********************************
+Spring React
+********************************
+
+Will be available from Spring Framework 5.
+
+Another source of pain is that if we ever make a mistake and block in one of our Reactive callbacks, 
+we will be holding up all requests on the same thread. With the servlet-based containers every request is isolated to a thread, 
+and blocking doesn’t hold up other requests because they are be processed on different threads. 
+Blocking all requests is still a recipe for trouble, but it only shows up as increased latency with roughly a constant factor per request. 
+In the Reactive world, blocking a single request can lead to increased latency for all requests, 
+and blocking all requests can bring a server to its knees because the extra layers of buffers and threads are not there to take up the slack.
+	
+	
+	
 	
 	
 ********************************

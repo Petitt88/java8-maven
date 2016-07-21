@@ -187,7 +187,7 @@ List<String> x = new ArrayList<>(); - type information gets lost!
 	String name = type.getTypeName();
 	System.out.println(name);	// prints out java.util.AbstractList<E>...
 
-List<String> x = new ArrayList<String>() {}; - type information is retained due to we create a generic anonymous subclass of List<String> with to overrides!
+List<String> x = new ArrayList<String>() {}; - type information is retained due to we create a generic anonymous subclass of List<String> with no overrides!
 	List<String> x = new ArrayList<String>() {};
 	Class<? extends List> clazz = x.getClass();
 	ParameterizedType type = (ParameterizedType) clazz.getGenericSuperclass();
