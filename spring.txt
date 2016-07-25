@@ -18,12 +18,12 @@
 @ExceptionHandler
 @ResponseStatus
 
+@Cacheable - to use Spring's cache - implementations can be swapped
+
 @Lazy - lazily initialze beans
 
 @Import - Provides functionality equivalent to the <import/> element in Spring XML. Allows for importing @Configuration classes, ImportSelector and ImportBeanDefinitionRegistrar implementations, 
 		  as well as regular component classes (as of 4.2; analogous to AnnotationConfigApplicationContext.register(java.lang.Class<?>...)).
-
-FileCopyUtils
 
 
 org.springframework.beans.factory.Aware
@@ -194,15 +194,18 @@ However with @RequestMapping and viewtechnology (like thymeleaf) used together i
 For example: localhost:8080/index.html and localhost:8080 can return the same content!
 
 The WebMvcConfigurerAdapter is for configuring Spring MVC, the replacement of the xml file loaded by the 
-DispatcherServlet for configuring Spring MVC. The WebMvcConfigurerAdapter should be used for a @Configuration class.
-@EnableWebMvc //<mvc:annotation-driven />
-@Configuration
-@ComponentScan({ "com.mkyong.helloworld.web" })
-public class SpringWebConfig extends WebMvcConfigurerAdapter
+	DispatcherServlet for configuring Spring MVC. The WebMvcConfigurerAdapter should be used for a @Configuration class.
+	@EnableWebMvc //<mvc:annotation-driven />
+	@Configuration
+	@ComponentScan({ "com.mkyong.helloworld.web" })
+	public class SpringWebConfig extends WebMvcConfigurerAdapter
+
+ServletInitializer: necessary in order for Spring to generate web.xml (project is dynamic webproject and packaging is war - app is deployed to an existing servlet container)
+					Without this the war is either not generated or doesn’t work at all (not sure what Gabor said)
+					however probably this can be omitted by using "AbstractAnnotationConfigDispatcherServletInitializer" as demonstrated above
 
 AbstractAnnotationConfigDispatcherServletInitializer (ServletInitializer) is the replacement of web.xml. Initializes the servlet container.
-public class MyWebInitializer extends
-		AbstractAnnotationConfigDispatcherServletInitializer {
+public class MyWebInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
 
 	@Override
 	protected Class<?>[] getRootConfigClasses() {
@@ -782,6 +785,70 @@ Scaling and Parallel Processing
 
 
 
+********************************
+Spring 	Integration	
+********************************
+
+In addition to wiring together fine-grained components, Spring Integration provides a wide selection of channel adapters and gateways to 
+communicate with external systems. Channel Adapters are used for one-way integration (send or receive); 
+gateways are used for request/reply scenarios (inbound or outbound).
+
+
+Spring Integration provides an extension of the Spring programming model to support the well-known Enterprise Integration Patterns. 
+It enables lightweight messaging within Spring-based applications and supports integration with external systems via declarative adapters. 
+Those adapters provide a higher-level of abstraction over Spring’s support for remoting, messaging, and scheduling.
+
+Spring Integration is motivated by the following goals:
+	Provide a simple model for implementing complex enterprise integration solutions.
+	Facilitate asynchronous, message-driven behavior within a Spring-based application.
+	Promote intuitive, incremental adoption for existing Spring users.
+Spring Integration is guided by the following principles:
+	Components should be loosely coupled for modularity and testability.
+	The framework should enforce separation of concerns between business logic and integration logic.
+	Extension points should be abstract in nature but within well-defined boundaries to promote reuse and portability.
+	
+Message: In Spring Integration, a Message is a generic wrapper for any Java object combined with metadata used by the framework while handling 
+		 that object. It consists of a payload and headers.
+Message Channel: A Message Channel represents the "pipe" of a pipes-and-filters architecture. 
+				 Producers send Messages to a channel, and consumers receive Messages from a channel. 
+				 The Message Channel therefore decouples the messaging components, and also provides a convenient point for interception 
+				 and monitoring of Messages.
+				 
+				 A Message Channel may follow either Point-to-Point or Publish/Subscribe semantics. With a Point-to-Point channel, 
+				 at most one consumer can receive each Message sent to the channel. Publish/Subscribe channels, on the other hand, 
+				 will attempt to broadcast each Message to all of its subscribers. Spring Integration supports both of these.
+				 will attempt to broadcast each Message to all of its subscribers. Spring Integration supports both of these.
+Message Endpoint: One of the primary goals of Spring Integration is to simplify the development of enterprise integration solutions 
+				  through inversion of control. This means that you should not have to implement consumers and producers directly,
+				  and you should not even have to build Messages and invoke send or receive operations on a Message Channel. 
+				  Instead, you should be able to focus on your specific domain model with an implementation based on plain Objects. 
+				  Then, by providing declarative configuration, you can "connect" your domain-specific code to the messaging infrastructure
+				  provided by Spring Integration. The components responsible for these connections are Message Endpoints.
+				  
+Message Endpoints: A Message Endpoint represents the "filter" of a pipes-and-filters architecture. As mentioned above, the endpoint’s 
+				   primary role is to connect application code to the messaging framework and to do so in a non-invasive manner. 
+				   In other words, the application code should ideally have no awareness of the Message objects or the Message Channels.
+				   This is similar to the role of a Controller in the MVC paradigm. Just as a Controller handles HTTP requests, 
+				   the Message Endpoint handles Messages. Just as Controllers are mapped to URL patterns, Message Endpoints are mapped 
+				   to Message Channels.
+Transformer: A Message Transformer is responsible for converting a Message’s content or structure and returning the modified Message.
+Filter: A Message Filter determines whether a Message should be passed to an output channel at all. 
+Router: A Message Router is responsible for deciding what channel or channels should receive the Message next (if any). 
+Service Activator: A Service Activator is a generic endpoint for connecting a service instance to the messaging system.
+Channel Adapter: A Channel Adapter is an endpoint that connects a Message Channel to some other system or transport.
+
+@EnableIntegration
+@IntegrationComponentScan
+@EnablePublisher
+
+MessagingTemplate: send, receive, sendAndReceive
+
+Channel Adapter: A Channel Adapter is a Message Endpoint that enables connecting a single sender or receiver to a Message Channel. 
+				 Spring Integration provides a number of adapters out of the box to support various transports, such as JMS, File, HTTP,
+				 Web Services, Mail, and more. 
+Messaging Bridge: A Messaging Bridge is a relatively trivial endpoint that simply connects two Message Channels or Channel Adapters.
+MessageBuilder 
+	
 	
 ********************************
 Spring Framework
@@ -854,7 +921,8 @@ PaaS support: through Cloud Foundry which is an open source PaaS implementation.
 ********************************
 Useful utils
 ********************************
-	
+
+FileCopyUtils	
 org.springframework.util.FileSystemUtils
 org.springframework.beans.BeanUtils
 
@@ -875,10 +943,13 @@ Eclipse multi maven project with Spring, TDPraktiker
 2. install the dependency into  the local repo with "mvn install" --> update the consumer project via "maven update" then voila, works!
 
 TDPraktiker: parentPom/pom.xml: only for jenkins build
-
-ServletInitializer: necessary in order for Spring to generate web.xml (project is dynamic webproject and packaging is war - app is deployed to an existing serverlet container)
-					Without this the war is either not generated or not works at all (not sure what Gabor said)
-					however probably this can be omitted by using "AbstractAnnotationConfigDispatcherServletInitializer" as demonstrated above
+					
+OAuth2 is basically a protocol that supports authorization workflows. What this means is that it gives you a way to ensure that 
+a specific user has permissions to do something. That’s it. 
+OAuth2 isn’t meant to do stuff like validate a user’s identity — that’s taken care of by an Authentication service. 
+Authentication is when you validate a user’s identity (like asking for a username / password to log in), 
+whereas authorization is when you check to see what permissions an existing user already has.
+Just remember that OAuth2 is a protocol for authorization.
 
 
 
