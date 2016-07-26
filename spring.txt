@@ -835,7 +835,11 @@ Transformer: A Message Transformer is responsible for converting a Message’s c
 Filter: A Message Filter determines whether a Message should be passed to an output channel at all. 
 Router: A Message Router is responsible for deciding what channel or channels should receive the Message next (if any). 
 Service Activator: A Service Activator is a generic endpoint for connecting a service instance to the messaging system.
-Channel Adapter: A Channel Adapter is an endpoint that connects a Message Channel to some other system or transport.
+Channel Adapter: A Channel Adapter is an endpoint that connects a Message Channel to some other system or transport. 
+				 Channel Adapters may be either inbound or outbound. Typically, the Channel Adapter will do some mapping between the 
+				 Message and whatever object or resource is received-from or sent-to the other system (File, HTTP Request, JMS Message, etc).
+				 Depending on the transport, the Channel Adapter may also populate or extract Message header values. 
+				 Spring Integration provides a number of Channel Adapters, and they will be described in upcoming chapters.
 
 @EnableIntegration
 @IntegrationComponentScan
