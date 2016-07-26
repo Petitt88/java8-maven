@@ -835,7 +835,7 @@ Transformer: A Message Transformer is responsible for converting a Message’s c
 Filter: A Message Filter determines whether a Message should be passed to an output channel at all. 
 Router: A Message Router is responsible for deciding what channel or channels should receive the Message next (if any). 
 Service Activator: A Service Activator is a generic endpoint for connecting a service instance to the messaging system.
-Channel Adapter: A Channel Adapter is an endpoint that connects a Message Channel to some other system or transport. 
+Channel Adapter: A Channel Adapter is an endpoint that connects a Message Channel to some other system (external system) or transport. 
 				 Channel Adapters may be either inbound or outbound. Typically, the Channel Adapter will do some mapping between the 
 				 Message and whatever object or resource is received-from or sent-to the other system (File, HTTP Request, JMS Message, etc).
 				 Depending on the transport, the Channel Adapter may also populate or extract Message header values. 
@@ -867,7 +867,115 @@ eureka:
 Dependency Injection:
 	@PostConstruct
 	@PreDestroy
+	
 
+Components: 
+	Core Container: consists of the spring-core, spring-beans, spring-context, spring-context-support, and spring-expression 
+					(Spring Expression Language) modules. he Context module also supports Java EE features such as EJB, JMX, and basic remoting.
+	AOP and Instrumentation: aspect-oriented programming implementation allowing you to define, for example, method interceptors and pointcuts to cleanly decouple code that implements functionality that should be separated.
+	Messaging: Spring Framework 4 includes a spring-messaging module with key abstractions from the Spring Integration project such as Message, MessageChannel, MessageHandler, and others to serve as a foundation for messaging-based applications.
+	Data Access/Integration: The Data Access/Integration layer consists of the JDBC, ORM, OXM, JMS, and Transaction modules.
+	Web: The Web layer consists of the spring-web, spring-webmvc, spring-websocket, and spring-webmvc-portlet modules.
+		The spring-web module provides basic web-oriented integration features such as multipart file upload functionality and the 
+			initialization of the IoC container using Servlet listeners and a web-oriented application context. 
+			It also contains an HTTP client and the web-related parts of Spring’s remoting support.
+		The spring-webmvc module (also known as the Web-Servlet module) contains Spring’s model-view-controller (MVC) and REST Web Services
+			implementation for web applications. Spring’s MVC framework provides a clean separation between domain model code and 
+			web forms and integrates with all of the other features of the Spring Framework.
+	Test: The spring-test module supports the unit testing and integration testing of Spring components with JUnit or TestNG. It provides consistent 
+		loading of Spring ApplicationContexts and caching of those contexts. It also provides mock objects that you can use to test your code in isolation.
+	
+	
+For logging JCL (Jakarta Common Logging) library is used, but it was a mistake. It can be excluded from the dependencies of spring-core and use
+SLF4J  instead.
+		
+JMS improvements: Synchronous request-reply operations support in JmsTemplate
+Caching improvements
+
+Beans by default are Singletons and eagerly initialized. Use @Lazy for lazy initialization.
+Bean scopes: singleton, prototype, request, session, globalsession, application, websocket
+
+Method injection: used typically when a Singleton bean (A) has prototype dependency (B) and A needs new B instances.
+	- inject the ApplicationContext and use the Service Locator pattern is the only solution
+	
+To interact with the container’s management of the bean lifecycle, you can implement the Spring InitializingBean and DisposableBean interfaces.
+	BUT: The JSR-250 @PostConstruct and @PreDestroy annotations are generally considered best practice for receiving lifecycle callbacks in a modern 
+	Spring application. Using these annotations means that your beans are not coupled to Spring specific interfaces.
+	
+	
+7.6.3 Other Aware interfaces: ApplicationContextAware, BeanNameAware, ServletConfigAware, ServletContextAware
+7.9 Annotation-based container configuration
+
+@Required, 
+@Autowired - resolves dependencies by type
+@Primary - indicates that a particular bean should be given preference when multiple beans are candidates to be autowired to a single-valued dependency
+@Qualifier - specify the name of the dependency (use @Beans(name = "..."))
+@Bean - can be used on methods, by default the beans's name is the name of the method
+@Resource - takes a name attribute, and by default Spring interprets that value as the bean name to be injected. 
+			In other words, it follows by-name semantics, like this:
+				@Resource(name="myMovieFinder")
+				public void setMovieFinder(MovieFinder movieFinder) {
+					this.movieFinder = movieFinder;
+				}
+@Component and further stereotype annotations: @Service, @Repository, @Controller
+@Component: is a generic stereotype for any Spring-managed component.
+@Repository annotation is a marker for any class that fulfills the role or stereotype of a repository (also known as Data Access Object or DAO). 
+	Among the uses of this marker is the automatic translation of exceptions as described in Section 20.2.2, “Exception translation”.
+	(unchecked exceptions for @Transactional to rollback the commit)
+
+	
+7.10.3 Automatically detecting classes and registering bean definitions
+	To autodetect these classes and register the corresponding beans, you need to add @ComponentScan to your @Configuration class, 
+	where the basePackages attribute is a common parent package for the two classes. 
+	If basePackages is not specified on the @ComponentScan, then the package of the class it is applied on gets used.
+	
+7.10.4 Using filters to customize scanning
+
+7.10.5 Defining metadata
+	@Bean, @Lazy, @Qualifier, @Scope can be used together
+
+	@Service("myMovieLister")
+	public class SimpleMovieLister - bean's name is "myMovieLister"
+
+	@Repository
+	public class MovieFinderImpl - bean's name is "movieFinderImpl"
+
+
+7.11 Using JSR 330 Standard Annotations
+	@Inject vs @Autowired
+	@Named vs @Component - the two are identical
+	
+	
+7.11.3 Limitations of JSR-330 standard annotations
+
+7.12 Java-based container configuration
+	The central artifacts in Spring’s new Java-configuration support are @Configuration-annotated classes and @Bean-annotated methods.
+	
+	@Bean - method-level annotation and is used to indicate that a method instantiates, configures and initializes a new object 
+			to be managed by the Spring IoC container.
+	@Bean(initMethod = "init")
+	@Bean(destroyMethod = "cleanup")
+	@Configuration - indicates that its primary purpose is as a source of bean definitions. 
+					 Furthermore, @Configuration classes allow inter-bean dependencies to be defined by simply calling other 
+					 @Bean methods in the same class. 
+					 
+		
+	Full @Configuration vs 'lite' @Beans mode?
+	When @Bean methods are declared within classes that are not annotated with @Configuration they are referred to as being processed in a 'lite' mode.
+	For example, bean methods declared in a @Component or even in a plain old class will be considered 'lite'.
+	Unlike full @Configuration, lite @Bean methods cannot easily declare inter-bean dependencies. 
+	Usually one @Bean method should not invoke another @Bean method when operating in 'lite' mode.
+	Only using @Bean methods within @Configuration classes is a recommended approach of ensuring that 'full' mode is always used. 
+	This will prevent the same @Bean method from accidentally being invoked multiple times and helps to reduce subtle bugs that can be hard 
+	to track down when operating in 'lite' mode.
+
+	@Import - annotation allows for loading @Bean definitions from another configuration class
+
+	
+@Configuration
+@Bean
+@Import
+@DependsOn
 	
 	
 ********************************
