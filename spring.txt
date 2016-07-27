@@ -84,7 +84,7 @@ JDBC DataSource:
 	if you are looking for any of these features in your application. 
 	
 	
-Spring DataSoruce implementation: DriverManagerDataSource!
+Spring DataSource implementation: DriverManagerDataSource!
 	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 
 		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
@@ -970,12 +970,272 @@ To interact with the container’s management of the bean lifecycle, you can imp
 	to track down when operating in 'lite' mode.
 
 	@Import - annotation allows for loading @Bean definitions from another configuration class
-
 	
-@Configuration
-@Bean
-@Import
-@DependsOn
+Conditionally include @Configuration classes or @Bean methods
+	It is often useful to conditionally enable or disable a complete @Configuration class, or even individual @Bean methods, 
+	based on some arbitrary system state.
+	
+	@Profile - activate beans only when a specific profile has been enabled in the Spring Environment
+		spring.profiles=dev,prod
+		spring.profiles.active=dev
+	@Conditional
+	
+	
+Configuration injection
+
+	@ConfigurationProperties(prefix = "spring.dsMsSQL")
+	public class MsSQLDataSourceConfiguration extends DatabaseConfig {
+		// DatabaseConfig's fields are propagated with config properties from application.properties that match the prefix
+		// like spring.dsMsSQL.password <--- "password" field gets filled with the value of this
+	}
+
+	@Configuration
+	@PropertySource("classpath:neo4j.properties")
+	public class Neo4jConfig {
+		@Autowired
+		Environment environment;
+	}
+	
+	@PropertySource - provides a convenient and declarative mechanism for adding a PropertySource to Spring’s Environment
+	
+	
+7.15.1 Internationalization using MessageSource
+
+	MessageSource, HierarchicalMessageSource interfaces
+	
+	
+8.2 The Resource interface
+
+	Spring’s Resource interface is meant to be a more capable interface for abstracting access to low-level resources.
+	
+	UrlResource: The UrlResource wraps a java.net.URL, and may be used to access any object that is normally accessible via a URL, 
+				 such as files, an HTTP target, an FTP target, etc.
+	ClassPathResource
+	FileSystemResource: his is a Resource implementation for java.io.File handles. It obviously supports resolution as a File, and as a URL.
+	ServletContextResource
+	InputStreamResource
+	ByteArrayResource
+	
+	ResourceLoader: The ResourceLoader interface is meant to be implemented by objects that can return (i.e. load) Resource instances.
+		Resource template = ctx.getResource("classpath:some/resource/path/myTemplate.txt");
+		Resource template = ctx.getResource("file:///some/resource/path/myTemplate.txt");
+		Resource template = ctx.getResource("http://myhost.com/resource/path/myTemplate.txt");
+		
+		
+9. Validation, Data Binding, and Type Conversion
+		
+	Spring Framework 4.0 supports Bean Validation 1.0 (JSR-303) and Bean Validation 1.1 (JSR-349) in terms of setup support, 
+	also adapting it to Spring’s Validator interface.
+	
+9.5.1 Converter SPI
+	org.springframework.core.convert.converter.Converter interface
+	
+11. Aspect Oriented Programming with Spring
+	Aspect: a modularization of a concern that cuts across multiple classes. Transaction management is a good example of a crosscutting 
+			concern in enterprise Java applications. In Spring AOP, aspects are implemented using regular classes 
+			(the schema-based approach) or regular classes annotated with the @Aspect annotation (the @AspectJ style).
+	Join point: a point during the execution of a program, such as the execution of a method or the handling of an exception. 
+			In Spring AOP, a join point always represents a method execution.
+	Advice: action taken by an aspect at a particular join point. Different types of advice include "around," "before" and "after" advice.
+			(Advice types are discussed below.) Many AOP frameworks, including Spring, model an advice as an interceptor, maintaining a chain 
+			of interceptors around the join point.
+	Pointcut: a predicate that matches join points. Advice is associated with a pointcut expression and runs at any join point matched by 
+			the pointcut (for example, the execution of a method with a certain name). The concept of join points as matched by pointcut 
+			expressions is central to AOP, and Spring uses the AspectJ pointcut expression language by default.
+	Introduction: declaring additional methods or fields on behalf of a type. Spring AOP allows you to introduce new interfaces 
+			(and a corresponding implementation) to any advised object. For example, you could use an introduction to make a bean implement 
+			an IsModified interface, to simplify caching. (An introduction is known as an inter-type declaration in the AspectJ community.)
+	Target object: object being advised by one or more aspects. Also referred to as the advised object. Since Spring AOP is implemented 
+			using runtime proxies, this object will always be a proxied object.
+	AOP proxy: an object created by the AOP framework in order to implement the aspect contracts (advise method executions and so on). 
+			In the Spring Framework, an AOP proxy will be a JDK dynamic proxy or a CGLIB proxy.
+	Weaving: linking aspects with other application types or objects to create an advised object. This can be done at compile time 
+			(using the AspectJ compiler, for example), load time, or at runtime. Spring AOP, like other pure Java AOP frameworks, 
+			performs weaving at runtime.
+	
+	
+	Types of advice:
+		Before advice: Advice that executes before a join point, but which does not have the ability to prevent execution 
+			flow proceeding to the join point (unless it throws an exception).
+		After returning advice: Advice to be executed after a join point completes normally: for example, if a method returns without
+			throwing an exception.
+		After throwing advice: Advice to be executed if a method exits by throwing an exception.
+		After (finally) advice: Advice to be executed regardless of the means by which a join point exits (normal or exceptional return).
+		Around advice: Advice that surrounds a join point such as a method invocation. This is the most powerful kind of advice. 
+			Around advice can perform custom behavior before and after the method invocation. It is also responsible for choosing 
+			whether to proceed to the join point or to shortcut the advised method execution by returning its own return value or 
+			throwing an exception.
+			
+	@Configuration
+	@EnableAspectJAutoProxy
+	public class AppConfig {
+	}
+	
+	@Aspect
+	public class NotVeryUsefulAspect {
+	
+		@Pointcut("execution(public * *(..))")
+		private void anyPublicOperation() {}
+
+		@Pointcut("within(com.xyz.someapp.trading..*)")
+		private void inTrading() {}
+
+		@Pointcut("anyPublicOperation() && inTrading()")
+		private void tradingOperation() {}
+		
+		@Before("com.xyz.myapp.SystemArchitecture.dataAccessOperation()")
+		public void doAccessCheck() {
+		}
+		
+		@AfterReturning("com.xyz.myapp.SystemArchitecture.dataAccessOperation()")
+		public void doAccessCheck() {
+		}
+		
+		@AfterReturning(pointcut="com.xyz.myapp.SystemArchitecture.dataAccessOperation()", returning="retVal")
+		public void doAccessCheck(Object retVal) {
+		}
+		
+		@AfterThrowing("com.xyz.myapp.SystemArchitecture.dataAccessOperation()")
+		public void doRecoveryActions() {
+		}
+	
+		@After("com.xyz.myapp.SystemArchitecture.dataAccessOperation()")
+		public void doReleaseLock() {
+		}
+	
+		@Around("com.xyz.myapp.SystemArchitecture.businessService()")
+		public Object doBasicProfiling(ProceedingJoinPoint pjp) throws Throwable {
+			// start stopwatch
+			Object retVal = pjp.proceed();
+			// stop stopwatch
+			return retVal;
+    }
+}
+
+
+Transaction Management
+
+	PlatformTransactionManager: JtaTransactionManager, HibernateTransactionManager
+	
+17.4.2 Low-level synchronization approach
+
+	DataSourceUtils (for JDBC), EntityManagerFactoryUtils (for JPA), SessionFactoryUtils, PersistenceManagerFactoryUtils (for JDO)
+	
+	For example, in the case of JDBC, instead of the traditional JDBC approach of calling the getConnection() method on the DataSource, 
+	you instead use Spring’s org.springframework.jdbc.datasource.DataSourceUtils class as follows:
+		Connection conn = DataSourceUtils.getConnection(dataSource);
+		
+	@Transactional - declarative transaction support are that this support is enabled via AOP proxies
+	
+		- Propagation setting is REQUIRED.
+		- Isolation level is DEFAULT.
+		- Transaction is read/write. - not read-only by default
+		- Transaction timeout defaults to the default timeout of the underlying transaction system, or none if timeouts are not supported.
+		- Any RuntimeException triggers rollback, and any checked Exception does not.
+		
+		When using proxies, you should apply the @Transactional annotation only to methods with public visibility. 
+		If you do annotate protected, private or package-visible methods with the @Transactional annotation, no error is raised, 
+		but the annotated method does not exhibit the configured transactional settings. 
+		Consider the use of AspectJ (see below) if you need to annotate non-public methods.
+		
+		Spring recommends that you only annotate concrete classes (and methods of concrete classes) with the @Transactional annotation, as opposed 
+		to annotating interfaces. You certainly can place the @Transactional annotation on an interface (or an interface method), but this works only 
+		as you would expect it to if you are using interface-based proxies. The fact that Java annotations are not inherited from interfaces means that
+		if you are using class-based proxies ( proxy-target-class="true") or the weaving-based aspect ( mode="aspectj"), then the transaction 
+		settings are not recognized by the proxying and weaving infrastructure, and the object will not be wrapped in a transactional proxy, 
+		which would be decidedly bad.
+		
+		In proxy mode (which is the default), only external method calls coming in through the proxy are intercepted. This means that 
+		self-invocation, in effect, a method within the target object calling another method of the target object, will not lead to an
+		actual transaction at runtime even if the invoked method is marked with @Transactional. Also, the proxy must be fully initialized
+		to provide the expected behaviour so you should not rely on this feature in your initialization code, i.e. @PostConstruct.
+		
+		Consider the use of AspectJ mode (see mode attribute in table below) if you expect self-invocations to be wrapped with transactions
+		as well. In this case, there will not be a proxy in the first place; instead, the target class will be weaved (that is, its byte 
+		code will be modified) in order to turn @Transactional into runtime behavior on any kind of method.
+
+
+		If you find you are repeatedly using the same attributes with @Transactional on many different methods, then 
+		Spring’s meta-annotation support allows you to define custom shortcut annotations for your specific use cases. 
+		For example, defining the following annotations		
+			@Target({ElementType.METHOD, ElementType.TYPE})
+			@Retention(RetentionPolicy.RUNTIME)
+			@Transactional("account")
+			public @interface AccountTx {
+			}
+			
+			
+17.5.7 Transaction propagation
+	PROPAGATION_REQUIRED: However, in the case where an inner transaction scope sets the rollback-only marker, the outer transaction has not decided on 
+		the rollback itself, and so the rollback (silently triggered by the inner transaction scope) is unexpected. 
+		A corresponding UnexpectedRollbackException is thrown at that point. 
+	PROPAGATION_REQUIRES_NEW: uses a completely independent transaction for each affected transaction scope. In that case, the underlying 
+		physical transactions are different and hence can commit or roll back independently, with an outer transaction not affected by an 
+		inner transaction’s rollback status.
+	PROPAGATION_NESTED : uses a single physical transaction with multiple savepoints that it can roll back to. Such partial rollbacks 
+		allow an inner transaction scope to trigger a rollback for its scope, with the outer transaction being able to continue the physical 
+		transaction despite some operations having been rolled back. This setting is typically mapped onto JDBC savepoints, so will only work 
+		with JDBC resource transactions. See Spring’s DataSourceTransactionManager.
+			
+			
+17.6 Programmatic transaction management
+
+	Using the TransactionTemplate.
+	Using a PlatformTransactionManager implementation directly.
+	
+18.3 Annotations used for configuring DAO or Repository classes
+	@Repository
+	Any DAO or repository implementation will need to access to a persistence resource, depending on the persistence technology used; 
+	for example, a JDBC-based repository will need access to a JDBC DataSource; a JPA-based repository will need access to an EntityManager. 
+	The easiest way to accomplish this is to have this resource dependency injected using one of the
+	@Autowired,, @Inject, @Resource or @PersistenceContext annotations. Here is an example for a JPA repository:
+	
+	@Repository
+	public class JpaMovieFinder implements MovieFinder {
+    @PersistenceContext
+		private EntityManager entityManager;
+	}
+	
+	
+DataSource
+	DriverManagerDataSource dataSource = new DriverManagerDataSource();
+	dataSource.setDriverClassName("org.hsqldb.jdbcDriver");
+	dataSource.setUrl("jdbc:hsqldb:hsql://localhost:");
+	dataSource.setUsername("sa");
+	dataSource.setPassword("");
+	
+	Only use the DriverManagerDataSource class should only be used for testing purposes since it does not provide pooling and will perform poorly 
+	when multiple requests for a connection are made.
+	Always use the DataSource provided by the container via JNDI
+	
+
+	DataSourceUtils
+		The DataSourceUtils class is a convenient and powerful helper class that provides static methods to obtain connections from JNDI 
+		and close connections if necessary. It supports thread-bound connections with, for example, DataSourceTransactionManager.
+	
+	
+	JPA: 3 ways to set up JPA with spring: LocalEntityManagerFactoryBean, EntityManagerFactory from JNDI, LocalContainerEntityManagerFactoryBean
+		Use this latter option for full JPA capabilities in a Spring-based application environment. 
+	
+	
+21.2 Marshaller and Unmarshaller
+	As stated in the introduction, a marshaller serializes an object to XML, and an unmarshaller deserializes XML stream to an object. 
+	In this section, we will describe the two Spring interfaces used for this purpose.
+	
+
+22. Web MVC framework
+
+	The Spring Web model-view-controller (MVC) framework is designed around a DispatcherServlet that dispatches requests to handlers, 
+	with configurable handler mappings, view resolution, locale, time zone and theme resolution as well as support for uploading files.
+	
+	Spring’s view resolution is extremely flexible. A Controller is typically responsible for preparing a model Map with data 
+	and selecting a view name but it can also write directly to the response stream and complete the request. @Controller, @ResponseBody or just @Restcontroller
+	
+	View name resolution is highly configurable through file extension or Accept header content type negotiation, through bean names, 
+	a properties file, or even a custom ViewResolver implementation. The model (the M in MVC) is a Map interface, which allows for 
+	the complete abstraction of the view technology. You can integrate directly with template based rendering technologies such as JSP, 
+	Velocity and Freemarker, or directly generate XML, JSON, Atom, and many other types of content. The model Map is simply transformed 
+	into an appropriate format, such as JSP request attributes, a Velocity template model.
 	
 	
 ********************************
@@ -1037,8 +1297,8 @@ Useful utils
 FileCopyUtils	
 org.springframework.util.FileSystemUtils
 org.springframework.beans.BeanUtils
-
-
+org.springframework.validation.ValidationUtils
+DataSourceUtils (for JDBC), EntityManagerFactoryUtils (for JPA), SessionFactoryUtils, PersistenceManagerFactoryUtils (for JDO)
 
 
 ********************************
