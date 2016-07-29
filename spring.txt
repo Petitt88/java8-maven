@@ -2144,11 +2144,15 @@ org.springframework.validation.ValidationUtils
 DataSourceUtils (for JDBC), EntityManagerFactoryUtils (for JPA), SessionFactoryUtils, PersistenceManagerFactoryUtils (for JDO)
 
 
+
 ********************************
-Streaming http requests
+Asynchronous http processing
 ********************************
 
 Return RxJava Observable
+Spring Reactive, coming in Spring 5
+Mono, Flux: they both implement the Publisher interface, however Mono is for dealing with 1 item in the stream whereas Flux is for N items.
+
 
 
 ********************************
