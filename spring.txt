@@ -81,6 +81,9 @@ Spring:
 		  application PID (by default in the application directory with a file name of application.pid).
 		  
 		  
+********************************
+JDBC, JPA, Hibernate
+********************************
 		  
 JDBC:
 		// load the Driver Class
@@ -196,7 +199,11 @@ Checked exceptions that are thrown from a transactional method do not result in 
 Normally both JPA and Hibernate require an xml config (persistence.xml, hibernate.cfg.xml), but with Spring these can be omitted.
 (Spring scans the package and packages down for @Entity classes.) @EnableJpaRepositories("com.acme.repositories")
 
-@Entity --> @Respository (Dao) --> @Service --> @Controller/@Restcontroller			
+A persistence context is a concept that is a list of SQL statements to be sent to the database. Each Hibernate session has one persistence context.
+
+
+@Entity --> @Respository (Dao) --> @Service --> @Controller/@Restcontroller
+
 					
 					
 ********************************
