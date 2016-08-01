@@ -24,6 +24,7 @@
 
 @Import - Provides functionality equivalent to the <import/> element in Spring XML. Allows for importing @Configuration classes, ImportSelector and ImportBeanDefinitionRegistrar implementations, 
 		  as well as regular component classes (as of 4.2; analogous to AnnotationConfigApplicationContext.register(java.lang.Class<?>...)).
+@ImportResource: to import configuration from xml files
 	
 @EnableScheduling
 @Scheduled
@@ -924,7 +925,7 @@ Conditionally include @Configuration classes or @Bean methods
 	based on some arbitrary system state.
 	
 	@Profile - activate beans only when a specific profile has been enabled in the Spring Environment
-		spring.profiles=dev,prod
+		spring.profiles=dev,prod			(application-dev.properties, application-prod.yml)
 		spring.profiles.active=dev
 	@Conditional
 	
@@ -2092,15 +2093,184 @@ Part VII. Integration
 Spring Boot
 ********************************
 
-Boot priorities:
-	1. Commandline args
-	2. JNDI
-	3. Java System properties		- System.getProperty("path.separator");
-	4. OS Environment variables		- System.getenv();
-	5. Properties files				- application.properties
-	6. @PropertySource				- @PropertySource("classpath:/com/myco/app.properties"), then in the config java file: @Autowired Environment env;
-	7. Defaults
+Spring Boot allows you to externalize your configuration so you can work with the same application code in different environments. 
+You can use properties files, YAML files, environment variables and command-line arguments to externalize configuration. 
+Property values can be injected directly into your beans using the @Value annotation, accessed via Spring’s Environment abstraction or bound to 
+structured objects via @ConfigurationProperties.
 
+Boot priorities:
+	1. @TestPropertySource annotations on your tests.
+	2. Commandline args
+	3. Properties from SPRING_APPLICATION_JSON (inline JSON embedded in an environment variable or system property)
+	4. ServletConfig init parameters.
+	5. ServletContext init parameters.
+	6. JNDI attributes from java:comp/env.
+	7. Java System properties		- System.getProperty("path.separator");
+	8. OS Environment variables		- System.getenv();
+	9. A RandomValuePropertySource that only has properties in random.*.
+	10. Profile-specific application properties outside of your packaged jar (application-{profile}.properties and YAML variants)
+	11. Profile-specific application properties packaged inside your jar (application-{profile}.properties and YAML variants)
+	12. Application properties outside of your packaged jar (application.properties and YAML variants).
+	13. Application properties packaged inside your jar (application.properties and YAML variants).
+	14. @PropertySource annotations on your @Configuration classes. - @PropertySource("classpath:/com/myco/app.properties"), then in the config java file: @Autowired Environment env;
+	15. Default properties (specified using SpringApplication.setDefaultProperties).
+	
+@Component
+public class MyBean {
+
+    @Value("${name}")
+    private String name;
+
+    // ...
+
+}
+	
+To run a boot project from the command line: 
+	java -jar XXX.jar
+	mvn spring-boot:run
+	
+To create an executable jar just use the maven/gradle plugin provided by Spring:
+	Maven plugin binds to the "repackage" goal
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+	
+13.1. Spring Boot application starters
+	
+@EnableAutoConfiguration - This annotation tells Spring Boot to “guess” how you will want to configure Spring, based on the jar dependencies that you have added.
+@SpringBootApplication = @EnableAutoConfiguration + @ComponentScan + @Configuration
+@ComponentScan: what packages to scan for @Component. The default is the package that the class having @ComponentScan is defined
+@EntityScan: what packages to scan for JPA entities
+
+We generally recommend that you locate your main application class in a root package above other classes. 
+	The @EnableAutoConfiguration annotation is often placed on your main class, and it implicitly defines a base “search package” for certain items.
+	For example, if you are writing a JPA application, the package of the @EnableAutoConfiguration annotated class will be used to search for @Entity items.
+	
+	Using a root package also allows the @ComponentScan annotation to be used without needing to specify a basePackage attribute. 
+	You can also use the @SpringBootApplication annotation if your main class is in the root package.
+	
+	Many Spring configuration examples have been published on the Internet that use XML configuration. Always try to use the equivalent Java-based configuration if possible.
+	Searching for enable* annotations can be a good starting point.
+
+@Import: You don’t need to put all your @Configuration into a single class. The @Import annotation can be used to import additional configuration classes. 
+	Alternatively, you can use @ComponentScan to automatically pick up all Spring components, including @Configuration classes.
+		
+You should only ever add one @EnableAutoConfiguration annotation. We generally recommend that you add it to your primary @Configuration class.
+
+16.1 Gradually replacing auto-configuration
+	Auto-configuration is noninvasive, at any point you can start to define your own configuration to replace specific parts of the auto-configuration. 
+	For example, if you add your own DataSource bean, the default embedded database support will back away.
+
+	If you need to find out what auto-configuration is currently being applied, and why, start your application with the --debug switch. 
+	This will enable debug logs for a selection of core loggers and log an auto-configuration report to the console.
+	
+	
+16.2 Disabling specific auto-configuration
+	@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
+	
+	
+18. Using te @SpringBeanAutowiringSupport annotation
+	Many Spring Boot developers always have their main class annotated with @Configuration, @EnableAutoConfiguration and @ComponentScan. 
+	Since these annotations are so frequently used together (especially if you follow the best practices above), 
+	Spring Boot provides a convenient @SpringBootApplication alternative.
+	The @SpringBootApplication annotation is equivalent to using @Configuration, @EnableAutoConfiguration and @ComponentScan with their default attributes:
+
+
+20. Developer tools
+
+	spring-boot-devtools
+
+	Developer tools are automatically disabled when running a fully packaged application. If your application is launched using java -jar or if it’s started 
+	using a special classloader, then it is considered a “production application”. Flagging the dependency as optional is a best practice that prevents 
+	devtools from being transitively applied to other modules using your project. Gradle does not support optional dependencies out-of-the-box so you may 
+	want to have a look to the propdeps-plugin in the meantime.
+	
+20.1 Property defaults
+	Several of the libraries supported by Spring Boot use caches to improve performance. For example, Thymeleaf will cache templates to save repeatedly parsing XML source files.
+	This can be overridden in application.properties.
+	
+20.2 Automatic restart
+	Applications that use spring-boot-devtools will automatically restart whenever files on the classpath change. 
+		Triggering a restart
+		As DevTools monitors classpath resources, the only way to trigger a restart is to update the classpath. 
+		The way in which you cause the classpath to be updated depends on the IDE that you are using. 
+		In Eclipse, saving a modified file will cause the classpath to be updated and trigger a restart. 
+		In IntelliJ IDEA, building the project (Build → Make Project) will have the same effect.
+		
+	Restart vs Reload
+		The restart technology provided by Spring Boot works by using two classloaders. Classes that don’t change (for example, those from third-party jars) are 
+		loaded into a base classloader. Classes that you’re actively developing are loaded into a restart classloader. When the application is restarted, 
+		the restart classloader is thrown away and a new one is created. This approach means that application restarts are typically much faster than “cold starts” 
+		since the base classloader is already available and populated.
+		If you find that restarts aren’t quick enough for your applications, or you encounter classloading issues, you could consider reloading technologies 
+		such as JRebel from ZeroTurnaround. These work by rewriting classes as they are loaded to make them more amenable to reloading. Spring Loaded provides 
+		another option, however it doesn’t support as many frameworks and it isn’t commercially supported.
+	
+	
+20.2.1 Excluding resources	
+
+	Certain resources don’t necessarily need to trigger a restart when they are changed. For example, Thymeleaf templates can just be edited in-place. 
+	By default changing resources in /META-INF/maven, /META-INF/resources ,/resources ,/static ,/public or /templates will not trigger a restart but will trigger a live reload.
+	
+20.2.2 Watching additional paths
+		You may want your application to be restarted or reloaded when you make changes to files that are not on the classpath. 
+		To do so, use the spring.devtools.restart.additional-paths property to configure additional paths to watch for changes. 
+		
+23.4 Application events and listeners
+
+23.6 Accessing application arguments
+	Inject ApplicationArguments bean.
+	
+23.7 Using the ApplicationRunner or CommandLineRunner
+	Both interfaces work in the same way and offer a single run method which will be called just before SpringApplication.run(…​) completes.
+	
+23.9 Admin features
+	spring.application.admin.enabled
+	
+24. Externalized Configuration
+	Even if the configuration above will create a regular bean for ConnectionProperties, we recommend that @ConfigurationProperties
+	only deal with the environment and in particular does not inject other beans from the context. Having said that, The @EnableConfigurationProperties
+	annotation is also automatically applied to your project so that any existing bean annotated with @ConfigurationProperties will be configured from
+	the Environment properties. You could shortcut MyConfiguration above by making sure ConnectionProperties is a already a bean:
+		@Component
+		@ConfigurationProperties(prefix="connection")
+		public class ConnectionProperties {
+
+			// ... getters and setters
+
+		}
+
+		To work with @ConfigurationProperties beans you can just inject them in the same way as any other bean.		
+		@Service
+		public class MyService {
+
+			private final ConnectionProperties connection;
+
+			@Autowired
+			public MyService(ConnectionProperties connection) {
+				this.connection = connection;
+			}
+
+			 //...
+
+			@PostConstruct
+			public void openConnection() {
+				Server server = new Server();
+				this.connection.configure(server);
+			}
+
+		}
+	
+24.7.4 @ConfigurationProperties Validation
+
+24.7.5 @ConfigurationProperties vs. @Value
+	@Value is a core container feature and it does not provide the same features as type-safe Configuration Properties. 
+	
 	
 	
 ********************************
@@ -2118,6 +2288,19 @@ and blocking all requests can bring a server to its knees because the extra laye
 	
 	
 	
+********************************
+Gradle
+********************************
+
+Gradle wrapper: makes it possible to execute gradle tasks without having gradle installed
+	If a Gradle project has set up the Wrapper (and we recommend all projects do so), you can execute the build using one of the following commands from the root of the project:
+
+		./gradlew <task> (on Unix-like platforms such as Linux and Mac OS X)
+		gradlew <task> (on Windows using the gradlew.bat batch file)
+		
+		Each Wrapper is tied to a specific version of Gradle, so when you first run one of the commands above for a given Gradle version, 
+		it will download the corresponding Gradle distribution and use it to execute the build.
+
 	
 	
 ********************************
