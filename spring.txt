@@ -30,6 +30,11 @@
 @Scheduled
 
 @Cacheable	
+
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(securedEnabled = true), @Secured("ROLE_TELLER") - for method-level securing
+@EnableGlobalMethodSecurity(jsr250Enabled = true) - Support for JSR-250 annotations can be enabled using this. @RolesAllowed, @PermitAll, @DenyAll
+@EnableGlobalMethodSecurity(prePostEnabled = true), @PreAuthorize("hasAuthority('ROLE_TELLER')") - These are standards-based and allow simple role-based constraints to be applied but do not have the power Spring Security’s native annotations. To use the new expression-based syntax, you would use this.
 		  
 MVC:
 @RequestAttribute allows to access request attributes
@@ -2266,12 +2271,141 @@ You should only ever add one @EnableAutoConfiguration annotation. We generally r
 
 		}
 	
+24.7 Type-safe Configuration Properties
+	
+	@Configuration
+	@EnableConfigurationProperties(ConnectionProperties.class)	- but this is not necessary, since Spring boot automatically applies it
+	@SpringBootApplication
+	public class MyConfiguration {
+	}
+	
+	@Component - so this is injectable to other beans
+	@ConfigurationProperties(prefix="connection")
+	public class ConnectionProperties {
+
+		private String username;
+
+		private InetAddress remoteAddress;
+
+		// ... getters and setters
+	}
+
 24.7.4 @ConfigurationProperties Validation
+	You can simply add JSR-303 javax.validation constraint annotations to your @ConfigurationProperties class
+	
+	@ConfigurationProperties(prefix="connection")
+	public class ConnectionProperties {
+
+		@NotNull
+		private InetAddress remoteAddress;
+
+		// ... getters and setters
+
+	}
+	
+	In order to validate values of nested properties, you must annotate the associated field as @Valid to trigger its validation. For example, building upon the above ConnectionProperties example:
+	@ConfigurationProperties(prefix="connection")
+	public class ConnectionProperties {
+
+		@NotNull
+		@Valid
+		private RemoteAddress remoteAddress;
+
+		// ... getters and setters
+
+		public static class RemoteAddress {
+
+			@NotEmpty
+			public String hostname;
+
+			// ... getters and setters
+
+		}
+
+	}
 
 24.7.5 @ConfigurationProperties vs. @Value
 	@Value is a core container feature and it does not provide the same features as type-safe Configuration Properties. 
 	
+25. Profiles
+	Spring Profiles provide a way to segregate parts of your application configuration and make it only available in certain environments. 
+	Any @Component or @Configuration can be marked with @Profile to limit when it is loaded:
+	@Configuration
+	@Profile("production")
+	public class ProductionConfiguration {
 	
+25.1 Adding active profiles
+	The spring.profiles.active property follows the same ordering rules as other properties, the highest PropertySource will win. This means that you can specify active profiles in application.properties then replace them using the command line switch.
+	
+26. Logging
+	Spring by default uses Logback but this can be changed to Log4J 2
+
+26.2 Console output
+		The default log configuration will echo messages to the console as they are written. By default ERROR, WARN and INFO level messages are logged. 
+		To be able to log DEBUG messages: logging.level.{package[.sub-package]} can be changed
+		logging.file=logs/practice.log - spring will log here (both its internal logs and the org.slf4j.LoggerFactory used by the application)
+		
+		You can also enable a “debug” mode by starting your application with a --debug flag.
+			you can also specify debug=true in your application.properties.
+			java -jar myapp.jar --debug
+			
+26.3 File output
+	logging.file
+	
+26.5 Custom log configuration
+	logging.config can be set to for example "logback-spring.xml"
+
+	
+27.1 The ‘Spring Web MVC framework’
+27.1.2 HttpMessageConverters
+	pring MVC uses the HttpMessageConverter interface to convert HTTP requests and responses. Sensible defaults are included out of the box, 
+	for example Objects can be automatically converted to JSON (using the Jackson library) or XML (using the Jackson XML extension if available, else using JAXB). 
+	Strings are encoded using UTF-8 by default.
+	
+27.1.5 Static Content
+	By default Spring Boot will serve static content from a directory called /static (or /public or /resources or /META-INF/resources) in the classpath or 
+	from the root of the ServletContext. It uses the ResourceHttpRequestHandler from Spring MVC so you can modify that behavior by adding your own 
+	WebMvcConfigurerAdapter and overriding the addResourceHandlers method.
+	
+	Do not use the src/main/webapp directory if your application will be packaged as a jar. Although this directory is a common standard, 
+	it will only work with war packaging and it will be silently ignored by most build tools if you generate a jar.
+	
+
+27.3 Embedded servlet container support
+	When using an embedded servlet container you can register Servlets, Filters and all the listeners from the Servlet spec (e.g. HttpSessionListener)
+	either by using Spring beans or by scanning for Servlet components.
+	
+	If convention-based mapping is not flexible enough you can use the ServletRegistrationBean, FilterRegistrationBean and ServletListenerRegistrationBean classes for complete control.
+	
+27.3.2 Servlet Context Initialization
+
+27.3.4 Customizing embedded servlet containers
+	server.port
+	server.address
+	server.session.persistence
+	server.session.timeout
+	server.session.cookie.*
+	server.session.store-dir
+	
+
+28. Security
+	If Spring Security is on the classpath then web applications will be secure by default with ‘basic’ authentication on all HTTP endpoints. 
+	To add method-level security to a web application you can also add @EnableGlobalMethodSecurity with your desired settings: @Secured("ROLE_TELLER")
+	
+	@EnableWebSecurity, @EnableGlobalMethodSecurity - the latter is for method-based authorization
+	
+29. Working with SQL databases
+
+29.3.3 Creating and dropping JPA databases
+	By default, JPA databases will be automatically created only if you use an embedded database (H2, HSQL or Derby). 
+	You can explicitly configure JPA settings using spring.jpa.* properties. For example, to create and drop tables you can add the following to your application.properties.
+		spring.jpa.hibernate.ddl-auto=create-drop
+		
+	spring.jpa.properties.hibernate.globally_quoted_identifiers=true - passes hibernate.globally_quoted_identifiers to the Hibernate entity manager.
+	
+31. Caching
+
+
 	
 ********************************
 Spring React
