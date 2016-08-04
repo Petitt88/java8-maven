@@ -207,6 +207,10 @@ Normally both JPA and Hibernate require an xml config (persistence.xml, hibernat
 
 A persistence context is a concept that is a list of SQL statements to be sent to the database. Each Hibernate session has one persistence context.
 
+Mappings:
+	@OneToOne: @OneToOne(fetch = FetchType.LAZY, optional = false) to prevent hibernate from querying the related entity in a separate query even if the FetchType is LAZY.
+			   http://stackoverflow.com/questions/17987638/hibernate-one-to-one-lazy-loading-optional-false
+
 
 @Entity --> @Respository (Dao) --> @Service --> @Controller/@Restcontroller
 
@@ -310,6 +314,7 @@ Spring Session
 ********************************
 
 Overrdies the default session provided by the servlet container. We can use Gemfire, Redis, Jdbc, MongoDB transparently to store the session.
+By default the session-data gets stored in the servlet container's memory.
 
 We have already mentioned that Spring Session provides transparent integration with HttpSession, but what benefits do we get out of this?
 	Clustered Sessions - Spring Session makes it trivial to support clustered sessions without being tied to an application container 
@@ -2404,8 +2409,168 @@ You should only ever add one @EnableAutoConfiguration annotation. We generally r
 	spring.jpa.properties.hibernate.globally_quoted_identifiers=true - passes hibernate.globally_quoted_identifiers to the Hibernate entity manager.
 	
 31. Caching
+	@EnableCaching
+	You can either use the standard JSR-107 (JCache) annotations or Spring’s own caching annotations transparently. We strongly advise you however to not mix and match them.
+	
+Part V. Spring Boot Actuator: Production-ready features
+	Spring Boot includes a number of additional features to help you monitor and manage your application when it’s pushed to production. 
+	You can choose to manage and monitor your application using HTTP endpoints, with JMX or even by remote shell (SSH or Telnet). 
+	Auditing, health and metrics gathering can be automatically applied to your application.
 
+	Actuator HTTP endpoints are only available with a Spring MVC-based application. In particular, it will not work with Jersey unless you enable Spring MVC as well.
+	
+	
+82.1 Create a deployable war file
+	The first step in producing a deployable war file is to provide a SpringBootServletInitializer subclass and override its configure method.
+	This makes use of Spring Framework’s Servlet 3.0 support and allows you to configure your application when it’s launched by the servlet container. 
+	Typically, you update your application’s main class to extend SpringBootServletInitializer:
+	
+	@SpringBootApplication
+	public class Application extends SpringBootServletInitializer {
 
+		@Override
+		protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+			return application.sources(Application.class);
+		}
+
+		public static void main(String[] args) throws Exception {
+			SpringApplication.run(Application.class, args);
+		}
+
+	}
+	
+69.4 Create a non-web application
+	Not all Spring applications have to be web applications (or web services). If you want to execute some code in a main method, but also bootstrap a 
+	Spring application to set up the infrastructure to use, then it’s easy with the SpringApplication features of Spring Boot. A SpringApplication changes 
+	its ApplicationContext class depending on whether it thinks it needs a web application or not. The first thing you can do to help it is to just leave the
+	servlet API dependencies off the classpath.
+	
+71.1.1 Add a Servlet, Filter or Listener using a Spring bean
+	In the case of Filters and Servlets you can also add mappings and init parameters by adding a FilterRegistrationBean or ServletRegistrationBean
+	instead of or as well as the underlying component.
+		If no dispatcherType is specified on a filter registration, it will match FORWARD,INCLUDE and REQUEST. If async has been enabled, it will match ASYNC as well.
+		
+71.5 Configure SSL
+	server.port=8443
+	server.ssl.key-store=classpath:keystore.jks
+	server.ssl.key-store-password=secret
+	server.ssl.key-password=another-secret
+	
+72.2 Write an XML REST service
+	<dependency>
+		<groupId>com.fasterxml.jackson.dataformat</groupId>
+		<artifactId>jackson-dataformat-xml</artifactId>
+	</dependency>
+
+72.4 Customize the @ResponseBody rendering
+	Spring uses HttpMessageConverters to render @ResponseBody (or responses from @RestController). You can contribute additional converters by simply adding beans
+	of that type in a Spring Boot context. If a bean you add is of a type that would have been included by default anyway (like MappingJackson2HttpMessageConverter 
+	for JSON conversions) then it will replace the default value.
+	
+72.7 Switch off the Default MVC configuration
+	The easiest way to take complete control over MVC configuration is to provide your own @Configuration with the @EnableWebMvc annotation. 
+	This will leave all MVC configuration in your hands.
+	
+74. Logging
+	Spring Boot has no mandatory logging dependency, except for the Commons Logging API, of which there are many implementations to choose from. 
+	To use Logback you need to include it and jcl-over-slf4j (which implements the Commons Logging API) on the classpath. 
+	The simplest way to do that is through the starters which all depend on spring-boot-starter-logging. 
+	For a web application you only need spring-boot-starter-web since it depends transitively on the logging starter. For example, using Maven:
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		
+	logging.level.org.springframework.web=DEBUG
+	logging.level.org.hibernate=ERROR
+	
+75.2 Configure Two DataSources
+	@Bean
+	@Primary
+	@ConfigurationProperties(prefix="datasource.primary")
+	public DataSource primaryDataSource() {
+		return DataSourceBuilder.create().build();
+	}
+
+	@Bean
+	@ConfigurationProperties(prefix="datasource.secondary")
+	public DataSource secondaryDataSource() {
+		return DataSourceBuilder.create().build();
+	}
+	
+75.4 Separate @Entity definitions from Spring configuration
+	Spring Boot tries to guess the location of your @Entity definitions, based on the @EnableAutoConfiguration it finds. To get more control, you can use the @EntityScan annotation, e.g.
+
+	@Configuration
+	@EnableAutoConfiguration
+	@EntityScan(basePackageClasses=City.class)
+	public class Application {
+	
+75.5 Configure JPA properties
+	spring.jpa.hibernate.ddl-auto=create-drop
+	spring.jpa.hibernate.naming.physical-strategy=com.example.MyPhysicalNamingStrategy
+	spring.jpa.database=H2
+	spring.jpa.show-sql=true
+	
+	The ddl-auto setting is a special case in that it has different defaults depending on whether you are using an embedded database (create-drop) or not (none). In addition all properties in spring.jpa.properties.* are passed through as normal JPA properties (with the prefix stripped) when the local EntityManagerFactory is created.
+	
+	Spring Boot provides a consistent naming strategy regardless of the Hibernate generation that you are using. 
+	If you are using Hibernate 4, you can customize it using spring.jpa.hibernate.naming.strategy; Hibernate 5 defines a Physical and Implicit naming strategies: 
+	Spring Boot configures SpringPhysicalNamingStrategy by default. This implementation provides the same table structure as Hibernate 4. I
+	f you’d rather use Hibernate 5’s default instead, set the following property:
+	
+		spring.jpa.hibernate.naming.physical-strategy=org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+		
+75.7 Use Two EntityManagers
+	@Bean
+	public LocalContainerEntityManagerFactoryBean customerEntityManagerFactory(
+			EntityManagerFactoryBuilder builder) {
+		return builder
+				.dataSource(customerDataSource())
+				.packages(Customer.class)
+				.persistenceUnit("customers")
+				.build();
+	}
+
+	@Bean
+	public LocalContainerEntityManagerFactoryBean orderEntityManagerFactory(
+			EntityManagerFactoryBuilder builder) {
+		return builder
+				.dataSource(orderDataSource())
+				.packages(Order.class)
+				.persistenceUnit("orders")
+				.build();
+	}
+	
+76.1 Initialize a database using JPA
+	JPA has features for DDL generation, and these can be set up to run on startup against the database. This is controlled through two external properties:
+	spring.jpa.generate-ddl (boolean) switches the feature on and off and is vendor independent.
+	spring.jpa.hibernate.ddl-auto (enum) is a Hibernate feature that controls the behavior in a more fine-grained way. See below for more detail.
+	
+
+76.2 Initialize a database using Hibernate
+
+	You can set spring.jpa.hibernate.ddl-auto explicitly and the standard Hibernate property values are none, validate, update, create, create-drop. 
+	Spring Boot chooses a default value for you based on whether it thinks your database is embedded (default create-drop) or not (default none). 
+	An embedded database is detected by looking at the Connection type: hsqldb, h2 and derby are embedded, the rest are not. 
+	Be careful when switching from in-memory to a ‘real’ database that you don’t make assumptions about the existence of the tables and data in the new platform. 
+	You either have to set ddl-auto explicitly, or use one of the other mechanisms to initialize the database.
+	
+76.4 Initialize a Spring Batch database
+	f you are using Spring Batch then it comes pre-packaged with SQL initialization scripts for most popular database platforms. Spring Boot will detect your database type, and execute those scripts by default, and in this case will switch the fail fast setting to false (errors are logged but do not prevent the application from starting). 
+	You can switch off the initialization explicitly using spring.batch.initializer.enabled=false.
+	
+77.1 Execute Spring Batch jobs on startup
+	Spring Batch auto-configuration is enabled by adding @EnableBatchProcessing (from Spring Batch) somewhere in your context.
+	
+		
+80. Hot swapping
+	There are several options for hot reloading. The recommended approach is to use spring-boot-devtools as it provides additional development-time features such as support for fast application restarts and LiveReload as well as sensible development-time configuration (e.g. template caching).
+	
+	80.2.1 Thymeleaf templates
+		If you are using Thymeleaf, then set spring.thymeleaf.cache to false. See ThymeleafAutoConfiguration for other Thymeleaf customization options.
+		
 	
 ********************************
 Spring React
