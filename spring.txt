@@ -223,7 +223,7 @@ Spring Security
 When security is only the classpath, all endpoints by default requires basic authentitcation (including the static resource files).
 CSRF protection is enabled by default.
 
-.formLogin() - injects a Filter to the FilterChain pipeline
+.formLogin() - injects a Filter (UsernamePasswordAuthenticationFilter) to the FilterChain pipeline
 			 - invoked only when url is "loginProcessingUrl()"
 			 - default authenticationProvider is used which uses basic authentication - can be replaced with inMemory, jdbc, or custom
 
