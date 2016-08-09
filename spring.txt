@@ -339,6 +339,19 @@ public class HttpSessionConfig {
 
 JSESSIONID: this is the cookie that hold the id of the user's session
 
+To replace the path of the session cookie:
+
+	http://docs.spring.io/spring-session/docs/1.2.1.RELEASE/reference/html5/guides/custom-cookie.html
+		
+	@Bean
+	public CookieSerializer cookieSerializer() {
+			DefaultCookieSerializer serializer = new DefaultCookieSerializer();
+			serializer.setCookieName("JSESSIONID"); 
+			serializer.setCookiePath("/"); 
+			serializer.setDomainNamePattern("^.+?\\.(\\w+\\.[a-z]+)$"); 
+			return serializer;
+	}
+
 
 ********************************
 Spring Cloud, Microservices
@@ -2138,6 +2151,7 @@ public class MyBean {
 To run a boot project from the command line: 
 	java -jar XXX.jar
 	mvn spring-boot:run
+	mvn spring-boot:run --debug
 	
 To create an executable jar just use the maven/gradle plugin provided by Spring:
 	Maven plugin binds to the "repackage" goal
@@ -2344,6 +2358,10 @@ You should only ever add one @EnableAutoConfiguration annotation. We generally r
 	
 26. Logging
 	Spring by default uses Logback but this can be changed to Log4J 2
+	
+	To enable logging DEBUG messages (by default only ERROR, WARN, and INFO are logged), specify this:
+		logging.level.<base-package>
+		logging.level.hu.regens.edgemicro=DEBUG
 
 26.2 Console output
 		The default log configuration will echo messages to the console as they are written. By default ERROR, WARN and INFO level messages are logged. 
