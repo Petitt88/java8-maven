@@ -358,12 +358,15 @@ Spring Cloud, Microservices
 ********************************
 
 Eureka, ZooKeeper: service registry and provide network discovery (prefer to use eureka since it is more resilient to failures)
-Hystrix: fallback methods in case of failures - on the edge service, microservices
+Hystrix: fallback methods in case of failures - on the edge service, microservices. Implements the circuit breaker pattern.
 Microservice: invoked by the edge service, and they can invoke each other (hystrix needed if invoking other services for the best user experience - avoid showing stacktraces)
 Zuul: egde service implementation: micro proxy, api gateway
+	1. Micro proxy: bindlys forward packages outside to the datacenter inside the loadbalancer
+	2. API gateway: transforms the request to the services behind the loadbalancer
 Actuator: monitoring capabilities via jmx and rest api (use with the config server)
 Config server: central store for configurations of the participants of the system
 Hystrix dashboard, Turbine: use for health monitoring
+	Turbine: aggregates the Hystrix health monitoring data from each microservice and provides an aggregated result.
 Ribbon: round robin load balancer
 
 
