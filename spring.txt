@@ -719,44 +719,104 @@ Processing options:
 
 		
 Job: A Job is an entity that encapsulates an entire batch process. It contains one or more steps.
-JobIstance: JobInstance = Job + identifying JobParameters. A JobInstance refers to the concept of a logical job run.
-JobExecution: A JobExecution refers to the technical concept of a single attempt to run a Job.
-Setp: ItemReader + ItemProcessor + ItemWriter
-StepExecution: represents a single attempt to execute a Step
+
+JobIstance: JobInstance = Job + identifying JobParameters (starting time of the job). A JobInstance refers to the concept of a logical job run. Persisted in the database.
+
+JobExecution: A JobExecution refers to the technical concept of a single attempt to run a Job's instance. Persisted in the database.
+	Each JobInstance can have multiple JobExecutions.
+	The ideal number is one, but if the job's instance fails and are rerun, another execution is created for the same instance.
+	An execution may end in failure or success, but the JobInstance corresponding to a given execution will not be considered complete unless the execution completes successfully.
+	
+JobParameters: distinguishes a particaluar job's instances from each other. JobInstance gets it, it is the starting time of the job.
+
+Setp: ItemReader + ItemProcessor + ItemWriter. A Job has one or more Steps.
+
+StepExecution: represents a single attempt to execute a Step. JobExecution has one or more StepExecutions. 
+	A new StepExecution will be created each time a Step is run, similar to JobExecution. 
+	However, if a step fails to execute because the step before it fails, there will be no execution persisted for it. 
+	A StepExecution will only be created when its Step is actually started.
+	
 JobRepository: JobRepository is the persistence mechanism for all of the Stereotypes mentioned above.
+	It provides CRUD operations for JobLauncher, Job, and Step implementations. 
+	When a Job is first launched, a JobExecution is obtained from the repository, and during the course of execution 
+	StepExecution and JobExecution implementations are persisted by passing them to the repository.
+	
 JobLauncher represents a simple interface for launching a Job with a given set of JobParameters.
+
 ItemReader is an abstraction that represents the retrieval of input for a Step, one item at a time. When the ItemReader has exhausted the items it can provide, it will indicate this by returning null.
 ItemWriter is an abstraction that represents the output of a Step, one batch or chunk of items at a time.
 ItemProcessor is an abstraction that represents the business processing of an item. While the ItemReader reads one item, and the ItemWriter writes them, the ItemProcessor 
 	provides access to transform or apply other business processing. If, while processing the item, it is determined that the item is not valid, returning null indicates that the item should not be written out.
 	
-One key issue when executing a batch job concerns the behavior of a Job when it is restarted. The launching of a Job is considered to be a 'restart' if a JobExecution already exists for the particular JobInstance.
-
-In-Memory Repository: There are scenarios in which you may not want to persist your domain objects to the database.
-	<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
-		<property name="transactionManager" ref="transactionManager"/>
-	</bean>
+ExecutionContext: An ExecutionContext represents a collection of key/value pairs that are persisted and controlled by the framework in order to allow developers a 
+	place to store persistent state that is scoped to a StepExecution or JobExecution. For those familiar with Quartz, it is very similar to JobDataMap. 
+	The best usage example is to facilitate restart. Using flat file input as an example, while processing individual lines, 
+	the framework periodically persists the ExecutionContext at commit points. This allows the ItemReader to store its state in case a fatal error occurs during the run, 
+	or even if the power goes out. All that is needed is to put the current number of lines read into the context, and the framework will do the rest:
+		executionContext.putLong(getKey(LINES_READ_COUNT), reader.getPosition());
 	
-Chunk-Oriented Processing
+4.1.1 Restartability
+	One key issue when executing a batch job concerns the behavior of a Job when it is restarted. The launching of a Job is considered to be a 'restart' if a JobExecution already exists for the particular JobInstance.
+	
+4.1.2 Intercepting Job Execution
+
+4.3.3 In-Memory Repository
+	In-Memory Repository: There are scenarios in which you may not want to persist your domain objects to the database.
+		<bean id="jobRepository" class="org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean">
+			<property name="transactionManager" ref="transactionManager"/>
+		</bean>
+		
+4.6.1 Querying the Repository
+	Use the JobExplorer interface.
+	
+	
+5. Configuring a Step
+5.1 Chunk-Oriented Processing
 	Spring Batch uses a 'Chunk Oriented' processing style within its most common implementation. Chunk oriented processing refers to reading the data one at a time,
 	and creating 'chunks' that will be written out, within a transaction boundary. One item is read in from an ItemReader, handed to an ItemProcessor, and aggregated. 
 	Once the number of items read equals the commit interval, the entire chunk is written out via the ItemWriter, and then the transaction is committed.
 	
-All batch processing can be described in its most simple form as reading in large amounts of data, performing some type of calculation or transformation, and writing the result out.
-	Spring Batch provides three key interfaces to help perform bulk reading and writing: ItemReader, ItemProcessor and ItemWriter.
+6. ItemReaders and ItemWriters
+	All batch processing can be described in its most simple form as reading in large amounts of data, performing some type of calculation or transformation, 
+	and writing the result out. Spring Batch provides three key interfaces to help perform bulk reading and writing: ItemReader, ItemProcessor and ItemWriter.
 	
-
-Scaling and Parallel Processing
-	Multi-threaded Step: The result of the above configuration will be that the Step executes by reading, processing and writing each chunk of items (each commit interval)
-					 in a separate thread of execution. Note that this means there is no fixed order for the items to be processed, and a chunk might contain items that are 
-					 non-consecutive compared to the single-threaded case. In addition to any limits placed by the task executor (e.g. if it is backed by a thread pool), 
-					 there is a throttle limit in the tasklet configuration which defaults to 4. You may need to increase this to ensure that a thread pool is fully utilised.
+6.3.1 Chaining ItemProcessors
+	Use the CompositeItemProcessor.
+	
+6.3.2 Filtering Records
+	To filter a record, one simply returns "null" from the ItemProcessor.
+	
+7. Scaling and Parallel Processing
+	7.1 Multi-threaded Step
+		The result of the above configuration will be that the Step executes by reading, processing and writing each chunk of items (each commit interval)
+		in a separate thread of execution. Note that this means there is no fixed order for the items to be processed, and a chunk might contain items that are 
+		non-consecutive compared to the single-threaded case. In addition to any limits placed by the task executor (e.g. if it is backed by a thread pool), 
+		there is a throttle limit in the tasklet configuration which defaults to 4. You may need to increase this to ensure that a thread pool is fully utilised.
 					 
-	Parallel Steps: steps execute parallel
+	7.2 Parallel Steps
+		steps execute parallel
 
-	Remote Chunking: In Remote Chunking the Step processing is split across multiple processes, communicating with each other through some middleware.
+	7.3 Remote Chunking
+		In Remote Chunking the Step processing is split across multiple processes, communicating with each other through some middleware.
 
-	Paritioning: Spring Batch also provides an SPI for partitioning a Step execution and executing it remotely.
+	7.4 Paritioning: 
+		Spring Batch also provides an SPI for partitioning a Step execution and executing it remotely.
+	
+11. Common Batch Patterns
+11.1 Logging Item Processing and Failures
+	public class ItemFailureLoggerListener extends ItemListenerSupport {
+
+		private static Log logger = LogFactory.getLog("item.error");
+
+		public void onReadError(Exception ex) {
+			logger.error("Encountered error on read", e);
+		}
+
+		public void onWriteError(Exception ex, Object item) {
+			logger.error("Encountered error on write", ex);
+		}
+
+	}
 
 
 
@@ -2579,7 +2639,7 @@ Part V. Spring Boot Actuator: Production-ready features
 	You either have to set ddl-auto explicitly, or use one of the other mechanisms to initialize the database.
 	
 76.4 Initialize a Spring Batch database
-	f you are using Spring Batch then it comes pre-packaged with SQL initialization scripts for most popular database platforms. Spring Boot will detect your database type, and execute those scripts by default, and in this case will switch the fail fast setting to false (errors are logged but do not prevent the application from starting). 
+	If you are using Spring Batch then it comes pre-packaged with SQL initialization scripts for most popular database platforms. Spring Boot will detect your database type, and execute those scripts by default, and in this case will switch the fail fast setting to false (errors are logged but do not prevent the application from starting). 
 	You can switch off the initialization explicitly using spring.batch.initializer.enabled=false.
 	
 77.1 Execute Spring Batch jobs on startup
@@ -2640,6 +2700,25 @@ PaaS support: through Cloud Foundry which is an open source PaaS implementation.
 	What this means for the eIMS is that let’s say Alert Management microservice is having increased requests and struggles to serve them. 
 	We can tell the platform that we need more instances of the Alert Management microservice and the platform will handle firing them up.
 	Cloud Foundry is host-agnostic, meaning that it can run on VMWare, AWS, OpenStack, ...
+	
+	
+	
+********************************
+H2, HSQL in-memory databases
+********************************
+
+localhost:8080/h2-console to access the web console
+
+H2:
+	Driver class: org.h2.Driver
+	Jdbc Url: jdbc:h2:mem:testdb
+	name: sa
+	
+HSQL:
+	Driver class: org.hsqldb.jdbc.JDBCDriver
+	Jdbc Url: jdbc:hsqldb:mem:testdb
+	name: sa
+
 
 
 	
