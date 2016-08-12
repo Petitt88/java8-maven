@@ -794,7 +794,10 @@ ExecutionContext: An ExecutionContext represents a collection of key/value pairs
 		there is a throttle limit in the tasklet configuration which defaults to 4. You may need to increase this to ensure that a thread pool is fully utilised.
 					 
 	7.2 Parallel Steps
-		steps execute parallel
+		Steps execute parallel.
+		As long as the application logic that needs to be parallelized can be split into distinct responsibilities, 
+		and assigned to individual steps then it can be parallelized in a single process.
+		
 
 	7.3 Remote Chunking
 		In Remote Chunking the Step processing is split across multiple processes, communicating with each other through some middleware.
