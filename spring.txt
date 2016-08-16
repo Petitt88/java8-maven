@@ -8,11 +8,18 @@
 
 @Valid
 @ModelAttribute - this is used to add stuff to spring's model and it ultimately goes into the HttpServletRequest object after the handler executes
+	Using @ModelAttribute on a method argument: An @ModelAttribute on a method argument indicates the argument should be retrieved from the model. 
+		If not present in the model, the argument should be instantiated first and then added to the model. 
+		Once present in the model, the argument’s fields should be populated from all request parameters that have matching names. 
+		This is known as data binding in Spring MVC, a very useful mechanism that saves you from having to parse each form field individually.
 @SessionAttributes("key") - adds the value from the ModelMap that belongs to the specified key to the HttpSession object after the handler executes
 @ResponseBody
 @RequestBody
 @PathParam
 @Value - specify default value on properties. Can be arbirtary string or expression e.g. "#{systemProperties.myProp}"
+
+@Order: defines the sort order for an annotated component. The value() is optional and represents an order value as defined in the Ordered interface. Lower values have higher priority. The default value is Ordered.LOWEST_PRECEDENCE, indicating lowest priority (losing to any other specified order value).
+@Priority: the standardized version of @Order
 
 @ControllerAdvice - it is typically used to define @ExceptionHandler, @InitBinder, and @ModelAttribute methods that apply to all @RequestMapping methods.
 @ExceptionHandler

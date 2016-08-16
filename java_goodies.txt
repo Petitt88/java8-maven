@@ -24,7 +24,7 @@ The flow of "loadClass()" is as follows:
 Always load the classes once. It's also important to keep a cache because the loadClass() method is called recursively when a class is
 being resolved, and you will need to return the cached result rather than chase it down for another copy.
 
-Classpath: contains folders and jar files. A java class is found like this:
+Classpath: contains folders (like src/main/java) and jar files. A java class is found like this:
  - if a jar contains it, it is loaded from there
  - if not, the JVM concatenates the folder path from the classpath with the "import ..." statement located in the class file. 
    The resulting path must pont to the .class file.
