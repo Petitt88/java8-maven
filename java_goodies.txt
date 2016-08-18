@@ -45,6 +45,9 @@ For example, if we execute the compile phase, the phases that actually get execu
 
 mvn -DskipTests=true clean install <-- to excute the "clean" phase of the "clean" lifecycle then the "build" lifecycle's "install" phase but skip the preceeding "test" phase
 
+mvn spring-boot:run: to run a spring boot project (pom.xml is required ofc)
+mvn spring-boot:run --debug
+
 validate
 generate-sources
 process-sources
@@ -109,6 +112,8 @@ gradle build: assembles and tests the project
 gradle check: run all checks
 gradle test: run the unit tests
 
+gradle bootRun: to run a spring-boot project (build.gradle required ofc)
+
 gradle clean jar: to run the "clean" and after that the "jar" tasks
 
 https://docs.gradle.org/current/userguide/tutorial_gradle_command_line.html
@@ -129,15 +134,86 @@ Example multiple tasks:
 		println 'building the distribution'
 	}
 
+	
+A little explanation about the build.gradle file's structure:
 
+- there are plugins that expose configurations and we can specify configuration sections to adjust them:
+	eclipse {
+		classpath {
+			 containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
+			 containers 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8'
+		}
+	}
+	sonarqube {
+		properties {
+			property "sonar.projectVersion", "1.0"
+			property "sonar.jacoco.reportPath", "${buildDir}/jacoco/test.exec"
+			property "sonar.java.source", "1.8"
+			property "sonar.java.target", "1.8"
+		}
+	} 
+	
+	The "eclipse" and "sonarqube" are config sections exposed by the corresponding plugins:
+		plugins{
+			id "org.sonarqube" version "1.1"
+		}
+
+		apply plugin: 'java'
+		apply plugin: 'eclipse'
+		apply plugin: 'spring-boot' 
+		apply plugin: 'jacoco'
+	
+	Dependencies:
+		dependencies {
+			// Mysql and Mssql connection
+			compile('mysql:mysql-connector-java:5.1.38')
+			compile files('libs/sqljdbc4-4.2.jar')
+			
+			compile project(':VMCPriceDetector')
+			
+			// Mybatis
+			compile("org.mybatis.spring.boot:mybatis-spring-boot-starter:1.1.1")
+			
+			// RxJava 
+			compile("io.reactivex:rxjava:1.1.7")	// maven's compile
+			
+			providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")	// maven's provided
+			runtime("...")	// maven's runtime
+			
+			testCompile("org.springframework.boot:spring-boot-starter-test") 
+			testCompile("org.hsqldb:hsqldb:2.3.4")
+		}
+		
+		
 
 **********Tomcat**********
 
 tomcat-users.xml:
-<role rolename="admin-gui"/>
-<role rolename="manager-gui"/>
-<user username="admin" password="admin" roles="admin-gui,manager-gui"/>
+	<role rolename="admin-gui"/>
+	<role rolename="manager-gui"/>
+	<user username="admin" password="admin" roles="admin-gui,manager-gui"/>
 
+	Specifies the users and their roles. Tomcat comes with default roles. For example the "manager-gui" role is required to be able to access the "Manager app" (http://localhost:8080/manager/html)
+	
+	
+server.xml
+
+	the port Tomcat gets started on can be changed here.
+	
+Deploy:
+	war files can be deployed in two ways:
+	
+		1. copy the .war into the "webapps" folder. Context path will be the war's name.
+		2. Launch tomcat and use the "Manager app" to deploy a war. The user can optionally change the context path here.
+			In order to be able to use the "Manager app" a user with "manager-gui" role must be added to the tomcat-users.xml file, like this: <user username="admin" password="admin" roles="tomcat,manager-gui"/>
+			
+To run Tomcat:
+
+	/bin/startup.bat	<-- runs tomcat
+
+	Note: running Tomcat from Eclipse does not allow us to use the default apps that come with Tomcat (like the manager app)
+	Double-clicking on the Tomcat server in the "Servers" view in Eclispe allows us to change some settings (like the port on the "Overview" tab and the context path of the deployed applications on the "Modules" tab), 
+		but THIS HAS NO EFFECT on the real server.xml and other files which are taken into consideration when starting Tomcat from the /bin folder instead of using Eclipse. So it has no effect on production environment.
 
 
 

@@ -2187,6 +2187,49 @@ Part VII. Integration
 Spring Boot
 ********************************
 
+To create a deployable war:
+
+	@SpringBootApplication
+	public class Application extends SpringBootServletInitializer {
+
+		@Override
+		protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+			return application.sources(Application.class);
+		}
+
+		public static void main(String[] args) throws Exception {
+			SpringApplication.run(Application.class, args);
+		}
+	}
+	
+	pom.xml:
+		<packaging>war</packaging>
+		  <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		
+	build.gradle:
+		apply plugin: 'war'
+		dependencies {
+			// …
+			providedRuntime 'org.springframework.boot:spring-boot-starter-tomcat'
+			// …
+		}
+		
+Boot deploy:
+	
+	when creating a jar, everything just works. application.properties is taken into consideration by spring and configures the embedded tomcat/jetty/undertow accordingly:
+		server.contextPath=/VMC			<-- this sets the context path (virtualdirectory) of our app
+		server.port=8080				<--- this sets the port of our app
+		
+		The app will be available on: http://localhost:8080/VMC
+		
+	If creating then deploying a war file, the "server.contextPath" and "server.port" mean nothing, the servlet container gives the contextPath and port.
+	In case of Tomcat the default context path is the war's name, and the port is set in /conf/server.xml. This can be overridden, see java_goodies/Tomcat for more details.
+	
+
 Spring Boot allows you to externalize your configuration so you can work with the same application code in different environments. 
 You can use properties files, YAML files, environment variables and command-line arguments to externalize configuration. 
 Property values can be injected directly into your beans using the @Value annotation, accessed via Spring’s Environment abstraction or bound to 
