@@ -109,6 +109,26 @@ gradle build: assembles and tests the project
 gradle check: run all checks
 gradle test: run the unit tests
 
+gradle clean jar: to run the "clean" and after that the "jar" tasks
+
+https://docs.gradle.org/current/userguide/tutorial_gradle_command_line.html
+Example multiple tasks:
+	task compile << {
+		println 'compiling source'
+	}
+
+	task compileTest(dependsOn: compile) << {
+		println 'compiling unit tests'
+	}
+
+	task test(dependsOn: [compile, compileTest]) << {
+		println 'running unit tests'
+	}
+
+	task dist(dependsOn: [compile, test]) << {
+		println 'building the distribution'
+	}
+
 
 
 **********Tomcat**********
