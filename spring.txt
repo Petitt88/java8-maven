@@ -58,8 +58,6 @@ Sometimes we need Spring Framework objects in our beans to perform some operatio
 for example reading ServletConfig and ServletContext parameters or to know the bean definitions loaded by the ApplicationContext. 
 That’s why spring framework provides a bunch of *Aware interfaces that we can implement in our bean classes.
 
-mvn -DskipTests=true clean install
-
 spring.factories: a file that contains auto-configuration classes for everything. These are only included when certain
 	conditions are met thanks to the @ConditionalOnClass annotation which is like the .NET #ifdef
 	

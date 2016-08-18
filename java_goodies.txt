@@ -43,6 +43,8 @@ A phase is a step in the build lifecycle, which is an ordered sequence of phases
 When a phase is given, Maven will execute every phase in the sequence up to and including the one defined. Every goal in these cases is executed.
 For example, if we execute the compile phase, the phases that actually get executed are:
 
+mvn -DskipTests=true clean install <-- to excute the "clean" phase of the "clean" lifecycle then the "build" lifecycle's "install" phase but skip the preceeding "test" phase
+
 validate
 generate-sources
 process-sources
@@ -86,6 +88,26 @@ https://maven.apache.org/guides/mini/guide-configuring-plugins.html
 How do you know Jackson 2 is on the classpath? 
 Either run `mvn dependency:tree` or ./gradlew dependencies and you'll get a detailed tree of dependencies which shows Jackson 2.x. 
 You can also see that it comes from spring-boot-starter-web.
+
+
+
+**********Gradle**********
+
+build.gradle file
+The eclipse plugins adds 2 nice views: Gradle Executions and Gradle Tasks to be able to run the desired gradle task without:
+	1. going to the command line
+	2. the need to use the Run Configurations... window where we can add a new "Gradle Project"
+
+gradle --help: to display the help window
+gradle tasks: to display the available tasks (plugins might add tasks, so does the "java" plugin)
+gradle <task>: to run a task
+
+gradle clean: deletes the build directory
+gradle jar: assemble a jar achrive containing the main classes
+gradle javadoc: generates javadoc
+gradle build: assembles and tests the project
+gradle check: run all checks
+gradle test: run the unit tests
 
 
 
