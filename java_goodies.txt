@@ -28,6 +28,40 @@ Classpath: contains folders (like src/main/java) and jar files. A java class is 
  - if a jar contains it, it is loaded from there
  - if not, the JVM concatenates the folder path from the classpath with the "import ..." statement located in the class file. 
    The resulting path must pont to the .class file.
+   
+   
+   
+ **********Eclipse**********
+ 
+ The build path:
+	contains folders, that are part of the classpath along with .jar libraries - individual jars, maven/gradle jars.
+	These folders are tipically: src/main/java, src/main/resources, src/test/java. The order matters, the classloader tries the src/main/java first.
+		Order can be changed in right click --> Properties --> Java Build Path --> Order and Export
+		
+		
+Facets: this tells eclipse what our project is capable of. Right click --> Properties --> Project facets.
+	Only those projects can be added for example to Tomcat that has
+		- Java facat
+		- Dynamic Web Module facet: if the project has this the Properties will show the "Deployment Assembly" menu which tells eclipse where to put certain
+			folders (like /src/main/java) in the output .war file. Usually there is a "WebContent" folder as well located in /src/main/WebContent, however Spring does not require this.
+			Only old-school web archetype projects are scaffolded with this folder (it is for holding the static files: html, css, js. Also the web.xml, other necessary config xml files).
+			If no web.xml was added, then add it manually: in Project Explorer: Deployment Descriptor right click --> Generate Deployment Descriptor Stub
+			
+			This facet also add the web.xml deployment descriptor. This is where filters/servlets FilterConfigs, ServletConfigs can be specified using 2.5 servlet-container.
+			3.0+ servlet-containers support annotation-based Servlet, Filters and their configs, init-params without the need for a web.xml.
+			In maven the fail on missing web.xml can be turned off:
+				<build>
+					<plugins>
+						<plugin>
+							<groupId>org.apache.maven.plugins</groupId>
+							<artifactId>maven-war-plugin</artifactId>
+							<version>2.6</version>
+							<configuration>
+								<failOnMissingWebXml>false</failOnMissingWebXml>
+							</configuration>
+						</plugin>
+					</plugins>
+				</build>
 
 
 
