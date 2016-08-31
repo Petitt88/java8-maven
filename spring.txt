@@ -1,3 +1,6 @@
+@PostConstruct - bean lifecycle
+@PreDestroy - bean lifecycle
+
 @Component
 @Service
 @Repository
@@ -2262,10 +2265,13 @@ public class MyBean {
 
 }
 	
-To run a boot project from the command line: 
+To run a boot project from the command line with Maven: 
 	java -jar XXX.jar
 	mvn spring-boot:run
 	mvn spring-boot:run --debug
+	
+With Gradle:
+	gradle bootRun
 	
 To create an executable jar just use the maven/gradle plugin provided by Spring:
 	Maven plugin binds to the "repackage" goal
