@@ -130,6 +130,8 @@ How do you know Jackson 2 is on the classpath?
 Either run `mvn dependency:tree` or './gradlew dependencies' and you'll get a detailed tree of dependencies which shows Jackson 2.x. 
 You can also see that it comes from spring-boot-starter-web.
 
+To update dependencies shown in eclipse: right click on the project --> Maven --> Update Project... (Maven tends to do this on his own but not always :-()
+
 
 
 **********Gradle**********
@@ -221,6 +223,12 @@ A little explanation about the build.gradle file's structure:
 			testCompile("org.springframework.boot:spring-boot-starter-test") 
 			testCompile("org.hsqldb:hsqldb:2.3.4")
 		}
+		
+		
+	A little more on dependencies: after modifying the dependencies, in Eclipse a refresh is necessary to make Eclipse update the jars displayed 
+		in "Project and External Dependencies" library:
+		
+		right click on the project --> Gradle --> Refresh Gradle Project (this is similar to Maven's Update Project...)
 		
 		
 
