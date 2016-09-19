@@ -49,7 +49,7 @@ Facets: this tells eclipse what our project is capable of. Right click --> Prope
 			
 			Also:
 				- this facet makes eclipse display our application on the popup shown when trying to add our application to the ones that get started when Tomcat starts: Servers tab --> Tomcat --> Right click --> "Add and Remove..." - now out application is displayed
-				- this faces makes eclipse able to run out application on server: On the project --> Right click --> Run as --> Run on Server. Now our application starts.
+				- this faces makes eclipse able to run our application on server: On the project --> Right click --> Run as --> Run on Server. Now our application starts.
 			
 			This facet also adds the web.xml deployment descriptor. This is where filters/servlets FilterConfigs, ServletConfigs can be specified using 2.5 servlet-container.
 			3.0+ servlet-containers support annotation-based Servlet, Filters and their configs, init-params without the need for a web.xml.
