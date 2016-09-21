@@ -365,6 +365,20 @@ List<String> x = new ArrayList<String>() {}; - type information is retained due 
 	System.out.println(name);	// prints out String!
 	
 	This is called the "Type token pattern" - the Spring implementation is ParameterizedTypeReference<T>
+	
+	
+	
+********Static imports*********
+
+We can import static members from classes which allows us to use the member without the class qualification:
+
+	import static hu.regens.edgemicro.feature.validation.Building.trySome;
+	
+	trySome();	// - in action
+	
+The static import declaration is analogous to the normal import declaration. Where the normal import declaration imports classes from packages, 
+allowing them to be used without package qualification, the static import declaration imports static members from classes, 
+allowing them to be used without class qualification.
 
 
 
