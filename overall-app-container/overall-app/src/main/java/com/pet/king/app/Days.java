@@ -3,6 +3,8 @@ package com.pet.king.app;
 import java.util.EnumSet;
 import java.util.Set;
 
+import com.pet.king.app.InterfaceMindBlowUp.InnerEnum;
+
 interface DayOfWeek {
 	boolean isWeekend();
 }
@@ -66,5 +68,8 @@ class EnumTester {
 		System.out.println("FlagEnum test, (value should be 6): " + (FlagEnum.STRONG.id | FlagEnum.MEGA.id));
 
 		boolean weekend = Days.MONDAY.isWeekend();
+
+		InterfaceMindBlowUp.InnerEnum enum1 = InnerEnum.E1;
+		enum1.getMyName();
 	}
 }

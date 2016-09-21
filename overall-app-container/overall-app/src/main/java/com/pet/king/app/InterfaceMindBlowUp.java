@@ -13,7 +13,11 @@ public interface InterfaceMindBlowUp {
 	// nested classes, interfaces or enumerations are implicitly public and static
 
 	enum InnerEnum {
-		E1, E2
+		E1, E2;
+
+		String getMyName() {
+			return "Peter";
+		}
 	}
 
 	class InnerClass {
