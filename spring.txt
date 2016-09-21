@@ -1837,6 +1837,10 @@ HTTP Streaming Directly To The OutputStream
 	Flash attributes are saved temporarily before the redirect (typically in the session) to be made 
 	available to the request after the redirect and removed immediately.
 	
+		redirectAttributes.addFlashAttribute("customer", customer); - then the next request which is a GET due to a redirect can access this customer
+		return "redirect:showcustomer.html";	
+	
+	
 22.8 Using locales
 	Most parts of Spring’s architecture support internationalization, just as the Spring web MVC framework does.
 	DispatcherServlet enables you to automatically resolve messages using the client’s locale. This is done with LocaleResolver objects.
