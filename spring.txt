@@ -349,7 +349,7 @@ public class HttpSessionConfig {
 }
 
 
-JSESSIONID: this is the cookie that hold the id of the user's session
+JSESSIONID: this is the cookie that holds the id of the user's session
 
 To replace the path of the session cookie:
 
@@ -362,6 +362,17 @@ To replace the path of the session cookie:
 			serializer.setCookiePath("/"); 
 			serializer.setDomainNamePattern("^.+?\\.(\\w+\\.[a-z]+)$"); 
 			return serializer;
+	}
+	
+To replace the HttpSessionStrategy and store the sessionId in a header instead of a cookie use:
+	@Configuration
+	@EnableRedisHttpSession 
+	public class HttpSessionConfig {
+
+			@Bean
+			public HttpSessionStrategy httpSessionStrategy() {
+					return new HeaderHttpSessionStrategy(); 
+			}
 	}
 
 
@@ -1352,6 +1363,11 @@ Spring MVC:
 	BindingResult contains the outcome of this validation and any error that might have occurred during this validation. 
 	Notice that BindingResult must come right after the validated object else spring won’t be able to validate and an exception been thrown.
 	Custom errors can be added to the BindingResult: bindingResult.addError(new FieldError(...));		
+	
+	
+SessionAuthenticationStrategy
+	Allows pluggable support for HttpSession-related behaviour when an authentication occurs.
+	Typical use would be to make sure a session exists or to change the session Id to guard against session-fixation attacks.
 
 
 22. Web MVC framework
