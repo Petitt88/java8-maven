@@ -2218,6 +2218,65 @@ Part VII. Integration
 		// .. find messags for this user and return them ...
 	}
 	
+	
+Localization
+	
+	src/main/resources/messages.properties
+	src/main/resources/messages_{lang}.properties
+	
+	application.properties: spring.messages.basename=messages	#this is the default
+
+	@Configuration
+	public class LocalizationConfig extends WebMvcConfigurerAdapter {
+	
+		@Bean
+		public LocaleResolver localeResolver() {
+			SessionLocaleResolver slr = new SessionLocaleResolver();
+			slr.setDefaultLocale(Locale.US);
+			return slr;
+		}
+		
+		// this is auto-configured by Spring Boot
+		@Bean
+		public ReloadableResourceBundleMessageSource messageSource() {
+			ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+			messageSource.setBasename("classpath:locale/messages");
+			messageSource.setCacheSeconds(3600); //refresh cache once per hour
+			return messageSource;
+		}
+		
+		@Bean
+		public LocaleChangeInterceptor localeChangeInterceptor() {
+			LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
+			lci.setParamName("lang");
+			return lci;
+		}
+		
+		@Override
+		public void addInterceptors(InterceptorRegistry registry) {
+			registry.addInterceptor(localeChangeInterceptor());
+		}
+	}
+	
+	@Component
+	public class Localizer {
+	
+		private MessageSource messageSource;
+		private Localze localze;
+		
+		@Autowired
+		public Localizer(MessageSource messageSource, Locale locale) {
+			this.messageSource = messageSource;
+			this.locale = locale;
+		}
+		
+
+		public String getMessage(String id) {
+			Locale locale = LocaleContextHolder.getLocale();
+			return messageSource.getMessage(id,null,locale);
+		}
+	}
+	
 
 	
 ********************************
@@ -2746,7 +2805,37 @@ Part V. Spring Boot Actuator: Production-ready features
 	80.2.1 Thymeleaf templates
 		If you are using Thymeleaf, then set spring.thymeleaf.cache to false. See ThymeleafAutoConfiguration for other Thymeleaf customization options.
 		
+		
+		
+********************************
+Thymeleaf
+********************************
+
+${message} - read "message" from the Model
+#${field1} - for localization, read "field1" from the messages_{lang}.properties 		//  <label for="field1" th:text="#{field1}"></label>
+*{} - selection expression
 	
+	Values for th:field attributes must be selection expressions (*{...}), which makes sense given the fact that they will be evaluated on the form-backing bean
+	and not on the context variables (or model attributes in Spring MVC jargon).
+
+
+	<form th:action="@{/save}" method="post" th:object="${gizmo}">
+	instead of writing ${gizmo.datePlanted} we can write *{datePlanted} on elements inside the <form> tag
+		<input type="text" th:field="*{datePlanted}" /> - good
+		<input type="text" th:field="${gizmo.datePlanted}" /> - good as well
+	
+		
+There are special objects that thymeleaf exposes in the views like:
+	#field for form validation:	
+		<input type="text" th:field="*{datePlanted}" th:class="${#fields.hasErrors('datePlanted')}? fieldError" />
+	#httpServletRequest
+		<p>[[${#httpServletRequest.remoteUser}]]</p> 
+	#authentication by Spring Security
+		<span>[[${#authentication.firstName}]]</span>
+
+
+
+
 ********************************
 Spring React
 ********************************
