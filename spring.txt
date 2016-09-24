@@ -21,6 +21,7 @@
 @PathVariable - to map url parameters, like: "tender/{year}/forms"
 @RequestParam - for querystring parameter mapping
 @PathParam - t
+@AuthenticationPrincipal - Spring injects the current user with this
 
 @Value - specify default value on properties. Can be arbirtary string or expression e.g. "#{systemProperties.myProp}"
 @ConfigurationProperties - as @Value works with one field, this populates an entire java class's fields
@@ -2195,7 +2196,6 @@ Part VII. Integration
 			// handle exception
 		}
 	}
-
 	
 36. Cache Abstraction
 	Cache vs Buffer
@@ -2207,6 +2207,16 @@ Part VII. Integration
 	
 	@Cacheable("books")
 	public Book findBook(ISBN isbn) {...}
+	
+37.3
+
+	@AuthenticationPrincipal - Spring injects the current user with this
+
+	@RequestMapping("/messages/inbox")
+	public ModelAndView findMessagesForUser(@AuthenticationPrincipal CustomUser customUser) {
+
+		// .. find messags for this user and return them ...
+	}
 	
 
 	
