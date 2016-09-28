@@ -18,9 +18,11 @@
 @SessionAttributes("key") - adds the value from the ModelMap that belongs to the specified key to the HttpSession object after the handler executes
 @ResponseBody - @Controller + @ResponseBody = @RestController: write the response to the body (json, xml)
 @RequestBody - for json and xml request payloads: map them to arbitrary java classes
-@PathVariable - to map url parameters, like: "tender/{year}/forms"
+@PathVariable - to map url/route parameters, like: "tender/{year}/forms"
 @RequestParam - for querystring parameter mapping
 @PathParam - t
+@RequestAttribute - to bind a controller method's parameter to an object from the HttpServletRequest.Request
+@SessionAttribute - to bind a controller method's parameter to an object from the HttpServletRequest.Session
 @AuthenticationPrincipal - Spring injects the current user with this
 
 @Value - specify default value on properties. Can be arbirtary string or expression e.g. "#{systemProperties.myProp}"
