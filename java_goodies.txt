@@ -178,6 +178,8 @@ Example multiple tasks:
 A little explanation about the build.gradle file's structure:
 
 - there are plugins that expose configurations and we can specify configuration sections to adjust them:
+build.gradle:
+
 	eclipse {
 		classpath {
 			 containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
@@ -224,11 +226,18 @@ A little explanation about the build.gradle file's structure:
 			testCompile("org.hsqldb:hsqldb:2.3.4")
 		}
 		
+settings.gradle:
+	include ':VMCPriceDetector'
+	project(':VMCPriceDetector').projectDir = new File(settingsDir, '../VMCPriceDetector')
+		
 		
 	A little more on dependencies: after modifying the dependencies, in Eclipse a refresh is necessary to make Eclipse update the jars displayed 
 		in "Project and External Dependencies" library:
 		
 		right click on the project --> Gradle --> Refresh Gradle Project (this is similar to Maven's Update Project...)
+		
+How to build multiple projects in gradle (include dependencies and their transitive dependencies into the build output): 
+	https://docs.gradle.org/current/userguide/multi_project_builds.html
 		
 		
 
