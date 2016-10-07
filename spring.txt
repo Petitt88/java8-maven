@@ -46,7 +46,10 @@
 @EnableScheduling
 @Scheduled
 
-@Cacheable	
+@Cacheable
+
+@Transactional - declarative transaction support are that this support is enabled via AOP proxies
+@TransactionalEventListener - processes events if they were published between the specified Transaction boundary
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true), @Secured("ROLE_TELLER") - for method-level securing
