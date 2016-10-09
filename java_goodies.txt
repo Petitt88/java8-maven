@@ -375,6 +375,23 @@ List<String> x = new ArrayList<String>() {}; - type information is retained due 
 	
 	This is called the "Type token pattern" - the Spring implementation is ParameterizedTypeReference<T>
 	
+
+And by the way!
+Generic information is kept for declared fields (so not for the instance but for the declaration), ctor parameters, method parameters and return types.
+So the generic information can be acquired through reflection:
+
+	public class MyClass {
+	
+		private List<Integer> intList;
+		
+		private void testThisIsTrue() throws NoSuchFieldException, SecurityException {
+			
+			System.out.println(this.intList.getClass().getGenericSuperclass().getTypeName()); 					// prints java.util.AbstractList<E>
+			System.out.println(this.getClass().getDeclaredField("intList").getGenericType().getTypeName());		// prints java.util.List<java.lang.Integer>
+		}
+	
+	}
+	
 	
 	
 ********Static imports*********
