@@ -49,7 +49,12 @@
 @Cacheable
 
 @Transactional - declarative transaction support are that this support is enabled via AOP proxies
-@TransactionalEventListener - processes events if they were published between the specified Transaction boundary
+@TransactionalEventListener - processes application events if they were published between the specified Transaction boundary - after/before commit, after/before rollback
+	- events can be any arbitrary java class (does not have to extend ApplicationEvent anymore (from Spring 4.2))
+	- event listener is even a method (@EventListener) or a class that implement ApplicationListener<XXXEvent>
+	
+	https://spring.io/blog/2015/02/11/better-application-events-in-spring-framework-4-2
+	
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true), @Secured("ROLE_TELLER") - for method-level securing
@@ -982,7 +987,7 @@ To interact with the container’s management of the bean lifecycle, you can imp
 @Required, 
 @Autowired - resolves dependencies by type
 @Primary - indicates that a particular bean should be given preference when multiple beans are candidates to be autowired to a single-valued dependency
-@Qualifier - specify the name of the dependency (use @Beans(name = "..."))
+@Qualifier - specify the name of the dependency (use @Beans(name = "..."), @Component("myComp"))
 @Bean - can be used on methods, by default the beans's name is the name of the method
 @Resource - takes a name attribute, and by default Spring interprets that value as the bean name to be injected. 
 			In other words, it follows by-name semantics, like this:
@@ -1024,8 +1029,11 @@ To interact with the container’s management of the bean lifecycle, you can imp
 7.12 Java-based container configuration
 	The central artifacts in Spring’s new Java-configuration support are @Configuration-annotated classes and @Bean-annotated methods.
 	
-	@Bean - method-level annotation and is used to indicate that a method instantiates, configures and initializes a new object 
+	@Bean - method-level annotation and is used to indicate that a method instantiates, configures and initializes a new component that gets stored in the spring container
 			to be managed by the Spring IoC container.
+		  - spring intercepts the @Bean methods and invokes the container first
+			- @Bean methods can call each other and Spring ensures the correct behavior - the bean is returned from the container if already registered,
+			  otherwise the specified @Bean factory method is invoked
 	@Bean(initMethod = "init")
 	@Bean(destroyMethod = "cleanup")
 	@Configuration - indicates that its primary purpose is as a source of bean definitions. 
@@ -1048,10 +1056,10 @@ Conditionally include @Configuration classes or @Bean methods
 	It is often useful to conditionally enable or disable a complete @Configuration class, or even individual @Bean methods, 
 	based on some arbitrary system state.
 	
-	@Profile - activate beans only when a specific profile has been enabled in the Spring Environment
+	@Profile - activate @Bean beans from a configuration class at startup only - scan the @Configuration class only - when a specific profile has been enabled in the Spring Environment
 		spring.profiles=dev,prod			(application-dev.properties, application-prod.yml)
 		spring.profiles.active=dev
-	@Conditional
+	@Conditional, @ConditionalOnClass, @ConditionalOnMissingClass, @ConditionalOnBean, @ConditionalOnMissingBean, ...
 	
 	
 Configuration injection
@@ -2394,6 +2402,7 @@ To create an executable jar just use the maven/gradle plugin provided by Spring:
 13.1. Spring Boot application starters
 	
 @EnableAutoConfiguration - This annotation tells Spring Boot to “guess” how you will want to configure Spring, based on the jar dependencies that you have added.
+	@EnableAutoConfiguration(exclude = XXX.class)
 @SpringBootApplication = @EnableAutoConfiguration + @ComponentScan + @Configuration
 @ComponentScan: what packages to scan for @Component. The default is the package that the class having @ComponentScan is defined
 @EntityScan: what packages to scan for JPA entities
