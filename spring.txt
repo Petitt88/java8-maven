@@ -38,6 +38,19 @@
 @Cacheable - to use Spring's cache - implementations can be swapped
 
 @Lazy - lazily initialze beans
+	  - it can easily solve circular dependency problems: if one of the ends is lazy than it solves most of the cases
+	@Bean @Lazy
+	public MyRepository<Account> myAccountRepository() {
+		return new MyAccountRepository();
+	}
+	
+	@Service
+	public class MyBookAdminService implements BookAdminService {
+		// @Autowired
+		public MyBookAdminService(@Lazy MyRepository<Account> repo) {
+			// "repo" will be a lazy-initializing proxy
+		}
+	}
 
 @Import - Provides functionality equivalent to the <import/> element in Spring XML. Allows for importing @Configuration classes, ImportSelector and ImportBeanDefinitionRegistrar implementations, 
 		  as well as regular component classes (as of 4.2; analogous to AnnotationConfigApplicationContext.register(java.lang.Class<?>...)).
@@ -47,11 +60,30 @@
 @Scheduled
 
 @Cacheable
+@CachePut(key="#book.id") - on methods that just put values into the cache
+@CacheEvict - to remove from the cache
+	- JCache support
+	
+	@CacheConfig("books")
+	public class BookRepository {
+	
+		@Cacheable
+		public Book findById(String id) {...}
+		
+		@CachePut(key="#book.id")
+		public void updateBook(Book book) {...}
+		
+		@CacheEvict
+		public void delete(String id) {...}
+	}
 
 @Transactional - declarative transaction support are that this support is enabled via AOP proxies
 @TransactionalEventListener - processes application events if they were published between the specified Transaction boundary - after/before commit, after/before rollback
 	- events can be any arbitrary java class (does not have to extend ApplicationEvent anymore (from Spring 4.2))
-	- event listener is even a method (@EventListener) or a class that implement ApplicationListener<XXXEvent>
+	- event listener is either a method (@EventListener) or a class that implement ApplicationListener<XXXEvent>
+		- @Async can be used to process the event asynchronously
+		- by default event processing are synchronous like in C# events: the same thread handles the events that has a ApplicationEventPublisher fired it
+	- event can be published via the ApplicationEventPublisher class: applicationEventPublisher.publishEvent(new OrderCreatedEvent(order));
 	
 	https://spring.io/blog/2015/02/11/better-application-events-in-spring-framework-4-2
 	
@@ -1357,13 +1389,13 @@ Spring MVC:
 
 	Controller:
 
-	// this is used to add stuff to spring's model and it ultimately goes into the HttpServletRequest object after the handler executes
-	@ModelAttribute("myRequestObject")
-	public MyCommandBean addStuffToRequestScope() {
-		System.out.println("Inside of addStuffToRequestScope");
-		MyCommandBean bean = new MyCommandBean("Hello World",42);
-		return bean;
-	}
+		// this is used to add stuff to spring's model and it ultimately goes into the HttpServletRequest object after the handler executes
+		@ModelAttribute("myRequestObject")
+		public MyCommandBean addStuffToRequestScope() {
+			System.out.println("Inside of addStuffToRequestScope");
+			MyCommandBean bean = new MyCommandBean("Hello World",42);
+			return bean;
+		}
 		
 		@ModelAttribute refers to a property of the Model object (the M in MVC ;) so let's say we have a form with a form backing object that is called "Person" 
 		Then you can have Spring MVC supply this object to a Controller method by using the @ModelAttribute annotation:
@@ -1631,31 +1663,31 @@ Supported method return types
 	Any other return type is considered to be a single model attribute to be exposed to the view, using the attribute name specified through @ModelAttribute at the method level (or the default attribute name based on the return type class name). The model is implicitly enriched with command objects and the results of @ModelAttribute annotated reference data accessor methods.	
 	
 
-Using @ModelAttribute on a method
+	Using @ModelAttribute on a method
 
-The @ModelAttribute annotation can be used on methods or on method arguments. 
-	This section explains its usage on methods while the next section explains its usage on method arguments.
-	
-	// Add one attribute
-	// The return value of the method is added to the model under the name "account"
-	// You can customize the name via @ModelAttribute("myAccount")
+		The @ModelAttribute annotation can be used on methods or on method arguments. 
+		This section explains its usage on methods while the next section explains its usage on method arguments.
+		
+		// Add one attribute
+		// The return value of the method is added to the model under the name "account"
+		// You can customize the name via @ModelAttribute("myAccount")
+		// each route will its model populated with the Account object
+		@ModelAttribute
+		public Account addAccount(@RequestParam String number) {
+			return accountManager.findAccount(number);
+		}
 
-	@ModelAttribute
-	public Account addAccount(@RequestParam String number) {
-		return accountManager.findAccount(number);
-	}
+		// Add multiple attributes
 
-	// Add multiple attributes
-
-	@ModelAttribute
-	public void populateModel(@RequestParam String number, Model model) {
-		model.addAttribute(accountManager.findAccount(number));
-		// add more ...
-	}
-	@ModelAttribute methods are used to populate the model with commonly needed attributes for example to fill a drop-down with 
-	states or with pet types, or to retrieve a command object like Account in order to use it to represent the data on an HTML form. 
-	The latter case is further discussed in the next section.
-	A controller can have any number of @ModelAttribute methods. All such methods are invoked before @RequestMapping methods of the same controller.
+		@ModelAttribute
+		public void populateModel(@RequestParam String number, Model model) {
+			model.addAttribute(accountManager.findAccount(number));
+			// add more ...
+		}
+		@ModelAttribute methods are used to populate the model with commonly needed attributes for example to fill a drop-down with 
+		states or with pet types, or to retrieve a command object like Account in order to use it to represent the data on an HTML form. 
+		The latter case is further discussed in the next section.
+		A controller can have any number of @ModelAttribute methods. All such methods are invoked before @RequestMapping methods of the same controller.
 	
 	Using @ModelAttribute on a method argument
 	
@@ -1681,8 +1713,7 @@ The @ModelAttribute annotation can be used on methods or on method arguments.
 		}
 
 		@PostMapping("update")
-		public String update(@Valid AccountUpdateForm form, BindingResult result,
-				@ModelAttribute(binding=false) Account account) {
+		public String update(@Valid AccountUpdateForm form, BindingResult result, @ModelAttribute(binding=false) Account account) {
 
 			// ...
 		}

@@ -377,7 +377,8 @@ List<String> x = new ArrayList<String>() {}; - type information is retained due 
 	
 
 And by the way!
-Generic information is kept for declared fields (so not for the instance but for the declaration), ctor parameters, method parameters and return types.
+Generic information is kept for declared fields (so not for the instance but for the declaration), constructor parameters, method parameters and return types.
+Type information is also preserved for extends and implements clauses.
 So the generic information can be acquired through reflection:
 
 	public class MyClass {
