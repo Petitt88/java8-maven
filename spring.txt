@@ -2888,7 +2888,7 @@ There are special objects that thymeleaf exposes in the views like:
 
 
 ********************************
-Spring React
+Spring Reactive
 ********************************
 
 Will be available from Spring Framework 5.
@@ -2899,6 +2899,11 @@ and blocking doesn’t hold up other requests because they are be processed on d
 Blocking all requests is still a recipe for trouble, but it only shows up as increased latency with roughly a constant factor per request. 
 In the Reactive world, blocking a single request can lead to increased latency for all requests, 
 and blocking all requests can bring a server to its knees because the extra layers of buffers and threads are not there to take up the slack.
+
+2 entites: Subscriber, Publisher
+
+Backpressure: allows the Subscriber to indicate to the Publisher source whether it is ready to consume more data or not. 
+			  If the subscriber/consumer is not able to consume, the publisher is not supposed to produce.
 	
 	
 	
