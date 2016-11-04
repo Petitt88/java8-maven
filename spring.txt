@@ -26,6 +26,8 @@
 @AuthenticationPrincipal - Spring injects the current user with this
 
 @Value - specify default value on properties. Can be arbirtary string or expression e.g. "#{systemProperties.myProp}"
+@Value("#{ @environment['stormpath.sso.message.primary'] ?: 'Primary' }") --> ?: <-- this is the Elvis operator, we can specify fallback value to be used 
+																					 if the one is not found in application.properties
 @ConfigurationProperties - as @Value works with one field, this populates an entire java class's fields
 
 @Order: defines the sort order for an annotated component. The value() is optional and represents an order value as defined in the Ordered interface. Lower values have higher priority. The default value is Ordered.LOWEST_PRECEDENCE, indicating lowest priority (losing to any other specified order value).
@@ -440,7 +442,9 @@ Config server: central store for configurations of the participants of the syste
 Hystrix dashboard, Turbine: use for health monitoring
 	Turbine: aggregates the Hystrix health monitoring data from each microservice and provides an aggregated result.
 Ribbon: round robin load balancer
-
+Zipkin: Zipkin is a distributed tracing system. It helps gather timing data needed to troubleshoot latency problems in microservice architectures.
+Kafka: Kafka™ is used for building real-time data pipelines and streaming apps. It is horizontally scalable, fault-tolerant, wicked fast, 
+	and runs in production in thousands of companies.
 
 Config service: just a super lightweight service that is used to centralize the configuration data 
 	Scenario is that I have multiple microservices and do not want to store config one by one for each service, rather I would store them in a 
