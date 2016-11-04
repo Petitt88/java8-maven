@@ -226,8 +226,8 @@ build.gradle:
 			testCompile("org.hsqldb:hsqldb:2.3.4")
 		}
 		
-		// hooking into the "test" task: this method will be called before the "test" task itself
-		// note: chaning it to for instance "test2" would make the build instantly fail since there is no "test2" function defined before 
+		// hooking into the "test" task: this method will be called before the "test" task itself - the java plugin provides the "test" task
+		// note: chaining it to for instance "test2" would make the build instantly fail since there is no "test2" function defined before 
 		test {
 			println "- I'm the largest animal that has ever lived on this planet."
 		}
