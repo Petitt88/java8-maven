@@ -2643,6 +2643,31 @@ You should only ever add one @EnableAutoConfiguration annotation. We generally r
 			you can also specify debug=true in your application.properties.
 			java -jar myapp.jar --debug
 			
+		
+	How to retrieve a logger:
+		
+		class HomeController {
+			private static Logger logger = LoggerFactory.getLogger(HomeController.class);
+		}
+		
+		or we can do even better with DI:
+			@Bean
+			@Scope("prototype")
+			Logger getLooger(InjectionPoint ip) {
+				return LoggerFactory.getLogger(ip.getBean().getClass());
+				
+				// in Josh Long's video:
+				// return logger.getLooger(ip.getDeclaredType().getName());
+			}
+			
+			now Logger is injectable to all components:
+			class HomeController {
+			
+				@Autowired
+				private Logger logger;
+			}
+			
+			
 26.3 File output
 	logging.file
 	
