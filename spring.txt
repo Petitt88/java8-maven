@@ -903,69 +903,77 @@ ExecutionContext: An ExecutionContext represents a collection of key/value pairs
 Spring 	Integration	
 ********************************
 
-In addition to wiring together fine-grained components, Spring Integration provides a wide selection of channel adapters and gateways to 
-communicate with external systems. Channel Adapters are used for one-way integration (send or receive); 
-gateways are used for request/reply scenarios (inbound or outbound).
+	In addition to wiring together fine-grained components, Spring Integration provides a wide selection of channel adapters and gateways to 
+	communicate with external systems. Channel Adapters are used for one-way integration (send or receive); 
+	gateways are used for request/reply scenarios (inbound or outbound).
 
 
-Spring Integration provides an extension of the Spring programming model to support the well-known Enterprise Integration Patterns. 
-It enables lightweight messaging within Spring-based applications and supports integration with external systems via declarative adapters. 
-Those adapters provide a higher-level of abstraction over Spring’s support for remoting, messaging, and scheduling.
+	Spring Integration provides an extension of the Spring programming model to support the well-known Enterprise Integration Patterns. 
+	It enables lightweight messaging within Spring-based applications and supports integration with external systems via declarative adapters. 
+	Those adapters provide a higher-level of abstraction over Spring’s support for remoting, messaging, and scheduling.
 
-Spring Integration is motivated by the following goals:
-	Provide a simple model for implementing complex enterprise integration solutions.
-	Facilitate asynchronous, message-driven behavior within a Spring-based application.
-	Promote intuitive, incremental adoption for existing Spring users.
-Spring Integration is guided by the following principles:
-	Components should be loosely coupled for modularity and testability.
-	The framework should enforce separation of concerns between business logic and integration logic.
-	Extension points should be abstract in nature but within well-defined boundaries to promote reuse and portability.
-	
-Message: In Spring Integration, a Message is a generic wrapper for any Java object combined with metadata used by the framework while handling 
-		 that object. It consists of a payload and headers.
-Message Channel: A Message Channel represents the "pipe" of a pipes-and-filters architecture. 
-				 Producers send Messages to a channel, and consumers receive Messages from a channel. 
-				 The Message Channel therefore decouples the messaging components, and also provides a convenient point for interception 
-				 and monitoring of Messages.
-				 
-				 A Message Channel may follow either Point-to-Point or Publish/Subscribe semantics. With a Point-to-Point channel, 
-				 at most one consumer can receive each Message sent to the channel. Publish/Subscribe channels, on the other hand, 
-				 will attempt to broadcast each Message to all of its subscribers. Spring Integration supports both of these.
-				 will attempt to broadcast each Message to all of its subscribers. Spring Integration supports both of these.
-Message Endpoint: One of the primary goals of Spring Integration is to simplify the development of enterprise integration solutions 
-				  through inversion of control. This means that you should not have to implement consumers and producers directly,
-				  and you should not even have to build Messages and invoke send or receive operations on a Message Channel. 
-				  Instead, you should be able to focus on your specific domain model with an implementation based on plain Objects. 
-				  Then, by providing declarative configuration, you can "connect" your domain-specific code to the messaging infrastructure
-				  provided by Spring Integration. The components responsible for these connections are Message Endpoints.
-				  
-Message Endpoints: A Message Endpoint represents the "filter" of a pipes-and-filters architecture. As mentioned above, the endpoint’s 
-				   primary role is to connect application code to the messaging framework and to do so in a non-invasive manner. 
-				   In other words, the application code should ideally have no awareness of the Message objects or the Message Channels.
-				   This is similar to the role of a Controller in the MVC paradigm. Just as a Controller handles HTTP requests, 
-				   the Message Endpoint handles Messages. Just as Controllers are mapped to URL patterns, Message Endpoints are mapped 
-				   to Message Channels.
-Transformer: A Message Transformer is responsible for converting a Message’s content or structure and returning the modified Message.
-Filter: A Message Filter determines whether a Message should be passed to an output channel at all. 
-Router: A Message Router is responsible for deciding what channel or channels should receive the Message next (if any). 
-Service Activator: A Service Activator is a generic endpoint for connecting a service instance to the messaging system.
-Channel Adapter: A Channel Adapter is an endpoint that connects a Message Channel to some other system (external system) or transport. 
-				 Channel Adapters may be either inbound or outbound. Typically, the Channel Adapter will do some mapping between the 
-				 Message and whatever object or resource is received-from or sent-to the other system (File, HTTP Request, JMS Message, etc).
-				 Depending on the transport, the Channel Adapter may also populate or extract Message header values. 
-				 Spring Integration provides a number of Channel Adapters, and they will be described in upcoming chapters.
+	Spring Integration is motivated by the following goals:
+		Provide a simple model for implementing complex enterprise integration solutions.
+		Facilitate asynchronous, message-driven behavior within a Spring-based application.
+		Promote intuitive, incremental adoption for existing Spring users.
+	Spring Integration is guided by the following principles:
+		Components should be loosely coupled for modularity and testability.
+		The framework should enforce separation of concerns between business logic and integration logic.
+		Extension points should be abstract in nature but within well-defined boundaries to promote reuse and portability.
+		
+	Message: In Spring Integration, a Message is a generic wrapper for any Java object combined with metadata used by the framework while handling 
+			 that object. It consists of a payload and headers.
+	Message Channel: A Message Channel represents the "pipe" of a pipes-and-filters architecture. 
+					 Producers send Messages to a channel, and consumers receive Messages from a channel. 
+					 The Message Channel therefore decouples the messaging components, and also provides a convenient point for interception 
+					 and monitoring of Messages.
+					 
+					 A Message Channel may follow either Point-to-Point or Publish/Subscribe semantics. With a Point-to-Point channel, 
+					 at most one consumer can receive each Message sent to the channel. Publish/Subscribe channels, on the other hand, 
+					 will attempt to broadcast each Message to all of its subscribers. Spring Integration supports both of these.
+					 will attempt to broadcast each Message to all of its subscribers. Spring Integration supports both of these.
+	Message Endpoint: One of the primary goals of Spring Integration is to simplify the development of enterprise integration solutions 
+					  through inversion of control. This means that you should not have to implement consumers and producers directly,
+					  and you should not even have to build Messages and invoke send or receive operations on a Message Channel. 
+					  Instead, you should be able to focus on your specific domain model with an implementation based on plain Objects. 
+					  Then, by providing declarative configuration, you can "connect" your domain-specific code to the messaging infrastructure
+					  provided by Spring Integration. The components responsible for these connections are Message Endpoints.
+					  
+	Message Endpoints: A Message Endpoint represents the "filter" of a pipes-and-filters architecture. As mentioned above, the endpoint’s 
+					   primary role is to connect application code to the messaging framework and to do so in a non-invasive manner. 
+					   In other words, the application code should ideally have no awareness of the Message objects or the Message Channels.
+					   This is similar to the role of a Controller in the MVC paradigm. Just as a Controller handles HTTP requests, 
+					   the Message Endpoint handles Messages. Just as Controllers are mapped to URL patterns, Message Endpoints are mapped 
+					   to Message Channels.
+	Transformer: A Message Transformer is responsible for converting a Message’s content or structure and returning the modified Message.
+	Filter: A Message Filter determines whether a Message should be passed to an output channel at all. 
+	Router: A Message Router is responsible for deciding what channel or channels should receive the Message next (if any). 
+	Service Activator: A Service Activator is a generic endpoint for connecting a service instance to the messaging system.
+	Channel Adapter: A Channel Adapter is an endpoint that connects a Message Channel to some other system (external system) or transport. 
+					 Channel Adapters may be either inbound or outbound. Typically, the Channel Adapter will do some mapping between the 
+					 Message and whatever object or resource is received-from or sent-to the other system (File, HTTP Request, JMS Message, etc).
+					 Depending on the transport, the Channel Adapter may also populate or extract Message header values. 
+					 Spring Integration provides a number of Channel Adapters, and they will be described in upcoming chapters.
 
-@EnableIntegration
-@IntegrationComponentScan
-@EnablePublisher
+	@EnableIntegration
+	@IntegrationComponentScan
+	@EnablePublisher
 
-MessagingTemplate: send, receive, sendAndReceive
+	MessagingTemplate: send, receive, sendAndReceive
 
-Channel Adapter: A Channel Adapter is a Message Endpoint that enables connecting a single sender or receiver to a Message Channel. 
-				 Spring Integration provides a number of adapters out of the box to support various transports, such as JMS, File, HTTP,
-				 Web Services, Mail, and more. 
-Messaging Bridge: A Messaging Bridge is a relatively trivial endpoint that simply connects two Message Channels or Channel Adapters.
-MessageBuilder 
+	Channel Adapter: A Channel Adapter is a Message Endpoint that enables connecting a single sender or receiver to a Message Channel. 
+					 Spring Integration provides a number of adapters out of the box to support various transports, such as JMS, File, HTTP,
+					 Web Services, Mail, and more. 
+	Messaging Bridge: A Messaging Bridge is a relatively trivial endpoint that simply connects two Message Channels or Channel Adapters.
+	MessageBuilder 
+
+
+	- uses messaging to communicate between services
+		- JMS or AMQP (Java Messaging Service, Advanced Message Queuing Protocol)
+			- JMS works only between java-based components
+			- AMQP (Advanced Message Queuing Protocol) works between any kind of services
+				- RabbitMQ is one implementation (Spring supports it), or ActiveMQ
+			- Amazon has an implementation too that Spring supports
 	
 	
 ********************************
@@ -2650,14 +2658,15 @@ You should only ever add one @EnableAutoConfiguration annotation. We generally r
 			private static Logger logger = LoggerFactory.getLogger(HomeController.class);
 		}
 		
-		or we can do even better with DI:
+		or we can do even better with DI (since Spring Boot 1.4.2):
 			@Bean
 			@Scope("prototype")
-			Logger getLooger(InjectionPoint ip) {
-				return LoggerFactory.getLogger(ip.getBean().getClass());
-				
-				// in Josh Long's video:
-				// return logger.getLooger(ip.getDeclaredType().getName());
+			public Logger getLogger(InjectionPoint ip) {
+				Member member = ip.getMember();
+				if (member != null)
+					return LoggerFactory.getLogger(member.getDeclaringClass());
+
+				return LoggerFactory.getLogger(ip.getDeclaredType().getName());
 			}
 			
 			now Logger is injectable to all components:
