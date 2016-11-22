@@ -324,11 +324,98 @@ SecurityContextPersistenceFilter: stores the SecurityContext (user info) into th
 UserDetailsService: can be optionally overridden and provide a custom userDetails implementation (reach the db for instance)
 GrantedAuthority: UserDetailsService provides them, usually they are roles
 
+	@Override
+	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+		super.configure(auth);
+
+		// auth.authenticationProvider(authenticationProvider)
+		// auth.userDetailsService(userDetailsService)
+	}
+
 	
 What we need for authentication:
 	- Csrf filter
 	- UsernamePasswordAuthenticationFilter - or a custom filter that reads the credentials and invokes AuthenticationManager.authenticate
 	- custom AuthenticationProvider
+	
+	@Configuration
+	@PropertySource("classpath:custom.yml")
+	@EnableWebSecurity
+	@EnableGlobalMethodSecurity(prePostEnabled = true)
+	public class SecurityConfig extends WebSecurityConfigurerAdapter {
+	
+		@Override
+		protected void configure(HttpSecurity http) throws Exception {
+			System.out.println("env");
+			System.out.println(env.getProperty("vmc.admin.name"));
+
+			CookieCsrfTokenRepository tokenRepo = CookieCsrfTokenRepository.withHttpOnlyFalse();
+			tokenRepo.setHeaderName("X-XSRF-TOKEN");
+			tokenRepo.setCookieName("XSRF-TOKEN");
+
+			http.authorizeRequests()
+					.antMatchers("**/**").permitAll()
+					.antMatchers("/users/{userId}").access("#userId == principal.id.toString()")	// this is Spring Security path variables.
+																									// principal is the current user - whatever we return from out UserDetailsService
+																									// This is called "Spell extension with Spring Data" 
+																									//			- SecurityDataConfiguration provides the SecurityEvaluationContextExtensions to process the expression
+																									
+					.antMatchers("/users/{userId}").access("@authz.check(#userId, principal)")	// but I don't like the ".toString()" - I can refer to any bean in Spring Spell using the "@" symbol
+																								// here I have a bean called "authz"
+																								
+					.antMatchers("/admin").denyAll()	// matches only /admin and denies it.
+														// however if this is an Mvc controller route it can still be accessed by /admin/ or /admin.json, /admin.html etc because Spring Mvc removes file extensions
+					.antMatchers("/admin/**").denyAll()	// the correct way to disable /admin - but this also disables /admin/whatever
+					.mvcMatchers("/admin").denyAll() 	// use this to properly disable the Mvc route
+					
+					// .anyRequest().authenticated()
+					.and()
+					.formLogin()
+					.and()
+					.httpBasic()
+					.and()
+					.csrf()
+					.csrfTokenRepository(tokenRepo)
+					.and()
+					.headers()
+					/*.contentSecurityPolicy(policyDirectives)*/;
+			// .and()
+			// .sessionManagement()
+			// .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+			// .anonymous().disable();
+		}
+	}
+	
+	@Component
+	public class Authz {
+		// used in the SecurityConfig
+		public boolean check(Long userId, User user) {
+			return userId.equals(user.getId());
+		}
+		
+		// used by @ReadableMessage
+		public boolean check(Message message, User user) {
+			...
+		}
+	}
+	
+	public interface MessageRepository extends CrudRepository<Message, Long> {
+	
+		@Query("select m from Message m where m.to.id = ?#{principal.id}")
+		Iterable<Message> inbox();
+		
+		@PostAuthorize("returnObject?.to?.id == principal.id || returnObject?.from?.id == principal.id")	// returnObject refers to whatever object the query returns. The ?. is just to avoid NullPointerException
+		Message findBySummary(@Param("summary") String summary);
+		
+		@ReadableMessage	// this is a Meta-annotation, we avoided ugly string Spell extensions here
+		Message findBySummaryEvenBetter(@Param("summary") String summary);
+	}
+	
+	// Meta-annotation annotated with @PostAuthorize that has the "authz" custom bean invoking check
+	@Retention(RetentionPolicy.RUNTIME)
+	@PostAuthorize("@authz.check(returnObject, principal)")
+	public @interface ReadableMessage {
+	}
 	
 SecurityContextRepository: its job is to store the SecurityContext. The default ones stores it in the HttpSession as an attribute.
 
