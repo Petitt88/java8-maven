@@ -141,20 +141,28 @@ The eclipse plugins adds 2 nice views: Gradle Executions and Gradle Tasks to be 
 	1. going to the command line
 	2. the need to use the Run Configurations... window where we can add a new "Gradle Project"
 
-gradle --help: to display the help window
-gradle tasks: to display the available tasks (plugins might add tasks, so does the "java" plugin)
-gradle <task>: to run a task
+	gradle --help: to display the help window
+	gradle tasks: to display the available tasks (plugins might add tasks, so does the "java" plugin)
+	gradle <task>: to run a task
 
-gradle clean: deletes the build directory
-gradle jar: assemble a jar achrive containing the main classes
-gradle javadoc: generates javadoc
-gradle build: assembles and tests the project
-gradle check: run all checks
-gradle test: run the unit tests
+	gradle clean: deletes the build directory
+	gradle jar: assemble a jar achrive containing the main classes
+	gradle javadoc: generates javadoc
+	gradle build: assembles and tests the project
+	gradle check: run all checks
+	gradle test: run the unit tests
 
-gradle bootRun: to run a spring-boot project (build.gradle required ofc)
+	gradle bootRun: to run a spring-boot project (build.gradle required ofc)
 
-gradle clean jar: to run the "clean" and after that the "jar" tasks - java plugins adds them
+	gradle clean jar: to run the "clean" and after that the "jar" tasks - java plugins adds them
+
+To execute the wrapper specific to the project instead of the globbaly installed gradle version use:
+	gradlew.bat <task>
+	
+To specify the gradle of the wrapper to be used:
+	task wrapper(type: Wrapper) {
+		gradleVersion = '3.2.1'
+	}
 
 https://docs.gradle.org/current/userguide/tutorial_gradle_command_line.html
 Example multiple tasks:
@@ -231,6 +239,10 @@ build.gradle:
 		test {
 			println "- I'm the largest animal that has ever lived on this planet."
 		}
+		
+	task wrapper(type: Wrapper) {
+		gradleVersion = '3.2.1'
+	}
 		
 settings.gradle:
 	include ':VMCPriceDetector'
