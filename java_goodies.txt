@@ -412,6 +412,39 @@ So the generic information can be acquired through reflection:
 	}
 	
 	
+And: wildcard "?" vs generic "T"
+class Worker {
+	
+	// in Java, there is no need for T generic type, wildcard can be used
+	void process(Consumer<? extends String> cons) {
+		cons.accept(null);
+	}
+
+	// C#-like generic
+	<T extends String> void process2(Consumer<T> cons) {
+		cons.accept(null);
+	}
+
+}
+
+class WorkDelegator {
+	
+	WorkDelegator() {
+		Worker worker = new Worker();
+		
+		// this::processor works for wildcard
+		worker.process(this::processor);
+		
+		// and it also works for the C#-like generic
+		worker.process2(this::processor);
+	}
+
+	// cannot use "?" here
+	private <T extends String> void processor(T item) {
+		...
+	}
+}
+	
 	
 ********Static imports*********
 
