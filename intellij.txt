@@ -1,0 +1,5 @@
+IntelliJ cannot let us write characters that require altgr.
+
+This solution is this:
+	Please try adding actionSystem.force.alt.gr=true to bin/idea.properties and restart the IDE. Does it help?
+https://intellij-support.jetbrains.com/hc/en-us/community/posts/206189269-Unable-to-write-square-or-curly-brackets-in-IntelliJ-IDEA-CE-while-using-Croatian-keymap-
