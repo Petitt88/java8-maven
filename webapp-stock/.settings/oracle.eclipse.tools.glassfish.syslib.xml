@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<system-libraries>
-    <library path="C:/Java-artifacts/glassfish4/glassfish/modules/javax.servlet-api.jar" source="C:/Java-artifacts/apache-tomcat-8.0.33/apache-tomcat-8.0.33-src.zip"/>
-</system-libraries>
