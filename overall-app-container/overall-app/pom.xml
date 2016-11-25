@@ -23,6 +23,9 @@
         <!-- Customize the name of the generated jar file -->
         <!-- <finalName>java-tutorial-goodies</finalName> -->
 
+        <!-- To override the source directory - maven default is src/main/java -->
+        <!--<sourceDirectory>src/main/java</sourceDirectory>-->
+
         <plugins>
             <!-- "pluginManagement" element is set in the parent POM, which means
                 this modules inherits the parent's settings -->
