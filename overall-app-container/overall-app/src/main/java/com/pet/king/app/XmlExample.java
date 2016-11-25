@@ -101,7 +101,7 @@ public class XmlExample {
 				.limit(30)
 				.map(a -> {
 					Order order = factory.createOrder();
-					order.setCustomerID(new Integer(a % 10).toString());
+					order.setCustomerID(Integer.toString(a % 10));
 					order.setEmployeeID(a.toString());
 					order.setOrderDate(datatypeFactory.newXMLGregorianCalendar("2012-02-01"));
 					order.setRequiredDate(datatypeFactory.newXMLGregorianCalendar("2012-02-02"));
@@ -117,7 +117,7 @@ public class XmlExample {
 					shipInfo.setShippedDate(datatypeFactory.newXMLGregorianCalendar("2012-02-03"));
 					shipInfo.setShipPostalCode("pc" + a);
 					shipInfo.setShipRegion("region" + a);
-					shipInfo.setShipVia(new BigInteger(new Integer(a * a).toString()));
+					shipInfo.setShipVia(new BigInteger(Integer.toString(a * a)));
 
 					return order;
 				})

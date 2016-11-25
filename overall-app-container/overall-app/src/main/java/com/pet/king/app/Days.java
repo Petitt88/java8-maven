@@ -18,7 +18,7 @@ public enum Days implements DayOfWeek {
 
 	private boolean _isWeekend;
 
-	private Days(boolean isWeekend) {
+	Days(boolean isWeekend) {
 		this._isWeekend = isWeekend;
 	}
 
@@ -38,7 +38,7 @@ public enum Days implements DayOfWeek {
 }
 
 enum DaysOfTheWeek {
-	MONDAY(), TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY;
+	MONDAY(), TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
 
 	// DaysOfTheWeek(){
 	//

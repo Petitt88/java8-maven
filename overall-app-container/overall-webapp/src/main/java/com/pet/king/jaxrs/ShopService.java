@@ -39,7 +39,7 @@ public class ShopService {
 		YearDto yearDto = new YearDto();
 
 		if (year == null)
-			year = new Integer(LocalDate.now().getYear());
+			year = LocalDate.now().getYear();
 
 		yearDto.setYear(year + plusyear);
 

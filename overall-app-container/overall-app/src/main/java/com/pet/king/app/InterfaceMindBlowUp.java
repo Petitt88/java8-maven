@@ -38,7 +38,7 @@ public interface InterfaceMindBlowUp {
 
 @FunctionalInterface
 interface FileInterface {
-	public String readLines() throws IOException;
+	String readLines() throws IOException;
 }
 
 // Functional interfaces:

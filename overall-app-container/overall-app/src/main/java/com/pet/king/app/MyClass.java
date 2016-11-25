@@ -58,7 +58,7 @@ public class MyClass {
 		}
 
 		mc.futureTest();
-		mc.genericTest(new ArrayList<String>());
+		mc.genericTest(new ArrayList<>());
 		mc.reflectionTest("K.P.");
 		mc.streamAndCurryingTest();
 		mc.instanceOfTest();
@@ -140,20 +140,15 @@ public class MyClass {
 		Car car = new Car();
 		// must check for null
 		Integer res = car.parse("3");
-		if (res != null) {
-
-		}
 
 		Optional<Integer> optNoGo = car.parseOptional("333");
-		if (optNoGo.isPresent()) {
-			System.out.println(String.format("Optional value is: %s", optNoGo.get().intValue()));
-		}
+		optNoGo.ifPresent(integer -> System.out.println(String.format("Optional value is: %s", integer)));
 
-		Integer optGo = car.parseOptional(null).orElse(new Integer(666));
+		Integer optGo = car.parseOptional(null).orElse(666);
 		System.out.println(String.format("orElse optional value is: %s", optGo));
 
 		Optional.of(4)
-				.filter(a -> a.intValue() == 4)
+				.filter(a -> a == 4)
 				.flatMap(a -> Optional.of(String.format("Monad(%s) - Optional", a)))
 				.ifPresent(System.out::println);
 	}
@@ -168,9 +163,7 @@ public class MyClass {
 	void threadTest() {
 		System.out.println("-----------------threadTest-----------------");
 		int alma = 2;
-		Thread thread = new Thread(() -> {
-			System.out.println(String.format("Alma variable is currently now: \"%s\"", alma));
-		});
+		Thread thread = new Thread(() -> System.out.println(String.format("Alma variable is currently now: \"%s\"", alma)));
 		thread.setDaemon(false);
 		thread.start();
 		try {
@@ -284,7 +277,7 @@ public class MyClass {
 		Tuple tuple = new Tuple(15, "Peter");
 		System.out.println(tuple instanceof Tuple);
 
-		TupleGeneric<Integer, String> tupleGen1 = new TupleGeneric<Integer, String>(15, "Peter");
+		TupleGeneric<Integer, String> tupleGen1 = new TupleGeneric<>(15, "Peter");
 		System.out.println(tupleGen1 instanceof TupleGeneric);
 	}
 
@@ -303,7 +296,7 @@ public class MyClass {
 		cfNoResult.thenRunAsync(() -> System.out.println("Done Consumer, thread: " + Thread.currentThread().getName()));
 		// cf.complete(null);
 
-		CompletableFuture<Integer> cfWithResult = CompletableFuture.supplyAsync(() -> new Integer(50)).thenApplyAsync(res -> res + 50);
+		CompletableFuture<Integer> cfWithResult = CompletableFuture.supplyAsync(() -> (50)).thenApplyAsync(res -> res + 50);
 		cfWithResult.thenAccept(res -> System.out.println(String.format("Accumulated result: %s, thread: %s", res, Thread.currentThread().getName())));
 
 		// this::functionName
@@ -312,7 +305,7 @@ public class MyClass {
 		// Person::instanceFunction
 		// person::instanceFunction
 
-		IntStream.range(20, 30).mapToObj(i -> new Person(i)).map(Person::getAge).forEach(p -> System.out.print(" " + p));
+		IntStream.range(20, 30).mapToObj(Person::new).map(Person::getAge).forEach(p -> System.out.print(" " + p));
 		System.out.println();
 
 		// Collections.unmodifiableList(list)

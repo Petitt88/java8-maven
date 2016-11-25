@@ -24,7 +24,7 @@ public @interface Person {
 
 	Class<? extends Payload>[] payload() default {};
 
-	public static class PersonValidator implements ConstraintValidator<Person, PersonDto> {
+	class PersonValidator implements ConstraintValidator<Person, PersonDto> {
 
 		@Override
 		public void initialize(Person constraintAnnotation) {
@@ -35,10 +35,7 @@ public @interface Person {
 			if (value == null)
 				return false;
 
-			if (value.getName() == null || value.getAge() == null)
-				return false;
-
-			return true;
+			return !(value.getName() == null || value.getAge() == null);
 		}
 
 	}

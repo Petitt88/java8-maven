@@ -176,7 +176,7 @@ public class Root {
          */
         public List<Customer> getCustomer() {
             if (customer == null) {
-                customer = new ArrayList<Customer>();
+                customer = new ArrayList<>();
             }
             return this.customer;
         }
@@ -236,7 +236,7 @@ public class Root {
          */
         public List<Order> getOrder() {
             if (order == null) {
-                order = new ArrayList<Order>();
+                order = new ArrayList<>();
             }
             return this.order;
         }

@@ -10,7 +10,7 @@ import javax.jws.WebService;
 //@WebService(endpointInterface = "com.pet.king.jaxws.PersonService")
 public class PersonServiceImpl implements PersonService {
 
-	private static Map<Integer, Person> persons = new HashMap<Integer, Person>();
+	private static Map<Integer, Person> persons = new HashMap<>();
 
 	public String Hello() {
 		return "Hello from jax-ws webservice";
@@ -40,7 +40,7 @@ public class PersonServiceImpl implements PersonService {
 		return persons
 				.entrySet()
 				.stream()
-				.map(a -> a.getValue())
+				.map(Map.Entry::getValue)
 				.collect(Collectors.toList())
 				.toArray(new Person[persons.size()]);
 	}
