@@ -1,199 +1,199 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>com.pet.king</groupId>
-		<artifactId>overall-app-container</artifactId>
-		<version>0.0.1-SNAPSHOT</version>
-	</parent>
+    <parent>
+        <groupId>com.pet.king</groupId>
+        <artifactId>overall-app-container</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
 
-	<artifactId>overall-app</artifactId>
-	<packaging>jar</packaging>
+    <artifactId>overall-app</artifactId>
+    <packaging>jar</packaging>
 
-	<name>overall-app</name>
-	<url>http://maven.apache.org</url>
+    <name>overall-app</name>
+    <url>http://maven.apache.org</url>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
-	<!-- for the "build" lifecycle -->
-	<build>
-		<!-- Customize the name of the generated jar file -->
-		<!-- <finalName>java-tutorial-goodies</finalName> -->
-		<sourceDirectory>src</sourceDirectory>
-		<plugins>
-			<!-- "pluginManagement" element is set in the parent POM, which means 
-				this modules inherits the parent's settings -->
-			<!-- <plugin> -->
-			<!-- <artifactId>maven-compiler-plugin</artifactId> -->
-			<!-- <version>3.3</version> -->
-			<!-- <configuration> -->
-			<!-- <compilerArgument>-parameters</compilerArgument> -->
-			<!-- <source>1.8</source> -->
-			<!-- <target>1.8</target> -->
-			<!-- </configuration> -->
-			<!-- </plugin> -->
+    <!-- for the "build" lifecycle -->
+    <build>
+        <!-- Customize the name of the generated jar file -->
+        <!-- <finalName>java-tutorial-goodies</finalName> -->
 
-			<!-- This plugin makes the output jar executable (injects the entry class 
-				into the META-INF/MANIFEST.MF file) -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.4.3</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<transformers>
-								<transformer
-									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-									<mainClass>com.pet.king.app.MyClass</mainClass>
-								</transformer>
-							</transformers>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+        <plugins>
+            <!-- "pluginManagement" element is set in the parent POM, which means
+                this modules inherits the parent's settings -->
+            <!-- <plugin> -->
+            <!-- <artifactId>maven-compiler-plugin</artifactId> -->
+            <!-- <version>3.3</version> -->
+            <!-- <configuration> -->
+            <!-- <compilerArgument>-parameters</compilerArgument> -->
+            <!-- <source>1.8</source> -->
+            <!-- <target>1.8</target> -->
+            <!-- </configuration> -->
+            <!-- </plugin> -->
 
-			<!-- <plugin> -->
-			<!-- jaxb plugin - maven generates JAXB classes from the specified xsd -->
-			<!-- <groupId>org.jvnet.jaxb2.maven2</groupId> -->
-			<!-- <artifactId>maven-jaxb2-plugin</artifactId> -->
-			<!-- <executions> -->
-			<!-- <execution> -->
-			<!-- <goals> -->
-			<!-- <goal>generate</goal> -->
-			<!-- </goals> -->
-			<!-- <configuration> -->
-			<!-- the package for the generated java classes -->
-			<!-- <generatePackage>com.pet.king.app.xml</generatePackage> -->
-			<!-- If the following not specified all xsd in resources are included -->
-			<!-- <schemaIncludes> -->
-			<!-- This is from the /src/main/resources/ folder -->
-			<!-- <include>CustomersOrders.xsd</include> -->
-			<!-- </schemaIncludes> -->
-			<!-- if you don't want old output -->
-			<!-- <removeOldOutput>true</removeOldOutput> -->
-			<!-- if you want verbosity -->
-			<!-- verbose>true</verbose -->
-			<!-- </configuration> -->
-			<!-- </execution> -->
-			<!-- </executions> -->
-			<!-- </plugin> -->
-		</plugins>
+            <!-- This plugin makes the output jar executable (injects the entry class
+                into the META-INF/MANIFEST.MF file) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.4.3</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <transformers>
+                                <transformer
+                                        implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.pet.king.app.MyClass</mainClass>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
-		<!-- overriding the resources from the super POM -->
-		<resources>
-			<!-- This one is in the super POM, keep it -->
-			<resource>
-				<!-- Everything inside the resouces/META-INF folder gets copied into 
-					the jar's META-INF folder -->
-				<directory>${project.basedir}/src/main/resources</directory>
-			</resource>
+            <!-- <plugin> -->
+            <!-- jaxb plugin - maven generates JAXB classes from the specified xsd -->
+            <!-- <groupId>org.jvnet.jaxb2.maven2</groupId> -->
+            <!-- <artifactId>maven-jaxb2-plugin</artifactId> -->
+            <!-- <executions> -->
+            <!-- <execution> -->
+            <!-- <goals> -->
+            <!-- <goal>generate</goal> -->
+            <!-- </goals> -->
+            <!-- <configuration> -->
+            <!-- the package for the generated java classes -->
+            <!-- <generatePackage>com.pet.king.app.xml</generatePackage> -->
+            <!-- If the following not specified all xsd in resources are included -->
+            <!-- <schemaIncludes> -->
+            <!-- This is from the /src/main/resources/ folder -->
+            <!-- <include>CustomersOrders.xsd</include> -->
+            <!-- </schemaIncludes> -->
+            <!-- if you don't want old output -->
+            <!-- <removeOldOutput>true</removeOldOutput> -->
+            <!-- if you want verbosity -->
+            <!-- verbose>true</verbose -->
+            <!-- </configuration> -->
+            <!-- </execution> -->
+            <!-- </executions> -->
+            <!-- </plugin> -->
+        </plugins>
 
-			<resource>
-				<!-- Everything inside the external-resources folder gets copied into 
-					the jar's META-INF/external folder -->
-				<targetPath>META-INF/external</targetPath>
-				<filtering>false</filtering>
-				<directory>${basedir}/src/main/external-resources</directory>
-				<!-- <includes> -->
-				<!-- <include>configuration.xml</include> -->
-				<!-- </includes> -->
-				<excludes>
-					<exclude>**/*.properties</exclude>
-				</excludes>
-			</resource>
-		</resources>
-	</build>
+        <!-- overriding the resources from the super POM -->
+        <resources>
+            <!-- This one is in the super POM, keep it -->
+            <resource>
+                <!-- Everything inside the resouces/META-INF folder gets copied into
+                    the jar's META-INF folder -->
+                <directory>${project.basedir}/src/main/resources</directory>
+            </resource>
 
-	<!-- for the "site" lifecycle - generating javadocs for exaple -->
-	<reporting>
-		<outputDirectory>${basedir}/target/site</outputDirectory>
-		<plugins>
-			<plugin>
-				<artifactId>maven-project-info-reports-plugin</artifactId>
-				<version>2.0.1</version>
-				<reportSets>
-					<reportSet></reportSet>
-				</reportSets>
-			</plugin>
-		</plugins>
-	</reporting>
+            <resource>
+                <!-- Everything inside the external-resources folder gets copied into
+                    the jar's META-INF/external folder -->
+                <targetPath>META-INF/external</targetPath>
+                <filtering>false</filtering>
+                <directory>${basedir}/src/main/external-resources</directory>
+                <!-- <includes> -->
+                <!-- <include>configuration.xml</include> -->
+                <!-- </includes> -->
+                <excludes>
+                    <exclude>**/*.properties</exclude>
+                </excludes>
+            </resource>
+        </resources>
+    </build>
 
-	<repositories>
-		<repository>
-			<id>repo</id>
-			<url>file://${basedir}/repo</url>
-		</repository>
-	</repositories>
+    <!-- for the "site" lifecycle - generating javadocs for exaple -->
+    <reporting>
+        <outputDirectory>${basedir}/target/site</outputDirectory>
+        <plugins>
+            <!--<plugin>-->
+                <!--<artifactId>maven-project-info-reports-plugin</artifactId>-->
+                <!--<version>2.0.1</version>-->
+                <!--<reportSets>-->
+                    <!--<reportSet></reportSet>-->
+                <!--</reportSets>-->
+            <!--</plugin>-->
+        </plugins>
+    </reporting>
 
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-		</dependency>
+    <repositories>
+        <repository>
+            <id>repo</id>
+            <url>file://${basedir}/repo</url>
+        </repository>
+    </repositories>
 
-		<!-- Comes from the local repo and got to the local repo from the project-repo! 
-			This is how to use external dependency jar files: gotta install them to the 
-			local repo. When building the project for the very 1st time, maven under 
-			the covers installs the overall-lib.jar from the project-repo (specified 
-			below) to the local repo! This is why this works. And this is the magic how 
-			to install a custom jar into a project-repo: http://blog.valdaris.com/post/custom-jar -->
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
 
-		<!-- mvn install:install-file -DlocalRepositoryPath=repo -DcreateChecksum=true 
-			-Dpackaging=jar -Dfile="lib/overall-lib-0.0.1.jar" -DgroupId=overall-lib 
-			-DartifactId=overall-lib -Dversion="0.0.1" -e -->
+        <!-- Comes from the local repo and got to the local repo from the project-repo!
+            This is how to use external dependency jar files: gotta install them to the
+            local repo. When building the project for the very 1st time, maven under
+            the covers installs the overall-lib.jar from the project-repo (specified
+            below) to the local repo! This is why this works. And this is the magic how
+            to install a custom jar into a project-repo: http://blog.valdaris.com/post/custom-jar -->
 
-		<!-- Dependency on an external jar file. This dependency specification 
-			makes maven install the jar from the project-repo to the local-repo. -->
-		<dependency>
-			<groupId>overall-lib</groupId>
-			<artifactId>overall-lib</artifactId>
-			<version>1.0.0</version>
-		</dependency>
+        <!-- mvn install:install-file -DlocalRepositoryPath=repo -DcreateChecksum=true
+            -Dpackaging=jar -Dfile="lib/overall-lib-0.0.1.jar" -DgroupId=overall-lib
+            -DartifactId=overall-lib -Dversion="0.0.1" -e -->
 
-		<!-- Dependency on the overall-util jar, from this same Maven parent project. -->
-		<dependency>
-			<groupId>com.pet.king</groupId>
-			<artifactId>overall-util</artifactId>
-			<!-- <version>0.0.1-SNAPSHOT</version> -->
-		</dependency>
+        <!-- Dependency on an external jar file. This dependency specification
+            makes maven install the jar from the project-repo to the local-repo. -->
+        <dependency>
+            <groupId>overall-lib</groupId>
+            <artifactId>overall-lib</artifactId>
+            <version>1.0.0</version>
+        </dependency>
 
-		<dependency>
-			<groupId>com.pet.king</groupId>
-			<artifactId>overall-common</artifactId>
-		</dependency>
+        <!-- Dependency on the overall-util jar, from this same Maven parent project. -->
+        <dependency>
+            <groupId>com.pet.king</groupId>
+            <artifactId>overall-util</artifactId>
+            <!-- <version>0.0.1-SNAPSHOT</version> -->
+        </dependency>
 
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>com.pet.king</groupId>
+            <artifactId>overall-common</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>javax.xml.bind</groupId>
-			<artifactId>jaxb-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>javax.xml</groupId>
-			<artifactId>jaxb-impl</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>org.glassfish.jersey.core</groupId>
-			<artifactId>jersey-client</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish.jersey.media</groupId>
-			<artifactId>jersey-media-json-jackson</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml</groupId>
+            <artifactId>jaxb-impl</artifactId>
+        </dependency>
 
-	</dependencies>
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jackson</artifactId>
+        </dependency>
+
+    </dependencies>
 
 </project>
 
