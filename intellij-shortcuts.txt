@@ -1,10 +1,14 @@
 Alt + {number}: open certain views (Alt + 9 is for version control, Alt + 1 is for project, Alt + 2 is for structure, ...)
 
+Ctrl + Alt + S: settings...
+Ctrl + Alt + Shift + S: project structure...
+
 Alt + Home: go to navigation bar
 Shift + Shift: search everywhere (class, files, symbol)
 Ctrl + Shift + R: search in files
 Ctrl + Shift + T: search in classes
 Ctrl + Shift + N: search in symbols
+Ctrl + E: recent files
 
 Ctrl + O: outline popup
 F4: class hierarchy
