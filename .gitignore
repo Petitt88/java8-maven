@@ -1,6 +1,7 @@
 #generated files
 target/
 build/
+dependency-reduced-pom.xml
 
 # IntelliJ
 .idea/
