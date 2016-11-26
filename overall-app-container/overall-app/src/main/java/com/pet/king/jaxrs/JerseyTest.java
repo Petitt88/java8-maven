@@ -93,7 +93,7 @@ public class JerseyTest {
 
 			PersonDto person = new PersonDto();
 			person.setAge(27);
-			// age is not set, so Bean validation on the server side will send the reponse back without even hitting the Jaxrs service
+			// age is not set, so Bean validation on the server side will send the response back without even hitting the Jaxrs service
 
 			Response response = ClientBuilder
 					.newClient()
