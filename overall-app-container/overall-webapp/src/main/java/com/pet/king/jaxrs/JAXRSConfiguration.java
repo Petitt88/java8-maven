@@ -1,10 +1,10 @@
 package com.pet.king.jaxrs;
 
-import javax.ws.rs.ApplicationPath;
-import javax.ws.rs.core.Application;
-
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
+
+import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.core.Application;
 
 @ApplicationPath("api")
 public class JAXRSConfiguration extends Application {
@@ -20,12 +20,12 @@ public class JAXRSConfiguration extends Application {
 		// .property(ServerProperties.BV_DISABLE_VALIDATE_ON_EXECUTABLE_OVERRIDE_CHECK, true)
 		// // Further configuration of ResourceConfig.
 		// .register(...)
-		
+
 		// Create JAX-RS application.
 		final Application application = new ResourceConfig()
 				// register jackson to enable json reqest consuming and response producing
 				// otherwise jersey is only capable of xml handling
-		        .packages("org.glassfish.jersey.examples.jackson")
-		        .register(JacksonFeature.class);
+				.packages("org.glassfish.jersey.examples.jackson")
+				.register(JacksonFeature.class);
 	}
 }

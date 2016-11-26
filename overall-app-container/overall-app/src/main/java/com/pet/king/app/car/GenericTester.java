@@ -5,8 +5,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.pet.king.app.Person;
-
 public class GenericTester {
 
 	private final List<String> list = new ArrayList<>();

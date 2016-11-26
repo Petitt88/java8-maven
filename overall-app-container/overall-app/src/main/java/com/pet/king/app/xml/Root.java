@@ -8,20 +8,16 @@
 
 package com.pet.king.app.xml;
 
+import javax.xml.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 
 
 /**
  * <p>Java class for anonymous complex type.
- * 
+ * <p>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p>
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
@@ -54,193 +50,175 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
-    "customers",
-    "orders"
+		"customers",
+		"orders"
 })
 @XmlRootElement(name = "Root")
 public class Root {
 
-    @XmlElement(name = "Customers", required = true)
-    protected Root.Customers customers;
-    @XmlElement(name = "Orders", required = true)
-    protected Root.Orders orders;
+	@XmlElement(name = "Customers", required = true)
+	protected Root.Customers customers;
+	@XmlElement(name = "Orders", required = true)
+	protected Root.Orders orders;
 
-    /**
-     * Gets the value of the customers property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Root.Customers }
-     *     
-     */
-    public Root.Customers getCustomers() {
-        return customers;
-    }
+	/**
+	 * Gets the value of the customers property.
+	 *
+	 * @return possible object is
+	 * {@link Root.Customers }
+	 */
+	public Root.Customers getCustomers() {
+		return customers;
+	}
 
-    @Override
+	@Override
 	public String toString() {
 		return "Root [customers=" + customers + ", orders=" + orders + "]";
 	}
 
 	/**
-     * Sets the value of the customers property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Root.Customers }
-     *     
-     */
-    public void setCustomers(Root.Customers value) {
-        this.customers = value;
-    }
+	 * Sets the value of the customers property.
+	 *
+	 * @param value allowed object is
+	 *              {@link Root.Customers }
+	 */
+	public void setCustomers(Root.Customers value) {
+		this.customers = value;
+	}
 
-    /**
-     * Gets the value of the orders property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Root.Orders }
-     *     
-     */
-    public Root.Orders getOrders() {
-        return orders;
-    }
+	/**
+	 * Gets the value of the orders property.
+	 *
+	 * @return possible object is
+	 * {@link Root.Orders }
+	 */
+	public Root.Orders getOrders() {
+		return orders;
+	}
 
-    /**
-     * Sets the value of the orders property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Root.Orders }
-     *     
-     */
-    public void setOrders(Root.Orders value) {
-        this.orders = value;
-    }
+	/**
+	 * Sets the value of the orders property.
+	 *
+	 * @param value allowed object is
+	 *              {@link Root.Orders }
+	 */
+	public void setOrders(Root.Orders value) {
+		this.orders = value;
+	}
 
 
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType>
-     *   &lt;complexContent>
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *       &lt;sequence>
-     *         &lt;element name="Customer" type="{}Customer" maxOccurs="unbounded" minOccurs="0"/>
-     *       &lt;/sequence>
-     *     &lt;/restriction>
-     *   &lt;/complexContent>
-     * &lt;/complexType>
-     * </pre>
-     * 
-     * 
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "customer"
-    })
-    public static class Customers {
+	/**
+	 * <p>Java class for anonymous complex type.
+	 * <p>
+	 * <p>The following schema fragment specifies the expected content contained within this class.
+	 * <p>
+	 * <pre>
+	 * &lt;complexType>
+	 *   &lt;complexContent>
+	 *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+	 *       &lt;sequence>
+	 *         &lt;element name="Customer" type="{}Customer" maxOccurs="unbounded" minOccurs="0"/>
+	 *       &lt;/sequence>
+	 *     &lt;/restriction>
+	 *   &lt;/complexContent>
+	 * &lt;/complexType>
+	 * </pre>
+	 */
+	@XmlAccessorType(XmlAccessType.FIELD)
+	@XmlType(name = "", propOrder = {
+			"customer"
+	})
+	public static class Customers {
 
-        @XmlElement(name = "Customer")
-        protected List<Customer> customer;
+		@XmlElement(name = "Customer")
+		protected List<Customer> customer;
 
-        /**
-         * Gets the value of the customer property.
-         * 
-         * <p>
-         * This accessor method returns a reference to the live list,
-         * not a snapshot. Therefore any modification you make to the
-         * returned list will be present inside the JAXB object.
-         * This is why there is not a <CODE>set</CODE> method for the customer property.
-         * 
-         * <p>
-         * For example, to add a new item, do as follows:
-         * <pre>
-         *    getCustomer().add(newItem);
-         * </pre>
-         * 
-         * 
-         * <p>
-         * Objects of the following type(s) are allowed in the list
-         * {@link Customer }
-         * 
-         * 
-         */
-        public List<Customer> getCustomer() {
-            if (customer == null) {
-                customer = new ArrayList<>();
-            }
-            return this.customer;
-        }
+		/**
+		 * Gets the value of the customer property.
+		 * <p>
+		 * <p>
+		 * This accessor method returns a reference to the live list,
+		 * not a snapshot. Therefore any modification you make to the
+		 * returned list will be present inside the JAXB object.
+		 * This is why there is not a <CODE>set</CODE> method for the customer property.
+		 * <p>
+		 * <p>
+		 * For example, to add a new item, do as follows:
+		 * <pre>
+		 *    getCustomer().add(newItem);
+		 * </pre>
+		 * <p>
+		 * <p>
+		 * <p>
+		 * Objects of the following type(s) are allowed in the list
+		 * {@link Customer }
+		 */
+		public List<Customer> getCustomer() {
+			if (customer == null) {
+				customer = new ArrayList<>();
+			}
+			return this.customer;
+		}
 
-    }
+	}
 
 
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
-     * <pre>
-     * &lt;complexType>
-     *   &lt;complexContent>
-     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *       &lt;sequence>
-     *         &lt;element name="Order" type="{}Order" maxOccurs="unbounded" minOccurs="0"/>
-     *       &lt;/sequence>
-     *     &lt;/restriction>
-     *   &lt;/complexContent>
-     * &lt;/complexType>
-     * </pre>
-     * 
-     * 
-     */
-    @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "order"
-    })
-    public static class Orders {
+	/**
+	 * <p>Java class for anonymous complex type.
+	 * <p>
+	 * <p>The following schema fragment specifies the expected content contained within this class.
+	 * <p>
+	 * <pre>
+	 * &lt;complexType>
+	 *   &lt;complexContent>
+	 *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+	 *       &lt;sequence>
+	 *         &lt;element name="Order" type="{}Order" maxOccurs="unbounded" minOccurs="0"/>
+	 *       &lt;/sequence>
+	 *     &lt;/restriction>
+	 *   &lt;/complexContent>
+	 * &lt;/complexType>
+	 * </pre>
+	 */
+	@XmlAccessorType(XmlAccessType.FIELD)
+	@XmlType(name = "", propOrder = {
+			"order"
+	})
+	public static class Orders {
 
-        @XmlElement(name = "Order")
-        protected List<Order> order;
+		@XmlElement(name = "Order")
+		protected List<Order> order;
 
-        /**
-         * Gets the value of the order property.
-         * 
-         * <p>
-         * This accessor method returns a reference to the live list,
-         * not a snapshot. Therefore any modification you make to the
-         * returned list will be present inside the JAXB object.
-         * This is why there is not a <CODE>set</CODE> method for the order property.
-         * 
-         * <p>
-         * For example, to add a new item, do as follows:
-         * <pre>
-         *    getOrder().add(newItem);
-         * </pre>
-         * 
-         * 
-         * <p>
-         * Objects of the following type(s) are allowed in the list
-         * {@link Order }
-         * 
-         * 
-         */
-        public List<Order> getOrder() {
-            if (order == null) {
-                order = new ArrayList<>();
-            }
-            return this.order;
-        }
+		/**
+		 * Gets the value of the order property.
+		 * <p>
+		 * <p>
+		 * This accessor method returns a reference to the live list,
+		 * not a snapshot. Therefore any modification you make to the
+		 * returned list will be present inside the JAXB object.
+		 * This is why there is not a <CODE>set</CODE> method for the order property.
+		 * <p>
+		 * <p>
+		 * For example, to add a new item, do as follows:
+		 * <pre>
+		 *    getOrder().add(newItem);
+		 * </pre>
+		 * <p>
+		 * <p>
+		 * <p>
+		 * Objects of the following type(s) are allowed in the list
+		 * {@link Order }
+		 */
+		public List<Order> getOrder() {
+			if (order == null) {
+				order = new ArrayList<>();
+			}
+			return this.order;
+		}
 
-    }
+	}
 
 }

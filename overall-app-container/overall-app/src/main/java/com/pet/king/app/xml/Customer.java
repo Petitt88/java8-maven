@@ -8,21 +8,16 @@
 
 package com.pet.king.app.xml;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.*;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
  * <p>Java class for Customer complex type.
- * 
+ * <p>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p>
  * <pre>
  * &lt;complexType name="Customer">
  *   &lt;complexContent>
@@ -40,208 +35,178 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "Customer", propOrder = {
-    "companyName",
-    "contactName",
-    "contactTitle",
-    "phone",
-    "fax",
-    "fullAddress"
+		"companyName",
+		"contactName",
+		"contactTitle",
+		"phone",
+		"fax",
+		"fullAddress"
 })
 public class Customer {
 
-    @Override
+	@Override
 	public String toString() {
 		return "Customer [companyName=" + companyName + ", contactName=" + contactName + ", contactTitle=" + contactTitle + ", phone=" + phone + ", fax=" + fax + ", fullAddress=" + fullAddress + ", customerID=" + customerID + "]";
 	}
 
 	@XmlElement(name = "CompanyName", required = true)
-    protected String companyName;
-    @XmlElement(name = "ContactName", required = true)
-    protected String contactName;
-    @XmlElement(name = "ContactTitle", required = true)
-    protected String contactTitle;
-    @XmlElement(name = "Phone", required = true)
-    protected String phone;
-    @XmlElement(name = "Fax")
-    protected String fax;
-    @XmlElement(name = "FullAddress", required = true)
-    protected Address fullAddress;
-    @XmlAttribute(name = "CustomerID")
-    @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-    @XmlSchemaType(name = "token")
-    protected String customerID;
+	protected String companyName;
+	@XmlElement(name = "ContactName", required = true)
+	protected String contactName;
+	@XmlElement(name = "ContactTitle", required = true)
+	protected String contactTitle;
+	@XmlElement(name = "Phone", required = true)
+	protected String phone;
+	@XmlElement(name = "Fax")
+	protected String fax;
+	@XmlElement(name = "FullAddress", required = true)
+	protected Address fullAddress;
+	@XmlAttribute(name = "CustomerID")
+	@XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+	@XmlSchemaType(name = "token")
+	protected String customerID;
 
-    /**
-     * Gets the value of the companyName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getCompanyName() {
-        return companyName;
-    }
+	/**
+	 * Gets the value of the companyName property.
+	 *
+	 * @return possible object is
+	 * {@link String }
+	 */
+	public String getCompanyName() {
+		return companyName;
+	}
 
-    /**
-     * Sets the value of the companyName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setCompanyName(String value) {
-        this.companyName = value;
-    }
+	/**
+	 * Sets the value of the companyName property.
+	 *
+	 * @param value allowed object is
+	 *              {@link String }
+	 */
+	public void setCompanyName(String value) {
+		this.companyName = value;
+	}
 
-    /**
-     * Gets the value of the contactName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getContactName() {
-        return contactName;
-    }
+	/**
+	 * Gets the value of the contactName property.
+	 *
+	 * @return possible object is
+	 * {@link String }
+	 */
+	public String getContactName() {
+		return contactName;
+	}
 
-    /**
-     * Sets the value of the contactName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setContactName(String value) {
-        this.contactName = value;
-    }
+	/**
+	 * Sets the value of the contactName property.
+	 *
+	 * @param value allowed object is
+	 *              {@link String }
+	 */
+	public void setContactName(String value) {
+		this.contactName = value;
+	}
 
-    /**
-     * Gets the value of the contactTitle property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getContactTitle() {
-        return contactTitle;
-    }
+	/**
+	 * Gets the value of the contactTitle property.
+	 *
+	 * @return possible object is
+	 * {@link String }
+	 */
+	public String getContactTitle() {
+		return contactTitle;
+	}
 
-    /**
-     * Sets the value of the contactTitle property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setContactTitle(String value) {
-        this.contactTitle = value;
-    }
+	/**
+	 * Sets the value of the contactTitle property.
+	 *
+	 * @param value allowed object is
+	 *              {@link String }
+	 */
+	public void setContactTitle(String value) {
+		this.contactTitle = value;
+	}
 
-    /**
-     * Gets the value of the phone property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getPhone() {
-        return phone;
-    }
+	/**
+	 * Gets the value of the phone property.
+	 *
+	 * @return possible object is
+	 * {@link String }
+	 */
+	public String getPhone() {
+		return phone;
+	}
 
-    /**
-     * Sets the value of the phone property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setPhone(String value) {
-        this.phone = value;
-    }
+	/**
+	 * Sets the value of the phone property.
+	 *
+	 * @param value allowed object is
+	 *              {@link String }
+	 */
+	public void setPhone(String value) {
+		this.phone = value;
+	}
 
-    /**
-     * Gets the value of the fax property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getFax() {
-        return fax;
-    }
+	/**
+	 * Gets the value of the fax property.
+	 *
+	 * @return possible object is
+	 * {@link String }
+	 */
+	public String getFax() {
+		return fax;
+	}
 
-    /**
-     * Sets the value of the fax property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setFax(String value) {
-        this.fax = value;
-    }
+	/**
+	 * Sets the value of the fax property.
+	 *
+	 * @param value allowed object is
+	 *              {@link String }
+	 */
+	public void setFax(String value) {
+		this.fax = value;
+	}
 
-    /**
-     * Gets the value of the fullAddress property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Address }
-     *     
-     */
-    public Address getFullAddress() {
-        return fullAddress;
-    }
+	/**
+	 * Gets the value of the fullAddress property.
+	 *
+	 * @return possible object is
+	 * {@link Address }
+	 */
+	public Address getFullAddress() {
+		return fullAddress;
+	}
 
-    /**
-     * Sets the value of the fullAddress property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Address }
-     *     
-     */
-    public void setFullAddress(Address value) {
-        this.fullAddress = value;
-    }
+	/**
+	 * Sets the value of the fullAddress property.
+	 *
+	 * @param value allowed object is
+	 *              {@link Address }
+	 */
+	public void setFullAddress(Address value) {
+		this.fullAddress = value;
+	}
 
-    /**
-     * Gets the value of the customerID property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getCustomerID() {
-        return customerID;
-    }
+	/**
+	 * Gets the value of the customerID property.
+	 *
+	 * @return possible object is
+	 * {@link String }
+	 */
+	public String getCustomerID() {
+		return customerID;
+	}
 
-    /**
-     * Sets the value of the customerID property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setCustomerID(String value) {
-        this.customerID = value;
-    }
+	/**
+	 * Sets the value of the customerID property.
+	 *
+	 * @param value allowed object is
+	 *              {@link String }
+	 */
+	public void setCustomerID(String value) {
+		this.customerID = value;
+	}
 
 }

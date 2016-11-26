@@ -8,22 +8,17 @@
 
 package com.pet.king.app.xml;
 
+import javax.xml.bind.annotation.*;
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.XmlType;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
  * <p>Java class for ShipInfo complex type.
- * 
+ * <p>
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p>
  * <pre>
  * &lt;complexType name="ShipInfo">
  *   &lt;complexContent>
@@ -43,262 +38,225 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *   &lt;/complexContent>
  * &lt;/complexType>
  * </pre>
- * 
- * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ShipInfo", propOrder = {
-    "shipVia",
-    "freight",
-    "shipName",
-    "shipAddress",
-    "shipCity",
-    "shipRegion",
-    "shipPostalCode",
-    "shipCountry"
+		"shipVia",
+		"freight",
+		"shipName",
+		"shipAddress",
+		"shipCity",
+		"shipRegion",
+		"shipPostalCode",
+		"shipCountry"
 })
 public class ShipInfo {
 
-    @XmlElement(name = "ShipVia", required = true)
-    protected BigInteger shipVia;
-    @XmlElement(name = "Freight", required = true)
-    protected BigDecimal freight;
-    @XmlElement(name = "ShipName", required = true)
-    protected String shipName;
-    @Override
+	@XmlElement(name = "ShipVia", required = true)
+	protected BigInteger shipVia;
+	@XmlElement(name = "Freight", required = true)
+	protected BigDecimal freight;
+	@XmlElement(name = "ShipName", required = true)
+	protected String shipName;
+
+	@Override
 	public String toString() {
 		return "ShipInfo [shipVia=" + shipVia + ", freight=" + freight + ", shipName=" + shipName + ", shipAddress=" + shipAddress + ", shipCity=" + shipCity + ", shipRegion=" + shipRegion + ", shipPostalCode=" + shipPostalCode + ", shipCountry="
 				+ shipCountry + ", shippedDate=" + shippedDate + "]";
 	}
 
 	@XmlElement(name = "ShipAddress", required = true)
-    protected String shipAddress;
-    @XmlElement(name = "ShipCity", required = true)
-    protected String shipCity;
-    @XmlElement(name = "ShipRegion", required = true)
-    protected String shipRegion;
-    @XmlElement(name = "ShipPostalCode", required = true)
-    protected String shipPostalCode;
-    @XmlElement(name = "ShipCountry", required = true)
-    protected String shipCountry;
-    @XmlAttribute(name = "ShippedDate")
-    @XmlSchemaType(name = "dateTime")
-    protected XMLGregorianCalendar shippedDate;
+	protected String shipAddress;
+	@XmlElement(name = "ShipCity", required = true)
+	protected String shipCity;
+	@XmlElement(name = "ShipRegion", required = true)
+	protected String shipRegion;
+	@XmlElement(name = "ShipPostalCode", required = true)
+	protected String shipPostalCode;
+	@XmlElement(name = "ShipCountry", required = true)
+	protected String shipCountry;
+	@XmlAttribute(name = "ShippedDate")
+	@XmlSchemaType(name = "dateTime")
+	protected XMLGregorianCalendar shippedDate;
 
-    /**
-     * Gets the value of the shipVia property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BigInteger }
-     *     
-     */
-    public BigInteger getShipVia() {
-        return shipVia;
-    }
+	/**
+	 * Gets the value of the shipVia property.
+	 *
+	 * @return possible object is
+	 * {@link BigInteger }
+	 */
+	public BigInteger getShipVia() {
+		return shipVia;
+	}
 
-    /**
-     * Sets the value of the shipVia property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BigInteger }
-     *     
-     */
-    public void setShipVia(BigInteger value) {
-        this.shipVia = value;
-    }
+	/**
+	 * Sets the value of the shipVia property.
+	 *
+	 * @param value allowed object is
+	 *              {@link BigInteger }
+	 */
+	public void setShipVia(BigInteger value) {
+		this.shipVia = value;
+	}
 
-    /**
-     * Gets the value of the freight property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BigDecimal }
-     *     
-     */
-    public BigDecimal getFreight() {
-        return freight;
-    }
+	/**
+	 * Gets the value of the freight property.
+	 *
+	 * @return possible object is
+	 * {@link BigDecimal }
+	 */
+	public BigDecimal getFreight() {
+		return freight;
+	}
 
-    /**
-     * Sets the value of the freight property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BigDecimal }
-     *     
-     */
-    public void setFreight(BigDecimal value) {
-        this.freight = value;
-    }
+	/**
+	 * Sets the value of the freight property.
+	 *
+	 * @param value allowed object is
+	 *              {@link BigDecimal }
+	 */
+	public void setFreight(BigDecimal value) {
+		this.freight = value;
+	}
 
-    /**
-     * Gets the value of the shipName property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getShipName() {
-        return shipName;
-    }
+	/**
+	 * Gets the value of the shipName property.
+	 *
+	 * @return possible object is
+	 * {@link String }
+	 */
+	public String getShipName() {
+		return shipName;
+	}
 
-    /**
-     * Sets the value of the shipName property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setShipName(String value) {
-        this.shipName = value;
-    }
+	/**
+	 * Sets the value of the shipName property.
+	 *
+	 * @param value allowed object is
+	 *              {@link String }
+	 */
+	public void setShipName(String value) {
+		this.shipName = value;
+	}
 
-    /**
-     * Gets the value of the shipAddress property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getShipAddress() {
-        return shipAddress;
-    }
+	/**
+	 * Gets the value of the shipAddress property.
+	 *
+	 * @return possible object is
+	 * {@link String }
+	 */
+	public String getShipAddress() {
+		return shipAddress;
+	}
 
-    /**
-     * Sets the value of the shipAddress property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setShipAddress(String value) {
-        this.shipAddress = value;
-    }
+	/**
+	 * Sets the value of the shipAddress property.
+	 *
+	 * @param value allowed object is
+	 *              {@link String }
+	 */
+	public void setShipAddress(String value) {
+		this.shipAddress = value;
+	}
 
-    /**
-     * Gets the value of the shipCity property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getShipCity() {
-        return shipCity;
-    }
+	/**
+	 * Gets the value of the shipCity property.
+	 *
+	 * @return possible object is
+	 * {@link String }
+	 */
+	public String getShipCity() {
+		return shipCity;
+	}
 
-    /**
-     * Sets the value of the shipCity property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setShipCity(String value) {
-        this.shipCity = value;
-    }
+	/**
+	 * Sets the value of the shipCity property.
+	 *
+	 * @param value allowed object is
+	 *              {@link String }
+	 */
+	public void setShipCity(String value) {
+		this.shipCity = value;
+	}
 
-    /**
-     * Gets the value of the shipRegion property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getShipRegion() {
-        return shipRegion;
-    }
+	/**
+	 * Gets the value of the shipRegion property.
+	 *
+	 * @return possible object is
+	 * {@link String }
+	 */
+	public String getShipRegion() {
+		return shipRegion;
+	}
 
-    /**
-     * Sets the value of the shipRegion property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setShipRegion(String value) {
-        this.shipRegion = value;
-    }
+	/**
+	 * Sets the value of the shipRegion property.
+	 *
+	 * @param value allowed object is
+	 *              {@link String }
+	 */
+	public void setShipRegion(String value) {
+		this.shipRegion = value;
+	}
 
-    /**
-     * Gets the value of the shipPostalCode property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getShipPostalCode() {
-        return shipPostalCode;
-    }
+	/**
+	 * Gets the value of the shipPostalCode property.
+	 *
+	 * @return possible object is
+	 * {@link String }
+	 */
+	public String getShipPostalCode() {
+		return shipPostalCode;
+	}
 
-    /**
-     * Sets the value of the shipPostalCode property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setShipPostalCode(String value) {
-        this.shipPostalCode = value;
-    }
+	/**
+	 * Sets the value of the shipPostalCode property.
+	 *
+	 * @param value allowed object is
+	 *              {@link String }
+	 */
+	public void setShipPostalCode(String value) {
+		this.shipPostalCode = value;
+	}
 
-    /**
-     * Gets the value of the shipCountry property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getShipCountry() {
-        return shipCountry;
-    }
+	/**
+	 * Gets the value of the shipCountry property.
+	 *
+	 * @return possible object is
+	 * {@link String }
+	 */
+	public String getShipCountry() {
+		return shipCountry;
+	}
 
-    /**
-     * Sets the value of the shipCountry property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setShipCountry(String value) {
-        this.shipCountry = value;
-    }
+	/**
+	 * Sets the value of the shipCountry property.
+	 *
+	 * @param value allowed object is
+	 *              {@link String }
+	 */
+	public void setShipCountry(String value) {
+		this.shipCountry = value;
+	}
 
-    /**
-     * Gets the value of the shippedDate property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link XMLGregorianCalendar }
-     *     
-     */
-    public XMLGregorianCalendar getShippedDate() {
-        return shippedDate;
-    }
+	/**
+	 * Gets the value of the shippedDate property.
+	 *
+	 * @return possible object is
+	 * {@link XMLGregorianCalendar }
+	 */
+	public XMLGregorianCalendar getShippedDate() {
+		return shippedDate;
+	}
 
-    /**
-     * Sets the value of the shippedDate property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link XMLGregorianCalendar }
-     *     
-     */
-    public void setShippedDate(XMLGregorianCalendar value) {
-        this.shippedDate = value;
-    }
+	/**
+	 * Sets the value of the shippedDate property.
+	 *
+	 * @param value allowed object is
+	 *              {@link XMLGregorianCalendar }
+	 */
+	public void setShippedDate(XMLGregorianCalendar value) {
+		this.shippedDate = value;
+	}
 
 }

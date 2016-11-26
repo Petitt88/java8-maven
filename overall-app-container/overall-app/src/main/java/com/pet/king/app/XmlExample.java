@@ -1,11 +1,6 @@
 package com.pet.king.app;
 
-import java.io.File;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Stream;
+import com.pet.king.app.xml.*;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -13,13 +8,12 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
-
-import com.pet.king.app.xml.Address;
-import com.pet.king.app.xml.Customer;
-import com.pet.king.app.xml.ObjectFactory;
-import com.pet.king.app.xml.Order;
-import com.pet.king.app.xml.Root;
-import com.pet.king.app.xml.ShipInfo;
+import java.io.File;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 // @XmlRootElement
 // @XmlAccessorType(XmlAccessType.FIELD)

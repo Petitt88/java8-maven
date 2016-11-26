@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import javax.jws.WebService;
-
 // will be available at "/personws" uri, defined in the web.xml and sun-jaxws.xml files
 //@WebService(endpointInterface = "com.pet.king.jaxws.PersonService")
 public class PersonServiceImpl implements PersonService {

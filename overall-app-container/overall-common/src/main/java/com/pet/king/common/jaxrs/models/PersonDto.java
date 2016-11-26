@@ -1,7 +1,5 @@
 package com.pet.king.common.jaxrs.models;
 
-import javax.validation.constraints.NotNull;
-
 public class PersonDto {
 
 	// @NotNull

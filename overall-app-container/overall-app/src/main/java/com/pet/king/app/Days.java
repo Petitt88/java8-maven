@@ -1,9 +1,9 @@
 package com.pet.king.app;
 
+import com.pet.king.app.InterfaceMindBlowUp.InnerEnum;
+
 import java.util.EnumSet;
 import java.util.Set;
-
-import com.pet.king.app.InterfaceMindBlowUp.InnerEnum;
 
 interface DayOfWeek {
 	boolean isWeekend();

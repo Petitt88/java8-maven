@@ -1,24 +1,16 @@
 package com.pet.king.jaxrs;
 
-import java.time.LocalDate;
-
-import javax.validation.constraints.NotNull;
-import javax.websocket.server.PathParam;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-
-import org.hibernate.validator.constraints.Email;
-
 import com.pet.king.common.jaxrs.models.PersonDto;
 import com.pet.king.common.jaxrs.models.YearDto;
 import com.pet.king.common.jaxrs.validation.Person;
+import org.hibernate.validator.constraints.Email;
+
+import javax.validation.constraints.NotNull;
+import javax.websocket.server.PathParam;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.time.LocalDate;
 
 // maps to /api/shop
 @Path("shop")

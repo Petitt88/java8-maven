@@ -1,42 +1,32 @@
 
 package com.pet.king.app;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.nio.file.Files;
-import java.time.DayOfWeek;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.function.IntFunction;
-import java.util.function.IntUnaryOperator;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
-
-import org.apache.commons.lang3.StringUtils;
-
 import com.pet.king.app.car.Car;
 import com.pet.king.app.car.GenericTester;
 import com.pet.king.app.car.Tuple;
 import com.pet.king.app.car.TupleGeneric;
 import com.pet.king.jaxrs.JerseyTest;
 import com.pet.king.util.SuperCalculator;
-
 import hu.overall.lib.HeavyComputer;
+import org.apache.commons.lang3.StringUtils;
 
-@Trait(name = "Pet", names = { "Non", "Flor" })
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.*;
+import java.util.function.IntFunction;
+import java.util.function.IntUnaryOperator;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
+@Trait(name = "Pet", names = {"Non", "Flor"})
 @TraitDefault(27)
 public class MyClass {
 
@@ -157,7 +147,7 @@ public class MyClass {
 	protected void finalize() throws Throwable {
 		super.finalize();
 
-		String[] sArr = /* new String[] */ { "apple", "android" };
+		String[] sArr = /* new String[] */ {"apple", "android"};
 	}
 
 	void threadTest() {

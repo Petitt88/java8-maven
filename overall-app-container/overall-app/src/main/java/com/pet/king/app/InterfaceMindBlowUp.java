@@ -4,10 +4,14 @@ import java.io.IOException;
 
 @FunctionalInterface()
 public interface InterfaceMindBlowUp {
-	/** public static final implicitly */
+	/**
+	 * public static final implicitly
+	 */
 	String CONSTANT_VALUE = "CONSTANT";
 
-	/** public abstract implicitly */
+	/**
+	 * public abstract implicitly
+	 */
 	void performAction();
 
 	// nested classes, interfaces or enumerations are implicitly public and static

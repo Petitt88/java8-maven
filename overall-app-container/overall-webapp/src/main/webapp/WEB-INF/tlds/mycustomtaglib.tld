@@ -1,44 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <taglib version="2.1" xmlns="http://java.sun.com/xml/ns/javaee"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-jsptaglibrary_2_1.xsd">
 
-	<!-- Descriptor file to define the java tag handlers. If tag-files are to 
-		be reused in other projects and lets say this compiles down to a jar file, 
-		the individual .tag files must also be defined here as <tag-file> attributes. -->
-	<tlib-version>1.0</tlib-version>
-	<short-name>kp</short-name>
-	<uri>java_taghandlers</uri>
+    <!-- Descriptor file to define the java tag handlers. If tag-files are to
+        be reused in other projects and lets say this compiles down to a jar file,
+        the individual .tag files must also be defined here as <tag-file> attributes. -->
+    <tlib-version>1.0</tlib-version>
+    <short-name>kp</short-name>
+    <uri>java_taghandlers</uri>
 
-	<tag>
-		<name>hello</name>
-		<tag-class>com.pet.king.tags.HelloTag</tag-class>
-		<body-content>empty</body-content>
+    <tag>
+        <name>hello</name>
+        <tag-class>com.pet.king.tags.HelloTag</tag-class>
+        <body-content>empty</body-content>
 
-		<attribute>
-			<name>name</name>
-			<required>false</required>
-			<rtexprvalue>true</rtexprvalue>
-			<type>java.lang.String</type>
-		</attribute>
-	</tag>
+        <attribute>
+            <name>name</name>
+            <required>false</required>
+            <rtexprvalue>true</rtexprvalue>
+            <type>java.lang.String</type>
+        </attribute>
+    </tag>
 
-	<tag>
-		<name>hello-body</name>
-		<tag-class>com.pet.king.tags.HelloBodyTag</tag-class>
-		<body-content>scriptless</body-content>
-	</tag>
+    <tag>
+        <name>hello-body</name>
+        <tag-class>com.pet.king.tags.HelloBodyTag</tag-class>
+        <body-content>scriptless</body-content>
+    </tag>
 
-	<!-- Not necessary. Only when we want to reuse the tag-file through a jar. -->
-	<tag-file>
-		<name>banana</name>
-		<path>/WEB-INF/tags/banana.tag</path>
-	</tag-file>
+    <!-- Not necessary. Only when we want to reuse the tag-file through a jar. -->
+    <tag-file>
+        <name>banana</name>
+        <path>/WEB-INF/tags/banana.tag</path>
+    </tag-file>
 
-	<function>
-		<name>getSum</name>
-		<function-class>com.pet.king.functions.CustomELFunction</function-class>
-		<function-signature>String getSum(int, int)</function-signature>
-	</function>
+    <function>
+        <name>getSum</name>
+        <function-class>com.pet.king.functions.CustomELFunction</function-class>
+        <function-signature>String getSum(int, int)</function-signature>
+    </function>
 
 </taglib>
