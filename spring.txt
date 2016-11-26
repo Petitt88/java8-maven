@@ -28,6 +28,8 @@
 @Value - specify default value on properties. Can be arbirtary string or expression e.g. "#{systemProperties.myProp}"
 @Value("#{ @environment['stormpath.sso.message.primary'] ?: 'Primary' }") --> ?: <-- this is the Elvis operator, we can specify fallback value to be used 
 																					 if the one is not found in application.properties
+@Value("#{beanName.fieldName}")
+@Value("server.port") - from application.properties or from @PropertySource file
 @ConfigurationProperties - as @Value works with one field, this populates an entire java class's fields
 
 @Order: defines the sort order for an annotated component. The value() is optional and represents an order value as defined in the Ordered interface. Lower values have higher priority. The default value is Ordered.LOWEST_PRECEDENCE, indicating lowest priority (losing to any other specified order value).
@@ -332,90 +334,90 @@ GrantedAuthority: UserDetailsService provides them, usually they are roles
 		// auth.userDetailsService(userDetailsService)
 	}
 
-	
-What we need for authentication:
-	- Csrf filter
-	- UsernamePasswordAuthenticationFilter - or a custom filter that reads the credentials and invokes AuthenticationManager.authenticate
-	- custom AuthenticationProvider
-	
-	@Configuration
-	@PropertySource("classpath:custom.yml")
-	@EnableWebSecurity
-	@EnableGlobalMethodSecurity(prePostEnabled = true)
-	public class SecurityConfig extends WebSecurityConfigurerAdapter {
-	
-		@Override
-		protected void configure(HttpSecurity http) throws Exception {
-			System.out.println("env");
-			System.out.println(env.getProperty("vmc.admin.name"));
+26.2 Web Security Expressions
+	What we need for authentication:
+		- Csrf filter
+		- UsernamePasswordAuthenticationFilter - or a custom filter that reads the credentials and invokes AuthenticationManager.authenticate
+		- custom AuthenticationProvider
+		
+		@Configuration
+		@PropertySource("classpath:custom.yml")
+		@EnableWebSecurity
+		@EnableGlobalMethodSecurity(prePostEnabled = true)
+		public class SecurityConfig extends WebSecurityConfigurerAdapter {
+		
+			@Override
+			protected void configure(HttpSecurity http) throws Exception {
+				System.out.println("env");
+				System.out.println(env.getProperty("vmc.admin.name"));
 
-			CookieCsrfTokenRepository tokenRepo = CookieCsrfTokenRepository.withHttpOnlyFalse();
-			tokenRepo.setHeaderName("X-XSRF-TOKEN");
-			tokenRepo.setCookieName("XSRF-TOKEN");
+				CookieCsrfTokenRepository tokenRepo = CookieCsrfTokenRepository.withHttpOnlyFalse();
+				tokenRepo.setHeaderName("X-XSRF-TOKEN");
+				tokenRepo.setCookieName("XSRF-TOKEN");
 
-			http.authorizeRequests()
-					.antMatchers("**/**").permitAll()
-					.antMatchers("/users/{userId}").access("#userId == principal.id.toString()")	// this is Spring Security path variables.
-																									// principal is the current user - whatever we return from out UserDetailsService
-																									// This is called "Spell extension with Spring Data" 
-																									//			- SecurityDataConfiguration provides the SecurityEvaluationContextExtensions to process the expression
+				http.authorizeRequests()
+						.antMatchers("**/**").permitAll()
+						.antMatchers("/users/{userId}").access("#userId == principal.id.toString()")	// this is Spring Security path variables.
+																										// principal is the current user - whatever we return from out UserDetailsService
+																										// This is called "Spell extension with Spring Data" 
+																										//			- SecurityDataConfiguration provides the SecurityEvaluationContextExtensions to process the expression
+																										
+						.antMatchers("/users/{userId}").access("@authz.check(#userId, principal)")	// but I don't like the ".toString()" - I can refer to any bean in Spring Spell using the "@" symbol
+																									// here I have a bean called "authz"
 																									
-					.antMatchers("/users/{userId}").access("@authz.check(#userId, principal)")	// but I don't like the ".toString()" - I can refer to any bean in Spring Spell using the "@" symbol
-																								// here I have a bean called "authz"
-																								
-					.antMatchers("/admin").denyAll()	// matches only /admin and denies it.
-														// however if this is an Mvc controller route it can still be accessed by /admin/ or /admin.json, /admin.html etc because Spring Mvc removes file extensions
-					.antMatchers("/admin/**").denyAll()	// the correct way to disable /admin - but this also disables /admin/whatever
-					.mvcMatchers("/admin").denyAll() 	// use this to properly disable the Mvc route
-					
-					// .anyRequest().authenticated()
-					.and()
-					.formLogin()
-					.and()
-					.httpBasic()
-					.and()
-					.csrf()
-					.csrfTokenRepository(tokenRepo)
-					.and()
-					.headers()
-					/*.contentSecurityPolicy(policyDirectives)*/;
-			// .and()
-			// .sessionManagement()
-			// .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-			// .anonymous().disable();
-		}
-	}
-	
-	@Component
-	public class Authz {
-		// used in the SecurityConfig
-		public boolean check(Long userId, User user) {
-			return userId.equals(user.getId());
+						.antMatchers("/admin").denyAll()	// matches only /admin and denies it.
+															// however if this is an Mvc controller route it can still be accessed by /admin/ or /admin.json, /admin.html etc because Spring Mvc removes file extensions
+						.antMatchers("/admin/**").denyAll()	// the correct way to disable /admin - but this also disables /admin/whatever
+						.mvcMatchers("/admin").denyAll() 	// use this to properly disable the Mvc route
+						
+						// .anyRequest().authenticated()
+						.and()
+						.formLogin()
+						.and()
+						.httpBasic()
+						.and()
+						.csrf()
+						.csrfTokenRepository(tokenRepo)
+						.and()
+						.headers()
+						/*.contentSecurityPolicy(policyDirectives)*/;
+				// .and()
+				// .sessionManagement()
+				// .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+				// .anonymous().disable();
+			}
 		}
 		
-		// used by @ReadableMessage
-		public boolean check(Message message, User user) {
-			...
+		@Component
+		public class Authz {
+			// used in the SecurityConfig
+			public boolean check(Long userId, User user) {
+				return userId.equals(user.getId());
+			}
+			
+			// used by @ReadableMessage
+			public boolean check(Message message, User user) {
+				...
+			}
 		}
-	}
-	
-	public interface MessageRepository extends CrudRepository<Message, Long> {
-	
-		@Query("select m from Message m where m.to.id = ?#{principal.id}")
-		Iterable<Message> inbox();
 		
-		@PostAuthorize("returnObject?.to?.id == principal.id || returnObject?.from?.id == principal.id")	// returnObject refers to whatever object the query returns. The ?. is just to avoid NullPointerException
-		Message findBySummary(@Param("summary") String summary);
+		public interface MessageRepository extends CrudRepository<Message, Long> {
 		
-		@ReadableMessage	// this is a Meta-annotation, we avoided ugly string Spell extensions here
-		Message findBySummaryEvenBetter(@Param("summary") String summary);
-	}
-	
-	// Meta-annotation annotated with @PostAuthorize that has the "authz" custom bean invoking check
-	@Retention(RetentionPolicy.RUNTIME)
-	@PostAuthorize("@authz.check(returnObject, principal)")
-	public @interface ReadableMessage {
-	}
+			@Query("select m from Message m where m.to.id = ?#{principal.id}")	// ?#{principal.id} refers to the current user's id
+			Iterable<Message> inbox();
+			
+			@PostAuthorize("returnObject?.to?.id == principal.id || returnObject?.from?.id == principal.id")	// returnObject refers to whatever object the query returns. The ?. is just to avoid NullPointerException
+			Message findBySummary(@Param("summary") String summary);
+			
+			@ReadableMessage	// this is a Meta-annotation, we avoided ugly string Spell extensions here and moreover we do not tie ourselves to Spring Security API
+			Message findBySummaryEvenBetter(@Param("summary") String summary);
+		}
+		
+		// Meta-annotation annotated with @PostAuthorize annotation that has the "authz" custom bean invoking check
+		@Retention(RetentionPolicy.RUNTIME)
+		@PostAuthorize("@authz.check(returnObject, principal)")
+		public @interface ReadableMessage {
+		}
 	
 SecurityContextRepository: its job is to store the SecurityContext. The default ones stores it in the HttpSession as an attribute.
 
@@ -652,8 +654,6 @@ Edge service: there are two types:
 	We could use distributed transations but Josh Long urges us not to, it just slows down aggregate system.
 	Instead use messaging: forward to the service on a message bus: job is put into a queue (buffer) and eventually gets picked up by the service.
 	
-	
-	Spring cloud stream: a way of describing messaging based services and compose them outside of the actual code.
 	
 	2.1. continuing the Api gateway: the sender, producer - reservation-client
 		<dependency>
@@ -1061,6 +1061,22 @@ Spring 	Integration
 			- AMQP (Advanced Message Queuing Protocol) works between any kind of services
 				- RabbitMQ is one implementation (Spring supports it), or ActiveMQ
 			- Amazon has an implementation too that Spring supports
+			
+	Spring Cloud Stream: a way of describing messaging based services and compose them outside of the actual code.
+		It builds on Spring Integration and alleviates the need to specify the tedious work of adapters (Inbound and Outbound channels - Spring Integration uses these - they are still there tough if needed).
+		We don't have to worry have the channels talk to other nodes, services, that connectivity comes from conventions and configuration file.
+		Spring Cloud Stream Binder handles the communication: notably RabbitMQ, Apache Kafka.
+		
+	Spring Cloud Data Flow: coyorgraphing microservices based on Spring Cloud Stream.
+		They can be maven based Stream Applications with RabbitMQ Binder or with Apache Kafka Binder.
+		Or Docker based Stream Applications with RabbitMQ Binder or with Apache Kafka Binder.
+		Or Maven based Task Applications.
+		Or Docker based Task Applications.
+		
+		Maven produces a jar as for the output whereas in case of Docker the output is a Docker image.
+		
+		Stream vs Task: Stream is something that is infinite, like messaging while Task is finite, like Spring Batch jobs.
+		
 	
 	
 ********************************
