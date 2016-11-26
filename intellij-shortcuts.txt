@@ -1,0 +1,40 @@
+Alt + {number}: open certain views (Alt + 9 is for version control, Alt + 1 is for project, Alt + 2 is for structure, ...)
+
+Alt + Home: go to navigation bar
+Shift + Shift: search everywhere (class, files, symbol)
+Ctrl + Shift + R: search in files
+Ctrl + Shift + T: search in classes
+Ctrl + Shift + N: search in symbols
+
+Ctrl + O: outline popup
+F4: class hierarchy
+Ctrl + T: show implementations
+F2: show documentation for object where the caret currently lies
+
+Ctrl + Space: intellisense
+Ctrl + Shift + Space: smart type
+Alt + Enter: show lightbulb suggestions (this is like eclipse's quick fix)
+Ctrl + P: view method parameters
+
+F5: run
+F6: debug
+F7: reload changed classes
+
+F9: toggle breakpoint
+Ctrl + Shift + F9: show breakpoints
+Ctrl + K: toggle bookmark
+Shift + F11: show bookmarks
+
+F3: go to definition
+Ctrl + G: find all reference
+Ctrl + Shift + O: remove unused imports
+
+Ctrl + Shift + Alt + T: refactor this
+Alt + Shift + S: open context menu (here we can analyze the current file - inspect code for example) - there is a standalon "Analyze" menu for analyzing the whole project along with subprojects or just specific subprojects
+Ctrl + Alt + R: refactor rename
+Alt + Ins: generate
+
+Ctrl + -: fold
+Ctrl + "+": unfold
+Ctrl + Shift + -: fold everything in file
+Ctrl + Shift + "+": unfold everything in file (hold Ctrl+Shift and press "+" again, and it unfolds the imports as well)
