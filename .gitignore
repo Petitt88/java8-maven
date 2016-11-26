@@ -2,6 +2,7 @@
 target/
 build/
 dependency-reduced-pom.xml
+overall-app-container/root.xml
 
 # IntelliJ
 .idea/
