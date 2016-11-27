@@ -77,6 +77,13 @@ If you want to start more instances of a spring boot app, you just need to do 2 
 	2. in application.properties set server.port=0 (so to zero)
 	
 	With this, when you start the application IntelliJ assignes a random port. And the app can be started multiple times.
+	
+	
+	
+	
+**********Spring**********
+server.context-path=/champion-portal
+	this is like virtual path in Asp.Net applications: our app will be available at http://localhost:8080/champion-portal - this gets to be the root
 
 
 
