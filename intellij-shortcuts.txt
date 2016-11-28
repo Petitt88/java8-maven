@@ -26,12 +26,21 @@ F7: reload changed classes
 
 F9: toggle breakpoint
 Ctrl + Shift + F9: show breakpoints
-Ctrl + K: toggle bookmark
+Ctrl + B: toggle bookmark
 Shift + F11: show bookmarks
 
 F3: go to definition
-Ctrl + G: find all reference
+Ctrl + Shift + G: find usages
 Ctrl + Shift + O: remove unused imports
+
+Ctrl + F: find and replace
+Ctrl + G: go to line
+Ctrl + H: find in path
+
+Alt + Up: move code up
+Alt + Down: move code down
+Alt + Right: go forwards
+Alt + Left: go backwards
 
 Ctrl + Shift + Alt + T: refactor this
 Alt + Shift + S: open context menu (here we can analyze the current file - inspect code for example) - there is a standalon "Analyze" menu for analyzing the whole project along with subprojects or just specific subprojects
