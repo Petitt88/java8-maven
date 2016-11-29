@@ -1,3 +1,6 @@
+Spell extension usage: look for "@authz" (Spring security)
+Spring expression usage: look for "#{beanName.fieldName}" (Spring framework)
+
 @PostConstruct - bean lifecycle
 @PreDestroy - bean lifecycle
 
