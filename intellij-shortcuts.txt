@@ -4,6 +4,8 @@ Ctrl + Alt + S: settings...
 Ctrl + Alt + Shift + S: project structure...
 
 Alt + Home: go to navigation bar
+Alt + F1: select target (it is like choosing from Alt+1, Alt+2, ...)
+
 Shift + Shift: search everywhere (class, files, symbol)
 Ctrl + Shift + R: search in files
 Ctrl + Shift + T: search in classes
