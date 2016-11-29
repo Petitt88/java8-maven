@@ -38,6 +38,7 @@ Ctrl + Shift + O: remove unused imports
 Ctrl + F: find and replace
 Ctrl + G: go to line
 Ctrl + H: find in path
+Ctrl + K: highlight usages in file
 
 Alt + Up: move code up
 Alt + Down: move code down
