@@ -1,0 +1,137 @@
+service provider
+
+Cloud:
+
+	https://www.youtube.com/watch?v=qVYMQwSbTSk - the definition for private cloud types
+
+	- Public cloud:
+		- service is accessible to multiple customers over the public internet
+		- mutitenancy:  makes some people nervous because mutliple customers sharing the exact same resources
+		
+	- Virtual private cloud:
+		- set of resources on a public cloud
+		- are walled off virtually and assigned to you
+		- we're still on a multitenant environment, but we have some security constraints around what we do
+		- fairly easy
+	
+	- Hosted private cloud
+		- actually walled off
+		- don't put you on a public internet
+		- create an environment specific to you
+		- operates the cloud for you, you use it as it was your own personal resources
+	
+	- Private cloud:
+		- you put the cloud infrastructure and automation on top of resources that are in your own datacenter
+		
+	The implication between all of these are both security related and cost related.
+		- Private cloud: 2 major implications
+			- your IT department must run it: you must have the expertise and understanding how to run a cloud - there are very few enterprises that really know how to do it
+			- you have to provide the cloud environment 
+	
+	
+Basically 2 ways to build applications nowadays:
+	- monolith apps
+		- advantages:
+			- It is well known
+			- Have faster calls between components since they are often on the same machine
+			- Easy deployment: typically, only a single archive needs to be copied
+		- disadvantages:
+			- Harder code maintenance: the application will eventually start to break down as the team grows, experienced developers leave and new ones join in.
+			- The application is tightly coupled within the tiered layers, and you cannot scale individual components.
+			- Limited agility: because of the tighter coupling, a little change in a feature may easily introduce new bugs in the dependent features. The whole application needs to be tested again which can be time-consuming.
+			- Stuck with technology stack: it is typically not possible to change the technology stack mid-stream without throwing away or rewriting significant part of the existing application.
+			- Technical debt: a monolith application is built over several years with the team that is maintaining the code base completely different from the one that created the application. This increases technical debt of the application and makes it that much harder to refactor the application later on
+
+	- apps with microservices architecture
+		-advantages:
+			- Easier to develop, understand, and maintain: code in a microservice is restricted to one function of the business and is thus easier to understand.
+			- Starts faster than a monolith: scope of each microservice is much smaller than a monolith and this leads to a smaller archive
+			- Scale independently: each service can scale independently using X-axis cloning and Z-axis partitioning based upon their need. This is very different from monolithic applications that may have very different requirements and must be deployed together.
+			- Improves fault isolation: a misbehaving service, such as with a memory leak or unclosed database connections, will only affect that service as opposed to the entire monolithic application. This improves fault isolation and does not bring the entire application down, just a piece of it.
+			- No long term commitment to any stack: developers are free to pick language and stack that is best suited for their service. Even though the organizations may restrict the choice of technology but you are not penalized because of past decisions. It also enables to rewrite the service using better languages and technologies. This gives freedom of choice to pick a technology, tools, and frameworks.
+			- Light-weight communication: services communicate with each other using a light-weight communication, such as REST over HTTP. This is inherently synchronous and so could have some potential bottlenecks. An alternative mechanism is to use publish-subscribe mechanism that supports asynchronous messaging
+		- However, with microservices, there comes additional requirements that the infrastructure must fulfil:
+			- Service replication: each service needs to replicate using X-axis cloning or Z-axis partitioning.
+			- Service discovery: services need to be discovered somehow. Multiple services might be collaborating to provide an application functionality; therefore, they need to know about each other.
+			- Resiliency: failure in software occurs, no matter how much and how hard you test it. The key question is not “how to avoid failure” but “how to deal with it”. This is all the more prominent in microservices where services are distributed all over the Internet. It is important for services to automatically take corrective action and ensure the user experience is not impacted.
+			- Service monitoring: one of the most important aspects of a distributed system is service monitoring and logging. This allows to take a proactive action, for example, if a service is consuming unexpected resources
+
+
+		
+	
+Micro-services:
+	Spring Cloud provides tools for developers to quickly build some of the common patterns in distributed systems (e.g. configuration management, service discovery, circuit breakers, intelligent routing, micro-proxy, control bus, one-time tokens, global locks, leadership election, distributed sessions, cluster state).
+	Coordination of distributed systems leads to boiler plate patterns, and using Spring Cloud developers can quickly stand up services and applications that implement those patterns. They will work well in any distributed environment, including the developer’s own laptop, bare metal data centres, and managed platforms such as Cloud Foundry.
+	
+	Features: Spring Cloud focuses on providing good out of box experience for typical use cases and extensibility mechanism to cover others.
+	- Distributed/versioned configuration
+	- Service registration and discovery
+	- Routing
+	- Service-to-service calls
+	- Load balancing
+	- Circuit Breakers
+	- Global locks
+	- Leadership election and cluster state
+	- Distributed messaging
+	
+Eureka, ZooKeeper: service registry and provide network discovery (prefer to use eureka since it is more resilient to failures)
+Hystrix: Fault Tolerance: provide fallback methods in case of failures - on the edge service, microservices. Implements the circuit breaker pattern.
+Microservice: invoked by the edge service, and they can invoke each other (hystrix needed if invoking other services for the best user experience - avoid showing stacktraces)
+Zuul: egde service implementation: micro proxy, api gateway
+	1. Micro proxy: blindly forward packages outside the datacenter inside the loadbalancer
+	2. API gateway: transforms the request to the services behind the loadbalancer
+Actuator: monitoring capabilities via jmx and rest api (use with the config server)
+Config server: central store for configurations of the participants of the system
+Hystrix dashboard, Turbine: use for health monitoring
+	Turbine: aggregates the Hystrix health monitoring data from each method of each microservice and provides an aggregated result.
+Ribbon: round robin load balancer
+Zipkin: Zipkin is a distributed tracing system. It helps gather timing data needed to troubleshoot latency problems in microservice architectures.
+Kafka: Kafka™ is used for building real-time data pipelines and streaming apps. It is horizontally scalable, fault-tolerant, wicked fast, 
+	and runs in production in thousands of companies.
+
+Config service: just a super lightweight service that is used to centralize the configuration data 
+	Scenario is that I have multiple microservices and do not want to store config one by one for each service, rather I would store them in a 
+	central config server.
+	
+Messaging: this is good for reading (http endpoints), however for writing which requires synchronization is not good.
+		   We could use distributed transations but Josh Long urges us not to, it just slows down aggregate system.
+		   Instead use messaging: forward to the service on a message bus: job is put into a queue (buffer) and eventually gets picked up by the service.
+	- JMS: only between Java-based components
+	- AMQP (Advanved Message Queuing Protocol): works between components implemented with different technologies (.NET, Java, Python, ...)
+	
+Hystrix dashboard, H2 console - good stuff, start.spring.io starters
+Spring cloud handles Single Sign on, Oath2 is dead simple
+
+********************************
+Spring cloud deployment
+********************************
+
+Cloud Foundry: PaaS platform
+BOSH: how you automate, install and congfigure a CF system (among other things, it does a lot of stuff)
+
+	
+
+	
+Containers vs Virtual Machines:
+	Application Storage Overhead
+		- Virtual Machines: Each application workload runs on a separate virtual machine – which typically needs Gigabytes of OS overhead.
+		- Containers: Containers can run in isolation on the same physical or virtual machine – in which one common OS is used for all containers. The Docker Engine overhead is pretty small – i.e. megabytes.
+		
+	Instantiation
+		- Virtual Machines: Boot up time of both the OS and the application
+		- Containers: Application instantiation time only – i.e. time to spin up Linux processes
+	
+	Resource Allocation
+		- Virtual Machines: Generally rigid. Virtual CPU and Memory are typically pre-allocated to a VM and are hard to change post-provision – depending on the virtualization platform or cloud provider used.
+		- Containers: Generally flexible. CPU and Memory maximum limits can be defined for containers if desired (using the cpu_shares and mem_limit parameters). By default, containers can continue to consume the resources available on the underlying machine. With HyperForm, the minimum limits for CPU and Memory can also be defined — allowing users to place application workloads on machines that have enough CPU and Memory resources. You can read more about this here: http://dchq.co/docker-compose.html#docker-nodejs.
+	
+Cloud Foundry vs Docker:
+	- Docker is a technology for creating and running Linux "containers." A docker container for SpringBoot app will consist of a docker image, which will basically contain a filesystem with all the things needed to run your app (JVM, your source code, etc.), and docker container metadata, which tells the docker daemon how to run the app inside the image (e.g. what environment variables to set, what ports to expose, what commands to run, etc.). The docker daemon will use Linux features such as cgroups and kernel namespaces to run the container in isolation from other processes running on the host machine. Docker is somewhat low-level, in that you need to specify everything that goes into the image, and it runs arbitrary things, namely whatever you put into your image and tell it to run. The docker container that you get is very portable, so you can build, test, and run your docker container locally for development, and then ship that container to a production host that also has a docker daemon running on it, and be quite confident that you're getting the exact same thing.
+	
+	- Cloud Foundry works at a higher layer of abstraction, with applications being a first class concept. Cloud Foundry uses containerization technology similar to docker to build portable images and then run them, but it's an implementation detail and you don't need to specify all the details. In newer versions of Cloud Foundry, docker images will also be supported so you can specify the details if you want, but it also has a "buildpack" workflow, where it will automatically detect a Java application when you push your app and will know to include all the things necessary for the Java runtime when it builds the image.
+	
+	With Cloud Foundry, since applications and application management are first class concepts, and since it operates at a higher level, you get all sorts of things for free. For instance, you can easily scale your app horizontally (add instances), e.g. cf scale my_app -i 5 or vertically, cf scale my_app -m 2G (to set the allocated memory for each instance). You get streaming application logs: cf logs my_app. Cloud Foundry gives you a lot of fault tolerance for free, so if one of your application instances crashes, or the process running the application containers itself crashes (the thing that's similar to the docker daemon), or if the host VM that's running the container-running process dies, or the hardware cluster where that VM resides dies, Cloud Foundry will automatically bring your instances back up.
+
+	The docker daemon is a single process you can run on any Linux machine. So if you're doing something small and simple, and you need to do most of the setup yourself, it can be easier to get up and running both locally and in development using docker. With docker it's also easier to have access and share the docker image you create, so once you've created an image, you can put it in a docker repository, and then you can run it on any other docker daemon. With Cloud Foundry, the built image is generally an implementation detail and you don't really have access to it, so for instance you couldn't extract that image and run it on another Cloud Foundry installation.
+
+	There are various projects out there intended to make Cloud Foundry more accessible and easier to set up, while still giving you many of the benefits of a PaaS. Some of these projects also aim to allow you to combine using docker and the benefits of docker while also getting a lot of the PaaS benefits you get from Cloud Foundry.
