@@ -181,6 +181,9 @@ To specify the gradle of the wrapper to be used:
 	task wrapper(type: Wrapper) {
 		gradleVersion = '3.2.1'
 	}
+	
+To download the wrapper:
+	gradle wrapper --gradle-version 3.2.1
 
 https://docs.gradle.org/current/userguide/tutorial_gradle_command_line.html
 Example multiple tasks:
