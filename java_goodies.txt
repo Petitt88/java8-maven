@@ -481,6 +481,14 @@ allowing them to be used without class qualification.
 
 
 
+********JMX*********
+
+JMX: Java Management Extensions
+JConsole: it is a JMX implementation, baked into the java bundle (JVM_HOME/bin folder --> jconsole.exe).
+	JConsole uses the extensive instrumentation of the Java Virtual Machine (Java VM) to provide information about the performance and resource consumption of applications running on the Java platform.
+
+
+
 
 **********TODO**********
 
