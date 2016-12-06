@@ -433,17 +433,60 @@ So the generic information can be acquired through reflection:
 	}
 	
 	
-And: wildcard "?" vs generic "T"
-class Worker {
-	
-	// in Java, there is no need for T generic type, wildcard can be used
-	void process(Consumer<? extends String> cons) {
-		cons.accept(null);
-	}
+Type parameters "<T>" vs wildcard "?":
 
-	// C#-like generic
-	<T extends String> void process2(Consumer<T> cons) {
-		cons.accept(null);
+	Taking your method as example, suppose you want to ensure that the src and dest list passed to copy() method should be of same parameterized type, you can do it with type parameters like so:
+
+	public static <T extends Number> void copy(List<T> dest, List<T> src)
+	Here, you are ensured that both dest and src have same parameterized type for List. So, it's safe to copy elements from src to dest.
+
+	But, if you go on to change the method to use wildcard:
+
+	public static void copy(List<? extends Number> dest, List<? extends Number> src)
+	it won't work as expected. In 2nd case, you can pass List<Integer> and List<Float> as dest and src. So, moving elements from src to dest wouldn't be type safe anymore. If you don't need such kind of relation, then you are free not to use type parameters at all.
+	
+	- If you have only one parameterized type argument, then you can use wildcard, although type parameter will also work.
+	- Type parameters support multiple bounds, wildcards don't.
+	
+	Wildcards support both upper and lower bounds, type parameters just support upper bounds. So, if you want to define a method that takes a List of type Integer or it's super class, you can do:
+		public void print(List<? super Integer> list) { } // OK
+	but you can't use type parameter:
+		public <T super Integer> void print(List<T> list) { }  // Won't compile
+		
+	However, upper bounds work:
+		public void print(List<? extends Integer> list) { } // OK
+		public <T extends Integer> void print2(List<T> list) { } // OK
+		
+	// PECS: "Producer Extends, Consumer Super"
+		- "Producer Extends" - If you need a List to produce T values (you want to read Ts from the list), you need to declare it with ? extends T, e.g. List<? extends Integer>. But you cannot add to this list.
+		
+		- "Consumer Super" - If you need a List to consume T values (you want to write Ts into the list), you need to declare it with ? super T, e.g. List<? super Integer>. But there are no guarantees what type of object you may read from this list.
+		
+		- If you need to both read from and write to a list, you need to declare it exactly with no wildcards, e.g. List<Integer>.
+		
+	How this relates to C#:
+		extends --> out: property reading, or function return type
+		super	--> in: property writing, or function parameter
+
+class Worker {
+
+	
+	void consume(Consumer<? extends String> cons) {
+		cons.accept("Hello");	// won't compile, ? needs to be "super"
+	}
+	<T extends String> void consume2(Consumer<T> cons) {
+		cons.accept("Hello");	// the same, won't compile. However super cannot be used with type parameters.
+	}
+	void consume3(Consumer<? super String> cons) {
+		cons.accept("Hello");    // Good.
+	}
+	
+	void produce(Supplier<? extends String> prod) {
+		final String s = prod.get();
+	}
+	<T extends String> T produce2(Supplier<T> prod) {
+		final String s = prod.get();
+		return prod.get();
 	}
 
 }
