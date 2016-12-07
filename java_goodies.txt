@@ -207,7 +207,7 @@ Example multiple tasks:
 A little explanation about the build.gradle file's structure:
 
 - there are plugins that expose configurations and we can specify configuration sections to adjust them:
-build.gradle:
+build.gradle: (of VMCPriceCheckerAdmin)
 
 	eclipse {
 		classpath {
@@ -268,6 +268,11 @@ build.gradle:
 settings.gradle:
 	include ':VMCPriceDetector'
 	project(':VMCPriceDetector').projectDir = new File(settingsDir, '../VMCPriceDetector')
+	
+To build VMCPriceCheckerAdmin and all of its dependant projects (currently only VMCPriceDetector):
+	gradlew build
+To build only the VMCPriceDetector dependency:
+	gradlew :VMCPriceDetector:build
 		
 		
 	A little more on dependencies: after modifying the dependencies, in Eclipse a refresh is necessary to make Eclipse update the jars displayed 
