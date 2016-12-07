@@ -268,11 +268,20 @@ build.gradle: (of VMCPriceCheckerAdmin)
 settings.gradle:
 	include ':VMCPriceDetector'
 	project(':VMCPriceDetector').projectDir = new File(settingsDir, '../VMCPriceDetector')
+
+	VMCPriceCheckerAdmin
+	|
+	|_ _build.gradle
+	|
+	|_ _VMCPriceDetector
+		|
+		|...
 	
-To build VMCPriceCheckerAdmin and all of its dependant projects (currently only VMCPriceDetector):
-	gradlew build
-To build only the VMCPriceDetector dependency:
-	gradlew :VMCPriceDetector:build
+	To build VMCPriceCheckerAdmin and all of its dependant projects (currently only VMCPriceDetector):
+		gradlew build
+	To build only the VMCPriceDetector dependency (from the same directory):
+		gradlew :VMCPriceDetector:build
+
 		
 		
 	A little more on dependencies: after modifying the dependencies, in Eclipse a refresh is necessary to make Eclipse update the jars displayed 
