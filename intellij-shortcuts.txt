@@ -22,6 +22,8 @@ Ctrl + Shift + Space: smart type
 Alt + Enter: show lightbulb suggestions (this is like eclipse's quick fix)
 Ctrl + P: view method parameters
 
+Alt + Shift + Enter: toggle full screen mode
+
 F5: run
 F6: debug
 F7: reload changed classes
@@ -39,6 +41,7 @@ Ctrl + F: find and replace
 Ctrl + G: go to line
 Ctrl + H: find in path
 Ctrl + K: highlight usages in file
+Ctrl + L: delete line
 
 Alt + Up: move code up
 Alt + Down: move code down
