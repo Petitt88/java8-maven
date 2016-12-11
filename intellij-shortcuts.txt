@@ -35,6 +35,7 @@ Shift + F11: show bookmarks
 
 F3: go to definition
 Ctrl + Shift + G: find usages
+Ctrl + Alt + Shift + G: find usages settings
 Ctrl + Shift + O: remove unused imports
 
 Ctrl + F: find and replace
