@@ -2013,7 +2013,7 @@ HTTP Streaming Directly To The OutputStream
 	}
 	
 22.4.1 Intercepting requests with a HandlerInterceptor
-	nterceptors located in the handler mapping must implement HandlerInterceptor from the org.springframework.web.servlet package. 
+	Interceptors located in the handler mapping must implement HandlerInterceptor from the org.springframework.web.servlet package. 
 	This interface defines three methods: preHandle(..) is called before the actual handler is executed; postHandle(..) is called after 
 	the handler is executed; and afterCompletion(..) is called after the complete request has finished.
 	
@@ -2124,6 +2124,18 @@ HTTP Streaming Directly To The OutputStream
 	}
 	
 I22.16.5 Interceptors
+
+	Interceptors vs Servlet Filters:
+		- Interceptors belong to the Spring framework and are executed regarding only @Controller endpoints.
+		- Whereas javax.servlet.Filter is executed on each request (even on static resources like css, js, images, etc.)
+			Actually this can be tweaked by applying the UrlPattern - in spring boot this can be done via @Bean FilterRegistrationBean
+				@Bean
+				public FilterRegistrationBean staticResoureFilter() {
+					FilterRegistrationBean frb = new FilterRegistrationBean();
+					frb.setUrlPatterns(Collections.singleton("/dist/*"));
+					frb.setFilter(new StaticResourceFilter());
+					return frb;
+				}
 
 	@Configuration
 	@EnableWebMvc
