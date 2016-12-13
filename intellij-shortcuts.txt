@@ -27,6 +27,11 @@ Alt + Shift + Enter: toggle full screen mode
 F5: run
 F6: debug
 F7: reload changed classes
+F10: step over
+F11: step into
+Ctrl + F11: step out
+
+Shift + F9: evaluate expression
 
 F9: toggle breakpoint
 Ctrl + Shift + F9: show breakpoints
