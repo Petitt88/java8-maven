@@ -59,8 +59,9 @@ Spring expression usage: look for "#{beanName.fieldName}" (Spring framework)
 		}
 	}
 
-@Import - Provides functionality equivalent to the <import/> element in Spring XML. Allows for importing @Configuration classes, ImportSelector and ImportBeanDefinitionRegistrar implementations, 
+@Import - Provides functionality equivalent to the <import/> element in Spring XML. Allows for importing configuration classes (which are not annotated with @Configuration), ImportSelector and ImportBeanDefinitionRegistrar implementations, 
 		  as well as regular component classes (as of 4.2; analogous to AnnotationConfigApplicationContext.register(java.lang.Class<?>...)).
+		  With this you don't have to specify everything in a single @Configuration (there can be multiple @Configuration classes though), you can @Import any classes that has @Bean beans on them.
 @ImportResource: to import configuration from xml files
 	
 @EnableScheduling
