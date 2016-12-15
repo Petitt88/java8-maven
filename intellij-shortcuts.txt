@@ -30,6 +30,7 @@ F7: reload changed classes
 F10: step over
 F11: step into
 Ctrl + F11: step out
+Ctrl + Shift + B: build project
 
 Shift + F9: evaluate expression
 
