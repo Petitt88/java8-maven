@@ -2762,6 +2762,31 @@ Nested @ConfigurationProperties
 			}
 		}
 	}
+	
+How to map camel cased variables and lists:
+	application.properties:
+		my.config.userName=Peter
+		my.config.long_password=PASSS	# snake casing works as well
+		my.config.names=Peter,Ildi		# just separate with comma
+		
+	And the Java pojo config:
+		@ConfigurationProperties("my.config")
+		public class MyConfig {
+
+			private String userName;
+			private String longPassword;
+			private List<String> names;
+
+			public String getUserName() {return userName;}
+			public void setUserName(String userName) {this.userName = userName;}
+			public String getLongPassword() {return longPassword;}
+			public void setLongPassword(String longPassword) {this.longPassword = longPassword;}
+			public List<String> getNames() {return names;}
+			public void setNames(List<String> names) {this.names = names;}
+		}
+
+		
+	
 
 24.7.4 @ConfigurationProperties Validation
 	You can simply add JSR-303 javax.validation constraint annotations to your @ConfigurationProperties class
