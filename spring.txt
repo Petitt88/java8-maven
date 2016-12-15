@@ -2549,6 +2549,14 @@ To run a boot project from the command line with Maven:
 	
 With Gradle:
 	gradle bootRun
+	gradle bootRun --debug
+	
+To debug without the maven/gradle parameters:
+	just command line: --debug=true
+	or application.properties: debug=true
+	or in IntelliJ: Spring Boot Run Configurations --> check the "Enable debug output" checkbox
+	
+	The --debug switch will make Spring Boot log to the console which AutoConfiguration files got matched, which didn't and which were excluded.
 	
 To create an executable jar just use the maven/gradle plugin provided by Spring:
 	Maven plugin binds to the "repackage" goal
@@ -2564,7 +2572,7 @@ To create an executable jar just use the maven/gradle plugin provided by Spring:
 13.1. Spring Boot application starters
 	
 @EnableAutoConfiguration - This annotation tells Spring Boot to “guess” how you will want to configure Spring, based on the jar dependencies that you have added.
-	@EnableAutoConfiguration(exclude = XXX.class)
+	To exclude a matched AutoConfiguration: @SpringBootApplication(exclude = {MultipartAutoConfiguration.class})
 @SpringBootApplication = @EnableAutoConfiguration + @ComponentScan + @Configuration
 @ComponentScan: what packages to scan for @Component. The default is the package that the class having @ComponentScan is defined
 @EntityScan: what packages to scan for JPA entities
@@ -2659,7 +2667,8 @@ You should only ever add one @EnableAutoConfiguration annotation. We generally r
 	only deal with the environment and in particular does not inject other beans from the context. Having said that, The @EnableConfigurationProperties
 	annotation is also automatically applied to your project so that any existing bean annotated with @ConfigurationProperties will be configured from
 	the Environment properties. You could shortcut MyConfiguration above by making sure ConnectionProperties is a already a bean:
-		@Component
+		@Component		// according to this talk: (https://www.infoq.com/presentations/spring-boot-dev-tools-productivity) DO NOT make a properties pojo a @Component
+						// instead use on the Boot application class: @EnableConfigurationProperties({ConnectionProperties.class})
 		@ConfigurationProperties(prefix="connection")
 		public class ConnectionProperties {
 
@@ -2691,12 +2700,12 @@ You should only ever add one @EnableAutoConfiguration annotation. We generally r
 24.7 Type-safe Configuration Properties
 	
 	@Configuration
-	@EnableConfigurationProperties(ConnectionProperties.class)	- but this is not necessary, since Spring boot automatically applies it
+	@EnableConfigurationProperties(ConnectionProperties.class)	- necessary if ConnectionProperties is not a @Bean, @Component
 	@SpringBootApplication
 	public class MyConfiguration {
 	}
 	
-	@Component - so this is injectable to other beans
+	@Component - so this is injectable to other beans, but avoid it, prefer to use @EnableConfigurationProperties
 	@ConfigurationProperties(prefix="connection")
 	public class ConnectionProperties {
 
@@ -2705,6 +2714,53 @@ You should only ever add one @EnableAutoConfiguration annotation. We generally r
 		private InetAddress remoteAddress;
 
 		// ... getters and setters
+	}
+	
+Nested @ConfigurationProperties
+	@ConfigurationProperties("my.config")
+	class MyConfig {
+
+		private final Github github = new Github();
+		private final Work work = new Work();
+
+		public Github getGithub() {
+			return github;
+		}
+
+		public Work getWork() {
+			return work;
+		}
+
+		private static class Github {
+			private int userName;
+			private int password;
+			private int repoUrl;
+
+			public int getUserName() {
+				return userName;
+			}
+
+			public int getPassword() {
+				return password;
+			}
+
+			public int getRepoUrl() {
+				return repoUrl;
+			}
+		}
+
+		private static class Work {
+			private int location;
+			private int hours;
+
+			public int getLocation() {
+				return location;
+			}
+
+			public int getHours() {
+				return hours;
+			}
+		}
 	}
 
 24.7.4 @ConfigurationProperties Validation
