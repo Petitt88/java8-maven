@@ -2464,6 +2464,11 @@ Localization
 Spring Boot
 ********************************
 
+Database migration: with Flyway
+
+To customize the embedded container, the Jackson ObjectMapper, the RestTemplate, or the CacheManager we can use the "customizer pattern" with the corresponding custimizer implementation
+	All we need to do is to provide a @Bean implementation of the Jackson2ObjectMapperBuilderCustomizer, RestTemplateCustomizer, JCacheManagerCustomizer, EmbeddedServletContainerCustomizer in out @Configuration class.
+
 To create a deployable war:
 
 	@SpringBootApplication
