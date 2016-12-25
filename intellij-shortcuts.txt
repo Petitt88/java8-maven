@@ -40,6 +40,7 @@ Ctrl + B: toggle bookmark
 Shift + F11: show bookmarks
 
 F3: go to definition
+Alt + F3: quick definition
 Ctrl + Shift + G: find usages
 Ctrl + Alt + Shift + G: find usages settings
 Ctrl + Shift + O: remove unused imports
