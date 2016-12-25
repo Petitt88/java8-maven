@@ -10,6 +10,7 @@ Shift + Shift: search everywhere (class, files, symbol)
 Ctrl + Shift + R: search in files
 Ctrl + Shift + T: search in classes
 Ctrl + Shift + N: search in symbols
+Ctrl + Shift + A: find action
 Ctrl + E: recent files
 
 Ctrl + O: outline popup
