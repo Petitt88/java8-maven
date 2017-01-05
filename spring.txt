@@ -4,6 +4,11 @@ Spring expression usage: look for "#{beanName.fieldName}" (Spring framework)
 @PostConstruct - bean lifecycle
 @PreDestroy - bean lifecycle
 
+@Autowired - avoid it, prefer to use constructor injection
+	to use optional dependencies:
+		- @Autowired(required = false) - but you have to check for null in the code
+		- or just Optional<SomeType>
+
 @Component
 @Service
 @Repository
