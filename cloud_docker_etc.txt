@@ -85,16 +85,15 @@ Config server: central store for configurations of the participants of the syste
 Hystrix dashboard, Turbine: use for health monitoring
 	Turbine: aggregates the Hystrix health monitoring data from each method of each microservice and provides an aggregated result.
 Ribbon: round robin load balancer
-Zipkin: Zipkin is a distributed tracing system. It helps gather timing data needed to troubleshoot latency problems in microservice architectures.
-Kafka: Kafka™ is used for building real-time data pipelines and streaming apps. It is horizontally scalable, fault-tolerant, wicked fast, 
-	and runs in production in thousands of companies.
+Zipkin: Zipkin is a distributed tracing system. It helps gathering timing data needed to troubleshoot latency problems in microservice architectures.
+Kafka: Kafka™ is used for building real-time data pipelines and streaming apps. It is horizontally scalable, fault-tolerant, wicked fast, and runs in production in thousands of companies.
 
 Config service: just a super lightweight service that is used to centralize the configuration data 
 	Scenario is that I have multiple microservices and do not want to store config one by one for each service, rather I would store them in a 
 	central config server.
 	
-Messaging: this is good for reading (http endpoints), however for writing which requires synchronization is not good.
-		   We could use distributed transations but Josh Long urges us not to, it just slows down aggregate system.
+Messaging: point-to-point service communication is good for reading, however for writing which requires synchronization is not good.
+		   We could use distributed transations but Josh Long urges us not to, it just slows down the aggregate system.
 		   Instead use messaging: forward to the service on a message bus: job is put into a queue (buffer) and eventually gets picked up by the service.
 	- JMS: only between Java-based components
 	- AMQP (Advanved Message Queuing Protocol): works between components implemented with different technologies (.NET, Java, Python, ...)
