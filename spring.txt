@@ -901,7 +901,7 @@ JobExecution: A JobExecution refers to the technical concept of a single attempt
 	
 JobParameters: distinguishes a particaluar job's instances from each other. JobInstance gets it, it is the starting time of the job.
 
-Setp: ItemReader + ItemProcessor + ItemWriter. A Job has one or more Steps.
+Step: ItemReader + ItemProcessor + ItemWriter. A Job has one or more Steps. Or if the reader, processor, writer are unnecessary, may contain only 1 single method.
 
 StepExecution: represents a single attempt to execute a Step. JobExecution has one or more StepExecutions. 
 	A new StepExecution will be created each time a Step is run, similar to JobExecution. 
