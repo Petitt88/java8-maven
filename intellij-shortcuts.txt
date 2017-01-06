@@ -39,6 +39,7 @@ F9: toggle breakpoint
 Ctrl + Shift + F9: show breakpoints
 Ctrl + B: toggle bookmark
 Shift + F11: show bookmarks
+Shift + F12: close any window-part except the editor
 
 F3: go to definition
 Alt + F3: quick definition
