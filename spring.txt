@@ -28,7 +28,7 @@ Spring expression usage: look for "#{beanName.fieldName}" (Spring framework)
 @RequestBody - for json and xml request payloads: map them to arbitrary java classes
 @PathVariable - to map url/route parameters, like: "tender/{year}/forms"
 @RequestParam - for querystring parameter mapping
-@PathParam - t
+@PathParam
 @RequestAttribute - to bind a controller method's parameter to an object from the HttpServletRequest.Request
 @SessionAttribute - to bind a controller method's parameter to an object from the HttpServletRequest.Session
 @AuthenticationPrincipal - Spring injects the current user with this
@@ -39,6 +39,15 @@ Spring expression usage: look for "#{beanName.fieldName}" (Spring framework)
 @Value("#{beanName.fieldName}")
 @Value("server.port") - from application.properties or from @PropertySource file
 @ConfigurationProperties - as @Value works with one field, this populates an entire java class's fields
+@ConfigurationPropertiesBinding - @Component can be a Converter that is used by Spring boot to convert a String from the .properties/.yml files to arbitrary java objects
+	@Component
+	@ConfigurationPropertiesBinding
+	public class LocalTimeConversionService implements Converter<String, LocalTime> {
+		@Override 
+		public LocalTime convert(String source) {
+			return LocalTime.parse(source);
+		}
+	}
 
 @Order: defines the sort order for an annotated component. The value() is optional and represents an order value as defined in the Ordered interface. Lower values have higher priority. The default value is Ordered.LOWEST_PRECEDENCE, indicating lowest priority (losing to any other specified order value).
 @Priority: the standardized version of @Order
