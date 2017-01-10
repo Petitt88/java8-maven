@@ -554,6 +554,7 @@ Hystrix dashboard, Turbine: use for health monitoring
 	Turbine: aggregates the Hystrix health monitoring data from each method of each microservice and provides an aggregated result.
 Ribbon: round robin load balancer
 Zipkin: Zipkin is a distributed tracing system. It helps gather timing data needed to troubleshoot latency problems in microservice architectures.
+	Visualization tool of flow of messages, requests. Spring Cloud Sleuth: distributed tracing solution.
 Kafka: Kafka™ is used for building real-time data pipelines and streaming apps. It is horizontally scalable, fault-tolerant, wicked fast, 
 	and runs in production in thousands of companies.
 
@@ -635,7 +636,12 @@ Edge service: there are two types:
 	
 		@EnableDiscoveryClient
 		@EnableZuulProxy - blindly forward the requests from the edge service into the service that we reference in the request's url
-			localhost:9999/reservation-service/reservations: {edge-service}/{serviceId as registered in the service registry}/{url in the referenced service}
+			It automatically makes the services registered with eureka available through a REST endpoint from the client service.
+			
+			If I have a service named "reservation-service" and it's registered in eureka, then it makes it available. The client service (which has the @EnableZuulProxy)
+			is running on port 9999. Then the "reservation-service" is available at: (and we assume it has a "reservations" @GetMapping)
+				localhost:9999/reservation-service/reservations: {edge-service}/{serviceId as registered in the service registry}/{url in the referenced service}
+			
 		
 		bootstrap.properties: sptring.application.name=reservation-client
 								spring.cloud.config.uri=http://localhost:8888	<-- config is from the config server
@@ -2501,6 +2507,13 @@ Localization
 ********************************
 Spring Boot
 ********************************
+
+RestTemplate:
+	- one liner http calls
+	- we can add interceptors: preprocess, postprocess the request
+	- do gzip compression, oath, content-negotiation
+	- uses the same message converters as spring
+	- preconfigured - when Ribbon is on the classpath, it is even load-balanced (@LoadBalanced). By default uses round-robin strategy.
 
 Database migration: with Flyway
 
