@@ -558,8 +558,24 @@ Config service: just a super lightweight service that is used to centralize the 
 	central config server.
 	
 	@EanbleConfigServer
-	application.properties: spring.cloud.config.server.git.uri=${HOME}/Desktop/config <-- in this folder resides the configs for the various microservices	
-							server.port=8888
+	
+	application.properties: 
+		spring.cloud.config.server.git.uri=${HOME}/Desktop/config <-- in this folder resides the configs for the various microservices	
+		server.port=8888
+							
+		# to use File System Backend instead of a git repo - able to use the classpath for the config repository
+		spring.profiles.active=native
+		# with this the git.uri is not needed --> resources/config-repo/ folder contains the microservice configs
+		spring.cloud.config.server.native.searchLocations=classpath:/config-repo
+		
+	Url to a config: 
+		http://localhost:8888/{microservice-config-name}/{profile}
+		http://localhost:8888/edge-service/dev	- this is a config for the microservice named "edge-service" running in "dev" profile
+		
+	Client microservice profiles: it needs to be set in the bootstrap.properties file. Example:
+		spring.application.name=edge-service
+		spring.cloud.config.uri=http://localhost:8888
+		spring.profiles.active=dev
 
 Service registry: (Eureka for example)
 				  It is like a phonebook for the cloud.
@@ -623,7 +639,7 @@ Edge service: there are two types:
 			<artifactId>spring-boot-starter-hateoas</artifactId>
 		</dependency>
 		
-		Hystrix: allows us to specify a fallback path if the microserve request goes wrong
+		Hystrix: allows us to specify a fallback path if the microservice request goes wrong
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-boot-starter-hystrix</artifactId>
