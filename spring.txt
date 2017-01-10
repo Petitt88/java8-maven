@@ -568,6 +568,10 @@ Config service: just a super lightweight service that is used to centralize the 
 		# with this the git.uri is not needed --> resources/config-repo/ folder contains the microservice configs
 		spring.cloud.config.server.native.searchLocations=classpath:/config-repo
 		
+	config-repo:
+		Microservices has their config located here. For example "edge-service.properties". It supports profiles: "edge-service-dev.properties".
+		The magic file here is: "application.properties". It is common config to each microservice. If this file exists, the properties in it are added to EVERY microservice config.
+		
 	Url to a config: 
 		http://localhost:8888/{microservice-config-name}/{profile}
 		http://localhost:8888/edge-service/dev	- this is a config for the microservice named "edge-service" running in "dev" profile
