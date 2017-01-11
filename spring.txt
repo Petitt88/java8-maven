@@ -205,7 +205,10 @@ Spring JdbcTemplate to the rescue:
 	PreparedStatementSetter and RowMapper for mapping arguments or converting ResultSet data to bean objects.
 	
 Spring DataSourceBuilder: creates a DataSource that using connection pooling if Tomcat, HikariCP or Commons DBCP is on the classpath.
-	Convenience class for building a DataSource with common implementations and properties. If Tomcat, HikariCP or Commons DBCP are on the classpath one of them will be selected (in that order with Tomcat first). In the interest of a uniform interface, and so that there can be a fallback to an embedded database if one can be detected on the classpath, only a small set of common configuration properties are supported. To inject additional properties into the result you can downcast it, or use @ConfigurationProperties.
+	Convenience class for building a DataSource with common implementations and properties. If Tomcat, HikariCP or Commons DBCP are on the 
+	classpath one of them will be selected (in that order with Tomcat first). In the interest of a uniform interface, and so that there can be a 
+	fallback to an embedded database if one can be detected on the classpath, only a small set of common configuration properties are supported. 
+	To inject additional properties into the result you can downcast it, or use @ConfigurationProperties.
 	
 	
 JPA: EntityManager
