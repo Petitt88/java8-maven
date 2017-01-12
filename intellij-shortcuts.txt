@@ -32,7 +32,6 @@ F10: step over
 F11: step into
 Ctrl + F11: step out
 Ctrl + Shift + B: build project
-
 Shift + F9: evaluate expression
 
 F9: toggle breakpoint
@@ -47,7 +46,9 @@ Ctrl + Shift + G: find usages
 Ctrl + Alt + Shift + G: find usages settings
 Ctrl + Shift + O: remove unused imports
 
-Ctrl + F: find and replace
+Ctrl + F: find
+Ctrl + Shift + F: replace
+Ctrl + Alt + F: format code
 Ctrl + G: go to line
 Ctrl + H: find in path
 Ctrl + K: highlight usages in file
