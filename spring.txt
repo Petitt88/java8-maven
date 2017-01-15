@@ -1042,7 +1042,73 @@ ExecutionContext: An ExecutionContext represents a collection of key/value pairs
 		}
 
 	}
+	
+Example 1
+	@Configuration
+	@EnableBatchProcessing
+	@EnableAutoConfiguration
+	public class BatchConfiguration {
 
+	  @Autowired
+	  private JobBuilderFactory jobBuilderFactory;
+
+	  @Autowired
+	  private StepBuilderFactory stepBuilderFactory;
+
+	  @Bean
+	  public Step step1() {
+		return stepBuilderFactory.get("step1")
+			.tasklet(new Tasklet() {
+			  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
+				return null;
+			  }
+			})
+			.build();
+	  }
+
+	  @Bean
+	  public Job job(Step step1) throws Exception {
+		return jobBuilderFactory.get("job1")
+			.incrementer(new RunIdIncrementer())
+			.start(step1)
+			.build();
+	  }
+	}
+	
+Example 2
+	@Configuration
+	@EnableBatchProcessing
+	@Import(DataSourceConfiguration.class)
+	public class AppConfig {
+
+		@Autowired
+		private JobBuilderFactory jobs;
+
+		@Autowired
+		private StepBuilderFactory steps;
+
+		@Bean
+		public Job job(@Qualifier("step1") Step step1, @Qualifier("step2") Step step2) {
+			return jobs.get("myJob").start(step1).next(step2).build();
+		}
+
+		@Bean
+		protected Step step1(ItemReader<Person> reader, ItemProcessor<Person, Person> processor, ItemWriter<Person> writer) {
+			return steps.get("step1")
+				.<Person, Person> chunk(10)
+				.reader(reader)
+				.processor(processor)
+				.writer(writer)
+				.build();
+		}
+
+		@Bean
+		protected Step step2(Tasklet tasklet) {
+			return steps.get("step2")
+				.tasklet(tasklet)
+				.build();
+		}
+	}
 
 
 ********************************
