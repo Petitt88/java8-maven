@@ -1588,7 +1588,7 @@ DataSource
 Spring MVC:
 ********************************
 
-	It is possbile to inject custom classes to methods of the Spring Mvc @Controller, @RestController. These are not necessarily have to be @Components.
+	It is possbile to inject custom classes to methods of the Spring Mvc @Controller, @RestController. These are not necessarily have to be @Components. Note that this ONLY WORK IF the injection method is Http request-bound.
 	Just implement the "HandlerMethodArgumentResolver" interface. Spring already ships with some implementations.
 	This is why it is possible to inject for example a request parameter via @RequestParam: there is a RequestParamMethodArgumentResolver that implements the HandlerMethodArgumentResolver interface.
 
