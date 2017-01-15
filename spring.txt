@@ -990,6 +990,14 @@ ExecutionContext: An ExecutionContext represents a collection of key/value pairs
 	and creating 'chunks' that will be written out, within a transaction boundary. One item is read in from an ItemReader, handed to an ItemProcessor, and aggregated. 
 	Once the number of items read equals the commit interval, the entire chunk is written out via the ItemWriter, and then the transaction is committed.
 	
+5.2 TaskletStep
+	Chunk-oriented processing is not the only way to process in a Step. What if a Step must consist as a simple stored procedure call? You could implement the call as an ItemReader and return null after the procedure 
+	finishes, but it is a bit unnatural since there would need to be a no-op ItemWriter. Spring Batch provides the TaskletStep for this scenario.
+	
+	The Tasklet is a simple interface that has one method, execute, which will be a called repeatedly by the TaskletStep until it either returns RepeatStatus.FINISHED or throws an exception to signal a failure. 
+	Each call to the Tasklet is wrapped in a transaction. Tasklet implementors might call a stored procedure, a script, or a simple SQL update statement. To create a TaskletStep, the 'ref' attribute of the <tasklet/> 
+	element should reference a bean defining a Tasklet object; no <chunk/> element should be used within the <tasklet/>:
+	
 6. ItemReaders and ItemWriters
 	All batch processing can be described in its most simple form as reading in large amounts of data, performing some type of calculation or transformation, 
 	and writing the result out. Spring Batch provides three key interfaces to help perform bulk reading and writing: ItemReader, ItemProcessor and ItemWriter.
