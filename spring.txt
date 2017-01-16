@@ -1188,8 +1188,8 @@ Spring 	Integration
 			- Amazon has an implementation too that Spring supports
 			
 	Spring Cloud Stream: a way of describing messaging based services and compose them outside of the actual code.
-		It builds on Spring Integration and alleviates the need to specify the tedious work of adapters (Inbound and Outbound channels - Spring Integration uses these - they are still there tough if needed).
-		We don't have to worry have the channels talk to other nodes, services, that connectivity comes from conventions and configuration file.
+		It builds on Spring Integration and alleviates the need to specify the tedious work of adapters (Inbound and Outbound channels - Spring Integration uses these - they are still there though if needed).
+		We don't have to worry about how the channels talk to other nodes, services. That connectivity comes from conventions and configuration file.
 		Spring Cloud Stream Binder handles the communication: notably RabbitMQ, Apache Kafka.
 		
 	Spring Cloud Data Flow: coyorgraphing microservices based on Spring Cloud Stream.
@@ -3341,6 +3341,11 @@ HSQL:
 Useful utils
 ********************************
 
+DataSourceBuilder - to use connection pooling if available (Tomcat, Hikari, or something... is on the classpath)
+RestTemplateBuilder
+MessageBuilder
+
+ReflectionUtils
 FileCopyUtils	
 org.springframework.util.FileSystemUtils
 org.springframework.beans.BeanUtils
