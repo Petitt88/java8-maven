@@ -40,8 +40,8 @@ Spring expression usage: look for "#{beanName.fieldName}" (Spring framework)
 Properties files can also have fallback values:
 	server.port=${PORT:8761} - if the "PORT" environment variables is available use that, otherwise fall back to "8761" as the port number
 																					 
-@Value("#{beanName.fieldName}")
-@Value("server.port") - from application.properties or from @PropertySource file
+@Value("${property}")
+@Value("${server.port}") - from application.properties or from @PropertySource file
 @ConfigurationProperties - as @Value works with one field, this populates an entire java class's fields
 @ConfigurationPropertiesBinding - @Component can be a Converter that is used by Spring boot to convert a String from the .properties/.yml files to arbitrary java objects
 	@Component
@@ -3352,6 +3352,7 @@ org.springframework.util.FileSystemUtils
 org.springframework.beans.BeanUtils
 org.springframework.validation.ValidationUtils
 DataSourceUtils (for JDBC), EntityManagerFactoryUtils (for JPA), SessionFactoryUtils, PersistenceManagerFactoryUtils (for JDO)
+AnnotationUtils
 
 
 
