@@ -31,7 +31,8 @@ F7: reload changed classes
 F10: step over
 F11: step into
 Ctrl + F11: step out
-Ctrl + Shift + B: build project
+Ctrl + Shift + B: build project - all modules
+Ctrl + Alt + Shift + B: build module - which the currently open file belongs to
 Shift + F9: evaluate expression
 
 F9: toggle breakpoint
