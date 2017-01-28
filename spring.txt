@@ -1432,6 +1432,36 @@ Configuration injection
 	public class AppConfig {
 	}
 	
+	@annotation and @within:
+		if you want to inject the specified Annotation on the method/class use @annotation(paramName), @within(paramName2) and the function is like: void processThis(AnnotationType1 paramName, AnnotationType2 paramName2) {...}
+		if you don't want to inject the Annotation use the fully qualified name like this: @annotation(com.pet.AnnotationType1), @within(com.pet.AnnotationType2) and the function is like: void processThis() {...}
+	
+	@Before("@annotation(eu.infralert.edge.infrastructure.csrf.ValidateAntiforgery) " +
+			        "|| @within(eu.infralert.edge.infrastructure.csrf.ValidateAntiforgery) && !@annotation(eu.infralert.edge.infrastructure.csrf.IgnoreValidateAntiforgery)")
+	public void validateToken() { }
+	
+	@AfterReturning(value = "@within(com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand)", returning = "ret")
+	public void postProcessFeignIntegrationResult(Object ret) { }
+	
+	@Around("@within(eu.infralert.utility.spring.ApiController)")
+	public Object postProcessResult(ProceedingJoinPoint pjp) throws Throwable { }
+	
+	@Before("@within(authenticated) && !@annotation(eu.infralert.utility.spring.AllowAnonymous) && !@annotation(eu.infralert.utility.spring.Authenticated)")
+	public void authOnlyController(Authenticated authenticated) {
+		this.handleAuthenticated(authenticated);
+	}
+	
+	@Before("@annotation(authenticated) && !@within(eu.infralert.utility.spring.Authenticated)")
+	public void authOnlyMethod(Authenticated authenticated) {
+		this.handleAuthenticated(authenticated);
+	}
+	
+	@Before("@within(authenticatedOnController) && @annotation(authenticatedOnMethod)")
+	public void authControllerAndMethod(Authenticated authenticatedOnController, Authenticated authenticatedOnMethod) {
+		this.handleAuthenticated(authenticatedOnMethod);
+	}
+	
+	
 	@Aspect
 	public class NotVeryUsefulAspect {
 	
@@ -3353,6 +3383,8 @@ org.springframework.beans.BeanUtils
 org.springframework.validation.ValidationUtils
 DataSourceUtils (for JDBC), EntityManagerFactoryUtils (for JPA), SessionFactoryUtils, PersistenceManagerFactoryUtils (for JDO)
 AnnotationUtils
+StringUtils
+StreamUtils
 
 
 
