@@ -3264,6 +3264,174 @@ Part V. Spring Boot Actuator: Production-ready features
 		
 		
 		
+		
+********************************
+Testing:
+********************************
+	
+	The @SpringBootTest annotation tells Spring Boot to go and look for a main configuration class (one with @SpringBootApplication for instance), and use that to start a Spring application context. You can run this test in your IDE or on the command line (mvn test or gradle test)
+	
+		@RunWith(SpringRunner.class)
+		@SpringBootTest
+		public class ApplicationTest {
+			@Test
+			public void contextLoads() throws Exception {
+			}
+		}
+		
+	To start a webserver and do integration tests:
+	
+		@RunWith(SpringRunner.class)
+		@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+		public class HttpRequestTest {
+
+			@LocalServerPort
+			private int port;
+
+			@Autowired
+			private TestRestTemplate restTemplate;
+
+			@Test
+			public void greetingShouldReturnDefaultMessage() throws Exception {
+				assertThat(this.restTemplate.getForObject("http://localhost:" + port + "/",
+						String.class)).contains("Hello World");
+			}
+		}
+		
+	Another useful approach is to not start the server at all, but test only the layer below that, where Spring handles the incoming HTTP request and hands it off to your controller. That way, almost the full stack is used, and your code will be called exactly the same way as if it was processing a real HTTP request, but without the cost of starting the server. To do that we will use Spring’s MockMvc, and we can ask for that to be injected for us by using the @AutoConfigureMockMvc annotation on the test case. In this test, the full Spring application context is started, but without the server.
+	
+		@RunWith(SpringRunner.class)
+		@SpringBootTest
+		@AutoConfigureMockMvc
+		public class ApplicationTest {
+
+			@Autowired
+			private MockMvc mockMvc;
+
+			@Test
+			public void shouldReturnDefaultMessage() throws Exception {
+				this.mockMvc.perform(get("/")).andDo(print()).andExpect(status().isOk())
+						.andExpect(content().string(containsString("Hello World")));
+			}
+		}
+		
+	We can narrow down the tests to just the web layer by using @WebMvcTest. The test assertion is the same as in the previous case, but here Spring Boot is only instantiating the web layer, not the whole context. In an application with multiple controllers you can even ask for just one to be instantiated, using, for example @WebMvcTest(HomeController.class).
+	
+		@RunWith(SpringRunner.class)
+		@WebMvcTest
+		public class WebLayerTest {
+
+			@Autowired
+			private MockMvc mockMvc;
+
+			@Test
+			public void shouldReturnDefaultMessage() throws Exception {
+				this.mockMvc.perform(get("/")).andDo(print()).andExpect(status().isOk())
+						.andExpect(content().string(containsString("Hello World")));
+			}
+		}
+		
+		
+		GreetingController has a dependency on GreetingService. We use @MockBean to create and inject a mock for the GreetingService (if you don’t do this the application context cannot start), and we set its expectations using Mockito.
+		
+		@RunWith(SpringRunner.class)
+		@WebMvcTest(GreetingController.class)
+		public class WebMockTest {
+
+			@Autowired
+			private MockMvc mockMvc;
+
+			@MockBean
+			private GreetingService service;
+
+			@Test
+			public void greetingShouldReturnMessageFromService() throws Exception {
+				when(service.greet()).thenReturn("Hello Mock");
+				this.mockMvc.perform(get("/greeting")).andDo(print()).andExpect(status().isOk())
+						.andExpect(content().string(containsString("Hello Mock")));
+			}
+		}
+		
+	Testing the JPA slice
+		To test the JPA slice of your application (Hibernate + Spring Data) you can use the @DataJpaTest annotation. A @DataJpaTest will:
+		- Configure an in-memory database.
+		- Auto-configure Hibernate, Spring Data and the DataSource.
+		- Perform an @EntityScan.
+		- Turn on SQL logging
+		
+		@RunWith(SpringRunner.class)
+		@DataJpaTest
+		public class UserRepositoryTests {
+
+			@Autowired
+			private TestEntityManager entityManager;
+
+			@Autowired
+			private UserRepository repository;
+
+			@Test
+			public void findByUsernameShouldReturnUser() {
+				this.entityManager.persist(new User("sboot", "123"));
+				User user = this.repository.findByUsername("sboot");
+				
+				assertThat(user.getUsername()).isEqualTo("sboot");
+				assertThat(user.getVin()).isEqualTo("123");
+			}
+		}
+		
+	Testing the Spring MVC slice
+		To test the Spring MVC slice of your application you can use the @WebMvcTest annotation. This will:
+		- Auto-configure Spring MVC, Jackson, Gson, Message converters etc.
+		- Load relevant components (@Controller, @RestController, @JsonComponent etc)
+		- Configure MockMVC
+		
+		@RunWith(SpringRunner.class)
+		@WebMvcTest(UserVehicleController.class)
+		public class UserVehicleControllerTests {
+
+			@Autowired
+			private MockMvc mvc;
+
+			@MockBean
+			private UserVehicleService userVehicleService;
+
+			@Test
+			public void getVehicleShouldReturnMakeAndModel() {
+				given(this.userVehicleService.getVehicleDetails("sboot"))
+					.willReturn(new VehicleDetails("Honda", "Civic"));
+
+				this.mvc.perform(get("/sboot/vehicle")
+					.accept(MediaType.TEXT_PLAIN))
+					.andExpect(status().isOk())
+					.andExpect(content().string("Honda Civic"));
+			}
+		}
+		
+	Testing the JSON slice
+		If you need to test that JSON serialization is working as expected, you can use @JsonTest. This will:
+		- Auto-configure Jackson and/or Gson
+		- Add any Module or @JsonComponent beans that you’ve defined
+		- Trigger initialization of any JacksonTester or GsonTester fields
+		
+		@RunWith(SpringRunner.class)
+		@JsonTest
+		public class VehicleDetailsJsonTests {
+
+			private JacksonTester<VehicleDetails> json;
+
+			@Test
+			public void serializeJson() {
+				VehicleDetails details = new VehicleDetails(
+					"Honda", "Civic");
+
+				assertThat(this.json.write(details))
+					.extractingJsonPathStringValue("@.make")
+					.isEqualTo("Honda");
+			}
+		}
+		
+		
+		
 ********************************
 Thymeleaf
 ********************************
