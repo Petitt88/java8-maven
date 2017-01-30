@@ -38,7 +38,7 @@ Spring expression usage: look for "#{beanName.fieldName}" (Spring framework)
 	this one basiscally says that, if the bean named "environment" does not have the key "stormpath.sso.message.primary" (and its value), then fall back to the string "Primary" and use it
 
 Properties files can also have fallback values:
-	server.port=${PORT:8761} - if the "PORT" environment variables is available use that, otherwise fall back to "8761" as the port number
+	server.port=${PORT:8761} - if the "PORT" environment variable is available use that, otherwise fall back to "8761" as for the port number
 																					 
 @Value("${property}")
 @Value("${server.port}") - from application.properties or from @PropertySource file
