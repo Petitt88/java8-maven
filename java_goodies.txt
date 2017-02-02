@@ -547,22 +547,31 @@ JConsole: it is a JMX implementation, baked into the java bundle (JVM_HOME/bin f
 	
 ********Garbage Collection*********
 
-		
 The Heap is divided into young and old generations as follows:
 	Young Generation: It is place where lived for short period and divided into two spaces:
-		Eden Space: When object created using new keyword memory allocated on this space.
-		Survivor Space: This is the pool which contains objects which have survived after java garbage collection from Eden space.
+		Eden Space (there is 1 of this): When object created using new keyword memory allocated on this space. If the object survives the 1st garbage collection, it goes to the Survivor space.
+		Survivor Space (there are 2 of this): This is the pool which contains objects which have survived after java garbage collection from Eden space. Objects may stay here for several garbage collection cycle.
+			If the survivor space gets full, it is copied to the other survivor space. Of that one gets full, the longest lived objects goes to the Old Generation.
 		
-	Old Generation: This pool is basically contain tenured and virtual (reserved) space and will be holding those objects which survived after garbage collection from Young Generation.
+	Old Generation: This pool basically contain tenured and virtual (reserved) space and will be holding those objects which survived after garbage collection from Young Generation.
 		Tenured Space: This memory pool contains objects which survived after multiple garbage collection means object which survived after garbage collection from Survivor space.
 		
-	Permanent Generation: This memory pool as name also says contain permanent class metadata and descriptors information so PermGen space always reserved for classes and those that is tied to the classes for example static members.
+	Permanent Generation: This memory pool as name also says contain permanent class metadata and descriptors information so PermGen space is always reserved for classes and those that is tied to the classes for example static members.
 
 	Java8 Update: PermGen is replaced with Metaspace which is very similar.
 		Main difference is that Metaspace re-sizes dynamically i.e., It can expand at runtime.
+		Metaspace is unmanaged C code while PermGen is managed Java.
 		Java Metaspace space: unbounded (default)
 		
 	Code Cache (Virtual or reserved): If you are using HotSpot Java VM this includes code cache area that containing memory which will be used for compilation and storage of native code
+	
+	
+	
+********JNDI*********
+
+It's a way of looking up keys and values in a context which is common in a lot of application servers
+In case of JNDI Spring does not instantiate the object, instead it manages an object in the context by looking up the object in some other memory of the JVM.
+In case of an application server, looks up the service from the memory of the application server.
 
 	
 
