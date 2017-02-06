@@ -2889,6 +2889,53 @@ You should only ever add one @EnableAutoConfiguration annotation. We generally r
 		// ... getters and setters
 	}
 	
+Nested configurations
+
+	@Configuration
+	public class JobConfig {
+	
+		@Configuration
+		public static class Step1Config {
+			
+			@Bean
+			ItemReader<Person> reader(@Value("${input}" Resource in) throws exception {
+				return new FlatFileItemReaderBuilder<Person>()
+					.name("file-reader")
+					.resource(in)
+					.targetType(Person.class)
+					.delimited().delimiter(",").names(new String[] {"firstName", "age", "email")
+					.build();
+			}
+			
+			@Bean
+			ItemWriter<Person> writer(DataSource ds) {
+				return new JdbcBatchItemWriterBuilder<Person>()
+					.dataSource(ds)
+					.sql("insert into PEOPLE(AGE, FIRST_NAME, EMAIL) values(:age, :firstName, :email)")
+					.beanMapped()
+					build();
+			}
+		}
+		
+		@Bean
+		public Job job(JobBuilderFactory jbs, StepBuilderFactory sbs, Step1Config step1Config, Step2Config step2Config) {
+			Step s1 = sbs.get("file-db")
+				.<Person, Person>(chunk(100)
+				.reader(step1Config.reader(null))	// here we are not really calling the method with null, Step1Config is just a proxy. Spring will call it with the proper dependency injected arguments.
+				.writer(step1Config.writer(null))
+				.build();
+				
+			Step s2 = sbs.get("db-file")
+				...
+				
+			return jbs.get("etl")
+				.incrementer(new RunIdIncrementer())
+				.start(s1)
+				.next(s2)
+				.build();
+		}
+	}
+	
 Nested @ConfigurationProperties
 	@ConfigurationProperties("my.config")
 	class MyConfig {
