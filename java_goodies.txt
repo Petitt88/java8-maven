@@ -177,6 +177,9 @@ The eclipse plugins adds 2 nice views: Gradle Executions and Gradle Tasks to be 
 To execute the wrapper specific to the project instead of the globbaly installed gradle version use:
 	gradlew.bat <task>
 	
+To execute in a multi-project environment a task only on one specific project use this:
+	gradlew.bat :edge-service:build - still from the root folder, where "edge-service" is the name of the target project
+	
 To specify the gradle of the wrapper to be used:
 	task wrapper(type: Wrapper) {
 		gradleVersion = '3.2.1'
