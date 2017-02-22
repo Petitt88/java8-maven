@@ -522,6 +522,21 @@ class WorkDelegator {
 		...
 	}
 }
+
+
+Get method parameter names by reflection at runtime:
+	- works only on concrete classes from java 8
+	- interfaces: there is no way to get the method parameter names for interface as of java 8 --> that is why we use annotations in Spring Data Rest Repositories, Spring Data JPA, Spring Data, MyBatis Mapper interfaces, etc.
+	
+	class Apple {
+		public void calculateSomething(int banana, int orange) {
+			... method parameters can be retained at runtime because apple is a class!
+		}
+	}
+	
+	interface Apple {
+		void calculateSomething(@Param("banana") int banana, @Param("orange") int orange);	// <-- this is the trick! @Param but it can be anything else. @Param is used and processed, read by Spring Data.
+	}
 	
 	
 ********Static imports*********
