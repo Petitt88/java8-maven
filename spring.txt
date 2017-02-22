@@ -3509,6 +3509,21 @@ There are special objects that thymeleaf exposes in the views like:
 		<p>[[${#httpServletRequest.remoteUser}]]</p> 
 	#authentication by Spring Security
 		<span>[[${#authentication.firstName}]]</span>
+		
+
+Example:		
+
+	Layout page, layout.html:
+		<div layout:fragment="content"> 					- this will be replaced runtime by the partial whose layout page is this one
+		<div th:replace="fragments/header :: header">		- this will be replaced runtime by the "header" named section of the file located in fragments/header.html
+	
+	fragments/header.html:
+		<div th:fragment="header">							- the content that will replace the contents of the html element that has this attribute set:
+															th:replace="fragments/header :: header" in the layout page of the fragments/header.html page (layout.html in this case)
+															
+	partial page (the one that gets returned by @Controller methods), index.html:
+		<html layout:decorator="layout">					- this page's layout is called "layout.html". This is the first ancenstor.
+		<div layout:fragment="content">						- this will replace the contents of the tag which has 'layout:fragment="content"' attribute set in the layout page (layout.html in this case)
 
 
 
