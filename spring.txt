@@ -2903,7 +2903,7 @@ Nested configurations
 					.name("file-reader")
 					.resource(in)
 					.targetType(Person.class)
-					.delimited().delimiter(",").names(new String[] {"firstName", "age", "email")
+					.delimited().delimiter(",").names(new String[] {"firstName", "age", "email"})
 					.build();
 			}
 			
@@ -2913,14 +2913,14 @@ Nested configurations
 					.dataSource(ds)
 					.sql("insert into PEOPLE(AGE, FIRST_NAME, EMAIL) values(:age, :firstName, :email)")
 					.beanMapped()
-					build();
+					.build();
 			}
 		}
 		
 		@Bean
 		public Job job(JobBuilderFactory jbs, StepBuilderFactory sbs, Step1Config step1Config, Step2Config step2Config) {
 			Step s1 = sbs.get("file-db")
-				.<Person, Person>(chunk(100)
+				.<Person, Person>chunk(100)
 				.reader(step1Config.reader(null))	// here we are not really calling the method with null, Step1Config is just a proxy. Spring will call it with the proper dependency injected arguments.
 				.writer(step1Config.writer(null))
 				.build();
