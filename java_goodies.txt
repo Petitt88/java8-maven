@@ -183,6 +183,7 @@ To execute in a multi-project environment a task only on one specific project us
 To specify the gradle of the wrapper to be used:
 	task wrapper(type: Wrapper) {
 		gradleVersion = '3.2.1'
+		distributionType = Wrapper.DistributionType.ALL
 	}
 	
 To download the wrapper:
