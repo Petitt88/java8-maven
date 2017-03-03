@@ -305,7 +305,7 @@ Mappings:
 @Entity --> @Respository (Dao) --> @Service --> @Controller/@Restcontroller
 
 
-Spring Data JDBC evaluates and runs these at application startup:
+Spring Data JDBC evaluates and runs these at application startup (files must be located in the root of the classpath):
 	- schema.sql: can create tables here. DDL functions. 								- Data Definition Language: create, alter, drop, truncate, comment, rename
 	- data.sql: gets executed AFTER schema.sql. Can insert data here. DML functions. 	- Data Manipulation Language: select, insert, update, delete, merge, call, explain plan, lock table
 
