@@ -36,6 +36,7 @@ Spring expression usage: look for "#{beanName.fieldName}" (Spring framework)
 @Value - specify default value on properties. Can be arbirtary string or expression e.g. "#{systemProperties.myProp}"
 @Value("#{ @environment['stormpath.sso.message.primary'] ?: 'Primary' }") --> ?: <-- this is the Elvis operator, we can specify fallback value to be used 
 	this one basiscally says that, if the bean named "environment" does not have the key "stormpath.sso.message.primary" (and its value), then fall back to the string "Primary" and use it
+@Value("${input-dir:file://${HOME}/Desktop/in}") - use the "input-dir" configuration value. In case of it is not specified, fall back to the "file://${HOME}/Desktop/in" directory
 
 Properties files can also have fallback values:
 	server.port=${PORT:8761} - if the "PORT" environment variable is available use that, otherwise fall back to "8761" as for the port number
