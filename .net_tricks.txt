@@ -1,0 +1,61 @@
+1. The runtime version is determined by the starting project. No matter what the runtime of the other referenced dlls are, they will use the same as the starting project.
+2. Similarly, only the starting app's config is taken into consideration.
+
+Assembly loading process:
+
+	It is based on strong name, the CLR uses the strong name of the assembly to load it
+		strong name: assembly name + version + optional culture + public key of the digital signature
+	1. the CLR checks whether the assembly has been loaded
+	2. if not, checks the GAC that belongs to the starting app's runtime version (v2 or v4)
+			GAC is located in C:\Windows\Microsoft.NET\assembly
+	3. if not found in the GAC, probably probes the paths specified in the PATH environment variable
+	4. if not found, tries in the same folder where the app is running
+	
+	
+machine.config:
+
+	Contains machine level settings.
+	The Machine.config file contains the ASP.NET schema for all of the Web applications on the server. This file is at the top of the configuration merge hierarchy.
+	
+	location:
+		C:\Windows\Microsoft.NET\Framework\v4.0.30319\Config
+		C:\Windows\Microsoft.NET\Framework64\v4.0.30319\Config
+	
+	good to know:
+		certain apps register their providers, config sections, etc. in the machine.config. It is good to check it over time.
+		
+		
+applicationhost.config:
+
+	IIS: 
+		ApplicationHost.config is the root file of the IIS 7.0 configuration system. It includes definitions of all sites, applications, virtual directories, and application pools, as well as global defaults for the Web server settings. It is in the following location: %windir%\system32\inetsrv\config.
+		
+			<sites>
+				<site name="Admin-Site" id="2">
+					<application path="/" applicationPool="Clr4IntegratedAppPool">
+						<virtualDirectory path="/" physicalPath="C:\Users\pkongyik\Documents\My Web Sites\Empty folder" />
+					</application>
+					<application path="/Admin" applicationPool="Clr4IntegratedAppPool">
+						<virtualDirectory path="/" physicalPath="C:\Projects\CemtPalyazat\src\Admin" />
+					</application>
+					<bindings>
+						<binding protocol="https" bindingInformation="*:44317:localhost" />
+						<binding protocol="http" bindingInformation="*:60435:localhost" />
+					</bindings>
+				</site>
+			</sites>
+	
+	Client application directory: 
+		The ApplicationName.config file contains settings for a Windows client application (not a Web application).
+	
+	
+web.config:
+
+	Web site: 
+		The Web.config file for a specific Web site contains settings that apply to the Web site and inherit downward through all of the ASP.NET applications and subdirectories of the site.
+	
+	ASP.NET application root directory:
+		The Web.config file for a specific ASP.NET application is located in the root directory of the application and contains settings that apply to the Web application and inherit downward through all of the subdirectories in its branch.
+	
+	ASP.NET application subdirectory:
+		The Web.config file for an application subdirectory contains settings that apply to this subdirectory and inherit downward through all of the subdirectories in its branch.
