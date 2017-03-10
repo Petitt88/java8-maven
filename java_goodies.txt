@@ -295,7 +295,75 @@ settings.gradle:
 		
 How to build multiple projects in gradle (include dependencies and their transitive dependencies into the build output): 
 	https://docs.gradle.org/current/userguide/multi_project_builds.html
+	
+	
+	
+******Dependency management*******
+
+A Maven bom is a so called "bill of materials" - it bundles several dependencies to assure that the versions will work together.
+	You include the bom into your pom like this:
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.jboss.bom</groupId>
+				<artifactId>jboss-javaee-6.0-with-tools</artifactId>
+				<version>${javaee6.with.tools.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement> 
+	
+	Then you do not have to specify the version attribute of a dependency, if it is defined in the bom like this:
+	<dependency>
+		<groupId>javax.enterprise</groupId>
+		<artifactId>cdi-api</artifactId>
+		<scope>provided</scope>
+	</dependency>
+	
+Gradle dependency management plugin: https://github.com/spring-gradle-plugins/dependency-management-plugin
+	
+	Dependency management DSL: this configuration will cause all dependencies (direct or transitive) on spring-core and commons-logging to have the versions 4.0.3.RELEASE and 1.1.2 respectively.
+		dependencyManagement {
+			 dependencies {
+				  dependency 'org.springframework:spring-core:4.0.3.RELEASE'
+				  dependency group:'commons-logging', name:'commons-logging', version:'1.1.2'
+			 }
+		}
+		dependencies {
+			 compile 'org.springframework:spring-core'
+		}
 		
+	Exclusions:
+		dependencyManagement {
+			dependencies {
+				dependency('org.springframework:spring-core:4.0.3.RELEASE') {
+					exclude 'commons-logging:commons-logging'
+				}
+			}
+		}
+	
+	Importing a maven bom --> dependency versions come from this bom file --> we can just use: "compile 'org.springframework:spring-core'"
+	
+		dependencyManagement {
+			 imports {
+				  mavenBom 'io.spring.platform:platform-bom:1.0.1.RELEASE'
+			 }
+		}
+		dependencies {
+			 compile 'org.springframework.integration:spring-integration-core'
+		}
+		// we can override the versions used and define variables
+		buildscript {
+		ext {
+			springBootVersion = "1.5.1.RELEASE"	// define variable
+			gradlewVersion = "3.3"
+			jooqVersion = "3.9.1"
+		}
+		ext["hibernate.version"] = "5.2.6.Final"	// override version used by the dependency plugin
+		
+	Gradle's maven and maven-publish plugins automatically generate a pom file that describes the published artifact.
+	
 		
 
 **********Tomcat**********
