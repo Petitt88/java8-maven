@@ -661,6 +661,19 @@ It's a way of looking up keys and values in a context which is common in a lot o
 In case of JNDI Spring does not instantiate the object, instead it manages an object in the context by looking up the object in some other memory of the JVM.
 In case of an application server, looks up the service from the memory of the application server.
 
+
+
+********** Native DLL at runtime***************
+
+https://www.chilkatsoft.com/p/p_499.asp
+https://examples.javacodegeeks.com/java-basics/java-library-path-what-is-it-and-how-to-use/
+	
+	java -Djava.library.path=<path_to_dll> <main_class>				- works
+	System.setProperty(“java.library.path”, “/path/to/library”);	- does not work because the "java.library.path" is readonly but this is not well documented. Can be only set at the JVM startup.
+	
+	Java System.loadLibrary - Loading a Native DLL at Runtime
+		System.loadLibrary("jri"); - will search for "chilkat.dll" in the folders specified by the PATH env variable
+		System.load("C:/Program Files/R/R-3.3.3/library/rJava/jri/x64/jri.dll"); - this can be used if we do not want to bother setting the PATH env variable
 	
 
 
