@@ -27,6 +27,7 @@ being resolved, and you will need to return the cached result rather than chase 
 Classpath: contains folders (like src/main/java) and jar files. A java class is found like this:
  - if a jar contains it, it is loaded from there
  - if not, the JVM concatenates the folder path from the classpath with the "import ..." statement located in the class file. 
+	The default classpath is the current working directory.
    The resulting path must pont to the .class file.
    
    
