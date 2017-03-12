@@ -17,12 +17,44 @@ machine.config:
 	Contains machine level settings.
 	The Machine.config file contains the ASP.NET schema for all of the Web applications on the server. This file is at the top of the configuration merge hierarchy.
 	
-	location:
+	location for the v4 runtime:
 		C:\Windows\Microsoft.NET\Framework\v4.0.30319\Config
 		C:\Windows\Microsoft.NET\Framework64\v4.0.30319\Config
+		
+	location for the v2 runtime:
+		C:\Windows\Microsoft.NET\Framework\v2.0.50727\CONFIG
+		C:\Windows\Microsoft.NET\Framework64\v2.0.50727\CONFIG
 	
-	good to know:
-		certain apps register their providers, config sections, etc. in the machine.config. It is good to check it over time.
+good to know:
+	1. certain apps register their providers, config sections, etc. in the machine.config. It is good to check it over time.
+	2. Also it is a good practice to in the web.config or app.config place a <clear /> tag in whatever provider section.
+	3. The best approuch is to tell the installer if possible (for example to the Oracle client or to the MySql when installing the providers) not to include machine level settings -->
+		--> machine.config won't get polluted with pre-registered providers like this:
+			<runtime>
+				<assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
+				  <dependentAssembly xmlns="urn:schemas-microsoft-com:asm.v1">
+					<assemblyIdentity name="MySql.Data" publicKeyToken="c5687fc88969c44d" culture="neutral" />
+					<bindingRedirect oldVersion="6.7.4.0" newVersion="6.9.9.0" />
+				  </dependentAssembly>
+				  <dependentAssembly xmlns="urn:schemas-microsoft-com:asm.v1">
+					<assemblyIdentity name="MySql.Data.Entity" publicKeyToken="c5687fc88969c44d" culture="neutral" />
+					<bindingRedirect oldVersion="6.7.4.0" newVersion="6.9.9.0" />
+				  </dependentAssembly>
+				  <dependentAssembly xmlns="urn:schemas-microsoft-com:asm.v1">
+					<assemblyIdentity name="MySql.Web" publicKeyToken="c5687fc88969c44d" culture="neutral" />
+					<bindingRedirect oldVersion="6.7.4.0" newVersion="6.9.9.0" />
+				  </dependentAssembly>
+				</assemblyBinding>
+			</runtime>
+			<DbProviderFactories>
+				<add name="MySQL Data Provider" invariant="MySql.Data.MySqlClient" description=".Net Framework Data Provider for MySQL" type="MySql.Data.MySqlClient.MySqlClientFactory, MySql.Data, Version=6.9.9.0, 			Culture=neutral, PublicKeyToken=c5687fc88969c44d" />
+			</DbProviderFactories>
+		And so on...
+	4. use client providers from nuget if available:
+		- for example we do not have to install the ODP.NET (Oracle Data Provider for .NET) which is several hundred megabytes big (http://www.oracle.com/technetwork/topics/dotnet/index-085163.html)
+		- instead we could install just 2 nuget packages and the Oracle providers will get packaged with out application:
+			1. Oracle.ManagedDataAccess							- if only ADO.NET is needed, then this is enought
+			2. Oracle.ManagedDataAccess.EntityFramework			- if we want to use Oracle with EntityFramework we will need this one as well
 		
 		
 applicationhost.config:
@@ -59,3 +91,29 @@ web.config:
 	
 	ASP.NET application subdirectory:
 		The Web.config file for an application subdirectory contains settings that apply to this subdirectory and inherit downward through all of the subdirectories in its branch.
+		
+
+Dump files, what assemblies are loaded in runtime:
+	Place a breakpoint somewhere:
+		Debug --> Windows --> Modules: we can check the loaded managed assmeblies here
+		Debug --> Save Dump As... we can save a dump file of the current state of the memory then load this dumpfile back into Visual Studio. This time we will see even the unmanaged native libraries that got loaded.
+	
+	
+Sysinternals, Resource monitor
+
+	Download the Sysinternals: google "Windows Sysinternals download" --> Sysinternals Suite
+		This contains a lot of system utilities, even the Process monitor
+		
+	Process Explorer (procexp64.exe): considered to be a more advanced form of the Windows Task Manager
+		we can find out which file is being held by which process
+		Find --> Find Handle or DLL...
+		
+	Process monitor (Procmon.exe):
+	
+	TcpView (Tcpview.exe)
+		lets us find out which process uses which port
+		
+	Resource monitor:
+		Task Mananger --> Performance --> Open Resource Monitor
+		Network tab --> Listening Ports: just like with TcpView we can see which ports are being used by which application
+			Moreover, this even show us whether the port is allowed in our firewall (Firewall Status column)
