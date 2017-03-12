@@ -674,6 +674,10 @@ https://examples.javacodegeeks.com/java-basics/java-library-path-what-is-it-and-
 	Java System.loadLibrary - Loading a Native DLL at Runtime
 		System.loadLibrary("jri"); - will search for "chilkat.dll" in the folders specified by the PATH env variable
 		System.load("C:/Program Files/R/R-3.3.3/library/rJava/jri/x64/jri.dll"); - this can be used if we do not want to bother setting the PATH env variable
+		
+		
+		
+	System.getProperty("java.class.path") - to get the classpath specified and used
 	
 
 
