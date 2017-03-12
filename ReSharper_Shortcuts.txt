@@ -1,0 +1,19 @@
+Alt+Enter - Context Menu Help
+Ctrl+R+R - Refactor rename
+Ctrl+Shift+R - Refactor
+Ctrl+Shift+G - Navigate To
+Ctrl+N ~ Ctrl+, - Go to Everything/Type
+Ctrl+Shift+Alt+N - Go to Symbol
+Ctrl+Shift+N - Go to File
+Ctrl+F11 - File Structure
+Ctrl+F12 - Go to File Member
+Alt+F7 - Find Usages
+Ctrl+Alt+F7 - Go to Usage
+Ctrl+Shift+F7 - Highlight Usage
+Ctrl+Alt+H - Type Hierarchy
+Ctrl+E - View Recent Files
+Ctrl+Shift+E - Stack Trace Explorer
+Ctrl+J - Live Templates
+Ctrl+Alt+J - 'Surround With' Templates
+Alt+Ins - Code Generation
+Ctrl+Q - Quick Documentation

@@ -1,0 +1,23 @@
+Ctrl+Shift-L - show shortucts
+Ctrl+T - Type hierarchy
+Ctrl+Shift+T - Open type
+Ctrl+Shift+H - Open type hierarchy
+Ctrl+Alt+H - Open call hierarchy
+Ctrl+1 - quick fix
+Ctrl+Space - intellisense
+Ctrl+E - chage editor tab
+Ctrl+H - Search
+Ctrl+F - Find and replace
+Ctrl+G - Search
+Ctrl-Shift+G - find all references
+F3 - go to definition
+F4 - Type hierarchy
+Ctrl+M - full screen
+Ctrl+B - build all
+Ctrl+L - go to line
+Ctrl+D - delete line
+Ctrl+Shift+O - fix imports
+Ctrl+Shift+F - format
+Ctrl+Shift+C - toggle comment
+Alft+Shift+G - generate code
+Ctrl+Shift+R - open resource
