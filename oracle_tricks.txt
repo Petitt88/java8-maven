@@ -1,0 +1,26 @@
+sqlplus: to log into an Oracle server and do sql commands without a GUI from the command line
+
+	sqlplus userName/password@tns
+	
+	sqlplus userName@tns - sqlplus will ask for the password@tns
+	
+	where sqlplus - displays from which location sqlplus is used. Useful when we have more than 1 ODP.NET client installed
+	
+	tnsping net_service_name
+		The TNSPING utility determines whether the listener for a service on an Oracle Net network can be reached successfully.
+		net_service_name must exist in tnsnames.ora file or the name service in use, such as NIS.
+		
+	Net Manager:
+	
+	Enterprise Manager:
+		Available on https://localhost:5500/em (https protocol is important!)
+		Oracle Enterprise Manager is Oracle’s on-premises management platform, providing a single pane of glass for managing all of a customer's Oracle deployments, whether in their data centers or in the Oracle Cloud. 
+		
+		
+ping 
+	ping google.com
+	verifies IP-level connectivity to another TCP/IP computer by sending Internet Control Message Protocol (ICMP) Echo Request messages.
+	
+nslookup
+	nslookup google.com
+	nslookup is a network administration command-line tool available for many computer operating systems for querying the Domain Name System (DNS) to obtain domain name or IP address mapping or for any other specific DNS record.
