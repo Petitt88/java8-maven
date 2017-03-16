@@ -117,3 +117,22 @@ Sysinternals, Resource monitor
 		Task Mananger --> Performance --> Open Resource Monitor
 		Network tab --> Listening Ports: just like with TcpView we can see which ports are being used by which application
 			Moreover, this even show us whether the port is allowed in our firewall (Firewall Status column)
+
+
+
+.NET Standard
+
+	If you're reading this post, you have hopefully already heard of .NET Standard. This is acts as an interface to .NET Platforms, and aims to define a unified set of APIs that those platforms must implement. 
+	It is the spiritual successor to PCLs, and allow you to target .NET Framework, .NET Core, and other .NET platforms with the same library code base.
+
+	The NETStandard.Library metapackage references a set of NuGet packages that define the .NET Standard library. Like the Microsoft.AspNetCore package from my last post, 
+	the package does not contain dlls itself, but rather references a number of other packages, hence the name metapackage. Depending on the target platform of your project, 
+	different packages will be added to the project, in line with the appropriate version of .NET Standard the platform implements.
+
+Reference assmeblies:
+
+	 The reference dlls just define the various APIs that these platforms (.NET Framework, .NET Core, Mono, etc) must expose for a given version of .NET Standard.
+	 The classes have literally empty method bodies.
+	 
+	 These placeholder assemblies are are a key part of the the .NET Standard infrastructure. They provide concrete APIs against which you can compile your projects, 
+	 without tying you to a specific implementation (i.e. .NET Framework or .NET Core).
