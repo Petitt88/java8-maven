@@ -28,7 +28,7 @@ Classpath: contains folders (like src/main/java) and jar files. A java class is 
  - if a jar contains it, it is loaded from there
  - if not, the JVM concatenates the folder path from the classpath with the "import ..." statement located in the class file. 
 	The default classpath is the current working directory.
-   The resulting path must pont to the .class file.
+   The resulting path must point to the .class file.
    
    
    
@@ -364,6 +364,23 @@ Gradle dependency management plugin: https://github.com/spring-gradle-plugins/de
 		ext["hibernate.version"] = "5.2.6.Final"	// override version used by the dependency plugin
 		
 	Gradle's maven and maven-publish plugins automatically generate a pom file that describes the published artifact.
+	
+	
+**********Java 8 Date API**********
+
+ZonedDateTime, LocalDateTime, LocalDate, LocalTime, ZoneOffset, Duration, Clock, Instant - java.time package
+
+	Use ZonedDateTime if offset information is needed because only this one contains it (like DateTimeOffset is C#)
+	After sent to the client (in json) the browser can easily convert it to javascript Date object.
+	You do not need to insist on UTC datetimes, local datetime is good as well, it only has to be a ZonedDateTime.
+
+		ZonedDateTime now = ZonedDateTime.now();
+		model.addAttribute("now", now.toInstant());
+		// .toInstant() call is necessary in order to get the desired output sent to the browser that can be mapped into a javascript Date.
+		// now().toString(): 2017-01-24T16:59:28.484+01:00[Europe/Prague]
+		// now().toInstant().toString(): 2017-01-24T15:59:28.484Z - and this is the good one required by the browsers
+
+	Please avoid the old java.util.Date and Calendar classes!
 	
 		
 

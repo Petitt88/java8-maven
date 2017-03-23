@@ -136,3 +136,16 @@ Reference assmeblies:
 	 
 	 These placeholder assemblies are are a key part of the the .NET Standard infrastructure. They provide concrete APIs against which you can compile your projects, 
 	 without tying you to a specific implementation (i.e. .NET Framework or .NET Core).
+	 
+	 
+	 
+Date handling
+
+	DateTime vs DateTimeOffset
+	
+		Use DateTimeOffset is timezone information is needed.
+	
+		A DateTime value defines a particular date and time. Starting with version 2.0 of the .NET Framework, it includes a Kind property that provides limited information about the time zone to which that date and time belongs. 
+		The DateTimeKind value returned by the Kind property indicates whether the DateTime value represents the local time (DateTimeKind.Local), Coordinated Universal Time (UTC) (DateTimeKind.Utc), or an unspecified time (DateTimeKind.Unspecified).
+		
+		The DateTimeOffset structure represents a date and time value, together with an offset that indicates how much that value differs from UTC. Thus, the value always unambiguously identifies a single point in time.
