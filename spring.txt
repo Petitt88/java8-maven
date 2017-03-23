@@ -3112,9 +3112,13 @@ How to map camel cased variables and lists:
 	Strings are encoded using UTF-8 by default.
 	
 27.1.5 Static Content
-	By default Spring Boot will serve static content from a directory called /static (or /public or /resources or /META-INF/resources) in the classpath or 
+	By default Spring Boot will serve static content from a directory called /static/** (or /public/** or /resources/** or /META-INF/resources) in the classpath or 
 	from the root of the ServletContext. It uses the ResourceHttpRequestHandler from Spring MVC so you can modify that behavior by adding your own 
 	WebMvcConfigurerAdapter and overriding the addResourceHandlers method.
+		@Override
+		public void addResourceHandlers(ResourceHandlerRegistry registry) {
+			registry.addResourceHandler("/dist/**").addResourceLocations("classpath:/static/");
+		}
 	
 	Do not use the src/main/webapp directory if your application will be packaged as a jar. Although this directory is a common standard, 
 	it will only work with war packaging and it will be silently ignored by most build tools if you generate a jar.
@@ -3125,7 +3129,7 @@ How to map camel cased variables and lists:
 	either by using Spring beans or by scanning for Servlet components.
 	
 	If convention-based mapping is not flexible enough you can use the ServletRegistrationBean, FilterRegistrationBean and ServletListenerRegistrationBean classes for complete control.
-	
+		
 27.3.2 Servlet Context Initialization
 
 27.3.4 Customizing embedded servlet containers
@@ -3190,8 +3194,7 @@ Part V. Spring Boot Actuator: Production-ready features
 	servlet API dependencies off the classpath.
 	
 71.1.1 Add a Servlet, Filter or Listener using a Spring bean
-	In the case of Filters and Servlets you can also add mappings and init parameters by adding a FilterRegistrationBean or ServletRegistrationBean
-	instead of or as well as the underlying component.
+	In the case of Filters and Servlets you can also add mappings and init parameters by adding a FilterRegistrationBean or ServletRegistrationBean instead of or as well as the underlying component.
 		If no dispatcherType is specified on a filter registration, it will match FORWARD,INCLUDE and REQUEST. If async has been enabled, it will match ASYNC as well.
 		
 71.5 Configure SSL
@@ -3315,6 +3318,73 @@ Part V. Spring Boot Actuator: Production-ready features
 	80.2.1 Thymeleaf templates
 		If you are using Thymeleaf, then set spring.thymeleaf.cache to false. See ThymeleafAutoConfiguration for other Thymeleaf customization options.
 		
+		
+Filters: Spring Security pipeline vs Servlet container pipeline
+
+	If a class implements the javax.servlet.Filter interface, then the filter can be registered at the Servlet container and so can it be with Spring Security.
+	
+		If we place @Component, then Spring Boot automatically adds the Filter to the Servlet container!
+			This somewhat surprised me, because almost all the time the Filter will be @Component simply because we want to take advantage of the DI.
+			However if we register the filter with Spring Security, then the filter is added twice two the pipeline! It runs twice on every single request!
+			In order to avoid this there is a handy class called FilterRegistrationBean:
+		
+		@Bean
+		public FilterRegistrationBean localeSetterFilter(LocaleFilter localeFilter) {
+			FilterRegistrationBean frb = new FilterRegistrationBean(localeFilter);
+			// if the parameter is "false" then Spring Boot does not register the Filter to the Servlet Container even if the Filter has @Component
+			// this should be true if the Filter is not @Component and in spite of this we would still like to register it to the Servlet Container
+			frb.setEnabled(false);
+			return frb;
+		}
+	
+	In our own SecurityConfig (derives from the WebSecurityConfigurerAdapter class) we can register the filter to Spring Security.
+	
+		@Configuration
+		@EnableWebSecurity		// always place this so we start with the minimal filter pipeline needed for Spring Security. Otherwise Spring Security registers 8 SecurityFilterChain instances (like FormLogin, FormLogout, HttpBasicLogin, etc.).
+								// instead of the 8 pipelines we are going to have only 1.
+		@Override
+		protected void configure(HttpSecurity http) throws Exception {
+			// require SSL if specified in application.properties
+			if (this.securityProperties.isRequireSsl()) {
+				http.requiresChannel().anyRequest().requiresSecure();
+			}
+
+			http
+					// no need for the AnonymousAuthenticationFilter to provide an AnonymousAuthenticationToken
+					// which represents an authenticated user.
+					.anonymous().disable()
+					.formLogin().disable()
+					.logout().disable()
+					.httpBasic().disable()
+					.servletApi().disable()
+					//.csrf().ignoringAntMatchers(Constants.Routes.LOGIN_URL).and()
+					// currently there is no need for CSRF protection because we do not use cookies for authentication. (actually we do not use cookies at all)
+					// Authentication is header based which is not exposed to CSRF vulnerability.
+					.csrf().disable()
+					// Spring Security adds caching headers:
+					// Cache-Control: no-cache, no-store, max-age=0, must-revalidate
+					// Pragma: no-cache
+					// Expires: 0
+					// We do not need them this way, so disable them.
+					// We apply them manually on @Controller methods by NoCacheInterceptor.
+					// As for the static resources we have StaticResourceFilter - this only applies to request sent for resource that are /dist prefixed.ű
+					.headers().cacheControl().disable()
+					.and()
+					// do not create session, do not create JSESSIONID cookie
+					.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+					.and()
+					// using method-level authentication instead
+					.authorizeRequests().anyRequest().permitAll()
+					.and()
+					.exceptionHandling()
+					.authenticationEntryPoint((request, response, exception) -> response.sendError(HttpStatus.UNAUTHORIZED.value()))
+					.and()
+					.addFilterBefore(this.csrfFilter, UsernamePasswordAuthenticationFilter.class)
+					.addFilterBefore(this.jwtProcessingFilter, CsrfFilter.class)
+					.addFilterBefore(this.hystrixInitializerFilter, JwtTokenAuthenticationProcessingFilter.class)
+					.addFilterBefore(this.localeFilter, HystrixContextInitializerFilter.class);
+		}
+	}
 		
 		
 		
@@ -3613,6 +3683,7 @@ MessageBuilder
 
 WebUtils
 ReflectionUtils
+	ReflectionUtils.rethrowRuntimeException(ex) - with this we can turn a checked exception into an unchecked exception (RuntimeException)
 FileCopyUtils	
 org.springframework.util.FileSystemUtils
 org.springframework.beans.BeanUtils
