@@ -2899,7 +2899,7 @@ Nested configurations
 		public static class Step1Config {
 			
 			@Bean
-			ItemReader<Person> reader(@Value("${input}" Resource in) throws exception {
+			ItemReader<Person> reader(@Value("${input}") Resource in) throws exception {
 				return new FlatFileItemReaderBuilder<Person>()
 					.name("file-reader")
 					.resource(in)
