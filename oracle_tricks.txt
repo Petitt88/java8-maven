@@ -11,12 +11,37 @@ sqlplus: to log into an Oracle server and do sql commands without a GUI from the
 		net_service_name must exist in tnsnames.ora file or the name service in use, such as NIS.
 		
 	Net Manager:
+	Database Configuration Assistant
 	
 	Enterprise Manager:
 		Available on https://localhost:5500/em (https protocol is important!)
 		Oracle Enterprise Manager is Oracle’s on-premises management platform, providing a single pane of glass for managing all of a customer's Oracle deployments, whether in their data centers or in the Oracle Cloud. 
 		
-		
+Install/uninstall Oracle client:
+
+	C:\Oracle\product\12.1.0\client_1\oui\bin\setup.exe - this starts the installer where the client can be deleted from
+	C:\Oracle\product\12.1.0\client_1\odp.net\managed\x64 - configure.bat - registers providers in machine.config regarding .NET?
+	unconfigure.bat - execute before uninstalling the product
+
+Good things
+
+	select date'2016-02-02' from dual;
+
+	// Oracle server on my comp
+	SYSTEM 	/ {password}	--> normal user
+	SYS 	/ {password}	--> SYSDBA role is necessary to be selected, otherwise user cannot connact to the database. It is worth connecting to the container (seed) db (SYS is the super user)
+	Service name: orcl
+				  pdborcl - this is the pluggable database, this is what we want to connect to and we create the new users for the pdborcl service
+
+		So we need to connect to the pdb database using "system" be will be unable to do so. The solution is these 2 sql commands:
+		http://krishanjaglan.blogspot.hu/2014/10/ora-01033-when-connecting-to-pdb.html
+			ALTER PLUGGABLE DATABASE ALL OPEN;
+			ALTER PLUGGABLE DATABASE ALL SAVE STATE;
+			
+		exp system@ORCLPDB owner=scott file=c:\temp\scott.dmp
+		imp system@ORCLPDB FROMUSER=scott TOUSER=scott file=c:\temp\scott.dmp	// FROMUSER=scott van benne a dmp file-ban kiexportálja, 
+																			// TOUSER-nek pedig a target adatbázisban léteznie kell mert a tool nem hozza létre a user-t!		
+
 ping 
 	ping google.com
 	verifies IP-level connectivity to another TCP/IP computer by sending Internet Control Message Protocol (ICMP) Echo Request messages.
