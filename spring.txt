@@ -1737,6 +1737,8 @@ DispatcherServlet
 		}
 	}
 	
+	ServletRegistrationBean: we can register Servlets, not just Filters via the FilterRegistrationBean (or using @Component)
+	
 	WebApplicationInitializer is an interface provided by Spring MVC that ensures your code-based configuration is detected and automatically 
 	used to initialize any Servlet 3 container.
 	
@@ -2632,6 +2634,24 @@ RestTemplate:
 	- do gzip compression, oath, content-negotiation
 	- uses the same message converters as spring
 	- preconfigured - when Ribbon is on the classpath, it is even load-balanced (@LoadBalanced). By default uses round-robin strategy.
+	
+	
+	Compression:
+	
+		We can enable it in the application.properties file:
+			server.compression.enabled=true
+			server.compression.mime-types=application/json,application/xml
+			
+		Or, we can spcify it programatically:
+		
+			class MyEmbeddedContainerCustomizer implements EmbeddedServletContainerCustomizer {
+
+				@Override
+				public void customize(ConfigurableEmbeddedServletContainer configurableEmbeddedServletContainer) {
+					configurableEmbeddedServletContainer.setContextPath("cp");
+					configurableEmbeddedServletContainer.setCompression(new Compression());
+				}
+			}
 
 Database migration: with Flyway
 
@@ -2645,6 +2665,7 @@ To create a deployable war:
 
 		@Override
 		protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+			// we just need to point the "configure" method to our sources: to the spring boot application endpoint, where the "public static void main" method resides
 			return application.sources(Application.class);
 		}
 
@@ -3334,8 +3355,20 @@ Filters: Spring Security pipeline vs Servlet container pipeline
 			// if the parameter is "false" then Spring Boot does not register the Filter to the Servlet Container even if the Filter has @Component
 			// this should be true if the Filter is not @Component and in spite of this we would still like to register it to the Servlet Container
 			frb.setEnabled(false);
+			frb.setOrder(1);
 			return frb;
 		}
+		
+	Filter ordering
+	
+		1. We could use the FilterRegistrationBean and invoke the ".setOrder" method
+		2. Web can use @Component and @Order together
+		
+			@Component
+			@Order
+			public class MyFilter implements Filter {
+				...
+			}
 	
 	In our own SecurityConfig (derives from the WebSecurityConfigurerAdapter class) we can register the filter to Spring Security.
 	
