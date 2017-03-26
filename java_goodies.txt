@@ -412,6 +412,15 @@ To run Tomcat:
 	Note: running Tomcat from Eclipse does not allow us to use the default apps that come with Tomcat (like the manager app)
 	Double-clicking on the Tomcat server in the "Servers" view in Eclispe allows us to change some settings (like the port on the "Overview" tab and the context path of the deployed applications on the "Modules" tab), 
 		but THIS HAS NO EFFECT on the real server.xml and other files which are taken into consideration when starting Tomcat from the /bin folder instead of using Eclipse. So it has no effect on production environment.
+		
+		
+**********JVM parameters***********
+
+Pre-allocated memory management:
+	-Xms64m
+	-Xmx512m
+	-XX:MetaspaceSize=96m
+	-XX:MaxMetaspaceSize=256
 
 
 
