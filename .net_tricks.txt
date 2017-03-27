@@ -149,3 +149,23 @@ Date handling
 		The DateTimeKind value returned by the Kind property indicates whether the DateTime value represents the local time (DateTimeKind.Local), Coordinated Universal Time (UTC) (DateTimeKind.Utc), or an unspecified time (DateTimeKind.Unspecified).
 		
 		The DateTimeOffset structure represents a date and time value, together with an offset that indicates how much that value differs from UTC. Thus, the value always unambiguously identifies a single point in time.
+	
+
+	
+MSBuild
+	
+	.Target files: https://msdn.microsoft.com/en-us/library/ms164312.aspx
+		MSBuild includes several .targets files that contain items, properties, targets, and tasks for common scenarios. These files are automatically imported into most Visual Studio project files to simplify maintenance and readability.
+		Projects typically import one or more .targets files to define their build process. For example a Visual C# project created by Visual Studio will import Microsoft.CSharp.targets which imports Microsoft.Common.targets. The Visual C# project itself will define the items and properties specific to that project, but the standard build rules for a Visual C# project are defined in the imported .targets files.
+		
+	ItemGroup element: https://msdn.microsoft.com/en-us/library/646dk05y.aspx
+		Contains a set of user-defined Item elements. Every item used in a MSBuild project must be specified as a child of an ItemGroup element.
+		
+	PropertyGroup element: https://msdn.microsoft.com/en-us/library/t4w159bs.aspx
+		Contains a set of user-defined Property elements. Every Property element used in an MSBuild project must be a child of a PropertyGroup element.
+		
+	VS2015 uses "dotnet.exe" whereas VS2017 uses MSBuild.
+		MSBuild.exe runs on .NET Framework
+		dotnet msbuild runs on .NET Core
+		
+		If you update the dotnet cli, VS2017 won't benefit from it because it does not use it. You need to update VS2017 as well.
