@@ -3720,11 +3720,19 @@ ReflectionUtils
 FileCopyUtils	
 org.springframework.util.FileSystemUtils
 org.springframework.beans.BeanUtils
+	BeanUtils.getPropertyDescriptors(MyClass.class)
+org.springframework.util.ClassUtils
+	ClassUtils.getConstructorIfAvailable(MyClass.class)
+	ClassUtils.determineCommonAncestor(clazz1, clazz2)
+	ClassUtils.getAllInterfaces()
+SystemPropertyUtils
 org.springframework.validation.ValidationUtils
 DataSourceUtils (for JDBC), EntityManagerFactoryUtils (for JPA), SessionFactoryUtils, PersistenceManagerFactoryUtils (for JDO)
 AnnotationUtils
 StringUtils
 StreamUtils
+
+org.springframework.util.Assert
 
 
 
