@@ -3144,6 +3144,9 @@ How to map camel cased variables and lists:
 	Do not use the src/main/webapp directory if your application will be packaged as a jar. Although this directory is a common standard, 
 	it will only work with war packaging and it will be silently ignored by most build tools if you generate a jar.
 	
+	application.properties: org.springframework.boot.autoconfigure.web.ResourceProperties
+		spring.resources.static-locations=		<-- with this, no folder gets served automatically by Spring Boot, only the ones that we specify in the WebMvcConfigurerAdapter.addResourceHandlers
+	
 
 27.3 Embedded servlet container support
 	When using an embedded servlet container you can register Servlets, Filters and all the listeners from the Servlet spec (e.g. HttpSessionListener)
