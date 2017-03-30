@@ -3715,17 +3715,43 @@ RestTemplateBuilder
 MessageBuilder
 
 WebUtils
+	WebUtils.getTempDir(httpServletRequest.getServletContext())
+ServletRequestUtils
+	ServletRequestUtils.getIntParameter(request, "age", -1)
+RequestContextUtils
+	WebApplicationContext webApplicationContext = RequestContextUtils.findWebApplicationContext(request);
+	webApplicationContext.getBean(Environment.class)
+
 ReflectionUtils
 	ReflectionUtils.rethrowRuntimeException(ex) - with this we can turn a checked exception into an unchecked exception (RuntimeException)
+	ReflectionUtils.doWithFields(MyClass.class, field -> log.info(field.toString()));
+	ReflectionUtils.doWithMethods(MyClass.class, method -> log.info(method.toString()));
+ResolvableType
+	ResolvableType.forField
+	ResolvableType.forMethodParameter
+	ResolvableType.forMethodReturnType
+	ResolvableType.forInstance
+	ResolvableType.forClass
+AopUtils
+	Class<?> targetClass = AopUtils.getTargetClass(demoClass)	- gets the originally weaved class (not the class of the generated proxy)
+	AopUtils.isAopProxy(demoClass)
+	
 FileCopyUtils	
 org.springframework.util.FileSystemUtils
+
 org.springframework.beans.BeanUtils
 	BeanUtils.getPropertyDescriptors(MyClass.class)
 org.springframework.util.ClassUtils
 	ClassUtils.getConstructorIfAvailable(MyClass.class)
 	ClassUtils.determineCommonAncestor(clazz1, clazz2)
 	ClassUtils.getAllInterfaces()
+	
 SystemPropertyUtils
+	SystemPropertyUtils.resolvePlaceholders("My home dir is ${user.home}")
+org.springframework.core.env.Environment
+	System.getProperties()	- jdk
+	System.getEnv()			- jdk
+
 org.springframework.validation.ValidationUtils
 DataSourceUtils (for JDBC), EntityManagerFactoryUtils (for JPA), SessionFactoryUtils, PersistenceManagerFactoryUtils (for JDO)
 AnnotationUtils
