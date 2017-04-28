@@ -213,9 +213,9 @@ Docker:
 		docker info - prints info about the host VM: OS, OS version, RAM, CPU, containers, running containers, docker root dir, ...
 	
 		docker pull [image_name]] - to pull existing image from Docker Hub
-		docker build -t my_mongodb . - to create an image from the Dockerfile script
+		docker build -t my_mongodb . - to create an image named "my_mongodb" from the Dockerfile script located in the same folder
 			-t [name of image] - name of the iamge
-			. - the destination regarding in the linux VM?
+			. location of the Dockerfile?
 		docker run [image_name] - to create a new contaimer from the image (copies the image into a folder to the disk) 
 			- the last string segment must be the name of the image!
 			- this command can be run multiple times resulting in more instances (containers) created
