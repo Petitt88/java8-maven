@@ -1,0 +1,14 @@
+version: '2'
+services:
+    learning:
+        build:
+            context: ./learning
+            dockerfile: Dockerfile
+        image: learning-mongodb:super
+        container_name: comptest_s_python
+    sample:
+        build:
+            context: ./sample
+            dockerfile: Dockerfile
+        image: sample-vt:latest
+        container_name: comptest_l_vt
