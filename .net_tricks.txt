@@ -169,3 +169,32 @@ MSBuild
 		dotnet msbuild runs on .NET Core
 		
 		If you update the dotnet cli, VS2017 won't benefit from it because it does not use it. You need to update VS2017 as well.
+		
+dotnet cli:
+	dotnet --help
+
+	1. create a new project: dotnet new ...
+	2. dotnet restore
+	3. dotnet run --> and the app runs
+	
+	3. dotnet build --> creates the dlls in the bin\Debug\netcoreapp1.1 folder
+	
+	3. dotnet clean --> cleans the bin\Debug\netcoreapp1.1 folder
+	
+	3. dotnet publish --> packages the application that can be copied to iis or run from the cli (location is bin\Debug\netcoreapp1.1\publish)
+	4. dotnet {myApplication.dll} --> runs the packaged application (after cd-ing into the bin\Debug\netcoreapp1.1\publish folder)
+	
+Docker with Asp.Net Core
+	- download docker for windows
+	- keep using Linux containers! do not switch to Windows containers (there is a bug and the app from VS just won't start)
+	- when pressing F5 is VS:
+		- VS uses the linux container and deploys everything there
+		- builds the Dockerfile on the MobyLinuxVM.vhdx and the image gets pulled into docker (docker images will display the newly created image)
+			- the name of the image is located in the docker-compose project's "docker-compose.yml" file
+		- creates a container from the image (docker run [image_name])
+		- starts the container (docker start [container_id])
+	- when shutting down the app from VS
+		- the container keeps running
+			docker stop [container_id] - to stop the container
+			docker rm [container_id] - to remove the container
+			docker rmi [image_id] - to remove the image
