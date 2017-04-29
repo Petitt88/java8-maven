@@ -1,9 +1,8 @@
 version: '2'
 services:
-    learning:
+    mongodb:
         build:
-            context: ./learning
-            dockerfile: Dockerfile
+            context: ./mongodb
         image: learning-mongodb:super
         container_name: comptest_s_python
     sample:
