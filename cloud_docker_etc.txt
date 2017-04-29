@@ -223,12 +223,12 @@ Docker:
 			
 			- docker run --name my-mongo_1 -d my_mongodb
 				--name [container_instance_name]
-				-d - detach, do not attach to the console of the container
+				-d - detach, run the in background
 			
 			docker run -d -p 127.0.0.1:81:80 --name webserver nginx - the same as:
 			docker run -d -p 81:80 --name webserver nginx
-				-p - this binds port 80 of the container to port 81 on 127.0.0.1 of the host machine
-				The p swtich CANNOT be used in Dockerfile scripts because that would be a security issue and only local administrators can set which port gets publish on the container to which port of the host OS. To avoid long "docker run" commands, consider using docker-compose: http://stackoverflow.com/questions/32740344/how-to-publish-ports-in-docker-files
+				-p - this binds port 80 of the container to port 81 on 127.0.0.1 of the host machine. In other words it publishes a oontainer port to a port of the host OS.
+				The -p swtich CANNOT be used in Dockerfile scripts because that would be a security issue and only local administrators can set which port gets publish on the container to which port of the host OS. To avoid long "docker run" commands, consider using docker-compose: http://stackoverflow.com/questions/32740344/how-to-publish-ports-in-docker-files
 					mywebserver:
 					  image: nginx
 					  ports:
@@ -445,7 +445,8 @@ Docker Compose
 		docker-compose stop - stop services
 		docker-compose create - create services
 		docker-compose rm - remove stopped containers
-		docker-compose ps - list containers
+		docker-compose ps - list running containers
+			docker-compose ps --all - list all containers
 		docker-compose port - print the public port for a port binding
 			
 		docker-compose scale - sets the number of containers to run for a service. Numbers are specified as arguments in the form service=num.
@@ -472,6 +473,7 @@ Docker Compose
 				In this case the "build" command is not specified.
 		ports - publishes ports on the container to the host OS so it can be reached from the host
 				Either specify both ports (HOST:CONTAINER), or just the container port (a random host port will be chosen).
+				docker ps - will display the running containers alongs with the port mappings
 		volumes - Mount host paths or named volumes. Named volumes must be defined in the top-level volumes key.
 				  If we make modifications into the mounted on the host OS, then we see changes immediately without having to rebuild the image.
 		
