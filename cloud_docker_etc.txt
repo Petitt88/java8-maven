@@ -207,7 +207,7 @@ Docker:
 																(docker stop, docker start)
 					(docker pull) --> download ready-to-use image from Docker Hub
 
-	Daily cmd commands:
+	Daily cmd commands (cli):
 		docker --help
 		docker version
 		docker info - prints info about the host VM: OS, OS version, RAM, CPU, containers, running containers, docker root dir, ...
@@ -332,6 +332,36 @@ Docker:
 			The WORKDIR directive is used to set where the command defined with CMD is to be executed.
 			# Usage: WORKDIR /path
 			WORKDIR ~/
+			
+		Prefer ENTRYPOINT to CMD when building executable Docker image and you need a command always to be executed. Additionally use CMD if you need to provide extra default arguments that could be overwritten from command line when docker container runs.
+		
+			- RUN executes command(s) in a new layer and creates a new image. E.g., it is often used for installing software packages.
+			- CMD sets default command and/or parameters, which can be overwritten from command line when docker container runs.
+			- ENTRYPOINT configures a container that will run as an executable.
+			
+		Shell and Exec forms
+			All three instructions (RUN, CMD and ENTRYPOINT) can be specified in shell form or exec form.
+			
+			Shell form: <instruction> <command>
+				RUN apt-get install python3  
+				CMD echo "Hello world"  
+				ENTRYPOINT echo "Hello world"  
+				
+				When instruction is executed in shell form it calls /bin/sh -c <command> under the hood and normal shell processing happens. For example, the following snippet in Dockerfile
+					ENV name John Dow  
+					ENTRYPOINT echo "Hello, $name"  
+				when container runs as docker run -it <image> will produce output: Hello, John Dow  
+				
+			Exec form: <instruction> ["executable", "param1", "param2", ...], this is the preferred form for CMD and ENTRYPOINT instructions.
+				RUN ["apt-get", "install", "python3"]  
+				CMD ["/bin/echo", "Hello world"]  
+				ENTRYPOINT ["/bin/echo", "Hello world"]
+				
+				When instruction is executed in exec form it calls executable directly, and shell processing does not happen. For example, the following snippet in Dockerfile
+					ENV name John Dow  
+					ENTRYPOINT ["/bin/echo", "Hello, $name"]  
+				when container runs as docker run -it <image> will produce output: Hello, $name  
+				
 		
 		
 	Docker project (open-sourced by dotCloud in March '13) consists of several main parts (applications) and elements (used by these parts) which are all [mostly] built on top of already existing functionality, libraries and frameworks offered by the Linux kernel and third-parties (e.g. LXC, device-mapper, aufs etc.).
@@ -349,7 +379,7 @@ Docker:
 	Each container is layered like an onion and each action taken within a container consists of putting another block (which actually translates to a simple change within the file system) on top of the previous one. And various tools and configurations make this set-up work in a harmonious way altogether (e.g. union file-system).
 
 	Docker containers:
-		Docker containers are basically directories which can be packed (e.g. tar-archived) like any other, then shared and run across various different machines and platforms (hosts). The only dependency is having the hosts tuned to run the containers (i.e. have docker installed). Containment here is obtained via Linux Containers (LXC).
+		Docker containers are basically directories which can be packed (e.g. tar-archived) like any other, then shared and run across various different machines and platforms (hosts). The only dependency is having the hosts tuned to run the containers (i.e. have docker installed). Containment here is obtained via Linux Containers (LXC). Containers are isolated.
 		
 		Docker containers have several main features.
 			They allow:
@@ -398,16 +428,30 @@ Docker Compose
 		2. Define the services that make up your app in docker-compose.yml so they can be run together in an isolated environment.
 		3. Lastly, run docker-compose up and Compose will start and run your entire app.
 		
-	Daily commands:
+	Daily commands (cli):
 		docker-compose --help
 		docker-compose version
-		docker-compose up - to start the images either from Docker Hub or build them from Dockerfile then start
+		docker-compose up - to start the images either from Docker Hub or build them from Dockerfile then start (Create and start containers)
 			docker-compose up -d <-- to detach the terminal and run the services in the background
-		docker-compose ps - to see what is curerntly running	
-		docker-compose down - to stop then even remove the containers (brings down everything)
+		docker-compose down - to stop then even remove the containers (brings down everything) (Stop and remove containers, networks, images, and volumes)
 			docker-compose down --volumes - to remove the volumes as well
 		docker-compose run - allows you to run one-off commands for your services
 			For example, to see what environment variables are available to the "web" service: docker-compose run web env
+			
+		docker-compose build - build or rebuild services
+		docker-compose bundle - generate a Docker bundle from the Compose file
+		docker-compose images - list images
+		docker-compose start - start services
+		docker-compose stop - stop services
+		docker-compose create - create services
+		docker-compose rm - remove stopped containers
+		docker-compose ps - list containers
+		docker-compose port - print the public port for a port binding
+			
+		docker-compose scale - sets the number of containers to run for a service. Numbers are specified as arguments in the form service=num.
+			docker-compose scale web=2 worker=3 - will result in 2 running instaces (containers) of the "web" and  3 instances (containers) of the "worker" services. Note: another instace of the same container won't start if using port sharing because the ports would collide on the host OS (multiple containers will try to bind to the same port on the host).
+		docker-compose exec [options] SERVICE COMMAND [ARGS...] - This is equivalent of docker exec. With this subcommand you can run arbitrary commands in your services. 
+																  Commands are by default allocating a TTY, so you can do 	e.g. docker-compose exec web sh to get an interactive prompt.
 			
 	docker-compose related commands (to be used in docker-compose.yml files)
 		build: . - use the current folder and look for "Dockerfile"
@@ -455,3 +499,19 @@ Docker Compose
 			2. Refresh the app in your browser. The greeting should be updated, and the counter should still be incrementing.
 			
 		As with docker run, options specified in the Dockerfile (e.g., CMD, EXPOSE, VOLUME, ENV) are respected by default - you don’t need to specify them again in docker-compose.yml.
+		
+		
+docker vs docker-compose
+	The docker cli is used when managing individual containers on a docker engine. It is the client command line to access the docker daemon api.
+
+	The docker-compose cli can be used to manage a multi-container application. It also moves many of the options you would enter on the docker run cli into the docker-compose.yml file for easier reuse. It works as a front end "script" on top of the same docker api used by docker, so you can do everything docker-compose does with docker commands and a lot of shell scripting. See this documentation on docker-compose for more details.
+	
+	Update for Swarm Mode
+
+		Since this answer was posted, docker has added a second use of docker-compose.yml files. Starting with the version 3 yml format and docker 1.13, you can use the yml with docker-compose and also to define a stack in docker's swarm mode. To do the latter you need to use docker stack deploy -c docker-compose.yml $stack_name instead of docker-compose up and then manage the stack with docker commands instead of docker-compose commands. The mapping is a one for one between the two uses:
+
+		- Compose Project -> Swarm Stack: A group of services for a specific purpose
+		- Compose Service -> Swarm Service: One image and it's configuration, possibly scaled up.
+		- Compose Container -> Swarm Task: A single container in a service
+
+	
