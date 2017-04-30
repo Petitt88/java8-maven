@@ -200,6 +200,8 @@ Cloud Foundry vs Docker:
 	There are various projects out there intended to make Cloud Foundry more accessible and easier to set up, while still giving you many of the benefits of a PaaS. Some of these projects also aim to allow you to combine using docker and the benefits of docker while also getting a lot of the PaaS benefits you get from Cloud Foundry.
 	
 	
+Containers:
+	Many view containers as virtual machines. They’re not. Well kind of not. A container is a virtual walled environment for your application. It’s literally a ‘container’ inside the host OS. Thus your application works like it is in it’s own self contained environment, but it’s actually sharing operating system resources of the host computer.  Because of this, containers are more resource efficient than full blown virtual machines. 
 	
 Docker:
 
@@ -215,7 +217,8 @@ Docker:
 		docker pull [image_name]] - to pull existing image from Docker Hub
 		docker build -t my_mongodb . - to create an image named "my_mongodb" from the Dockerfile script located in the same folder
 			-t [name of image] - name of the iamge
-			. location of the Dockerfile?
+			. - acting as a build-directory argument
+			--file - name of the Dockerfile (Default is 'PATH/Dockerfile')
 		docker run [image_name] - to create a new contaimer from the image (copies the image into a folder to the disk) 
 			- the last string segment must be the name of the image!
 			- this command can be run multiple times resulting in more instances (containers) created
@@ -239,6 +242,10 @@ Docker:
 				
 			docker run --expose 80 --name webserver nginx
 				--expopse - this exposes port 80 of the container without publishing the port to the host system’s interfaces.
+				
+			docker run --name=config-server --publish=8888:8888 \
+				--volume=spring-cloud-config-repo:/var/lib/spring-cloud/config-repo \
+     config-server:latest
 		docker start [container_id] - starts the container
 	
 		docker stop [container_id] - to stop the container
@@ -257,6 +264,11 @@ Docker:
 		docker ps - list running containers
 		docker ps -- all - list all containers
 		
+		docker exec - run a command in a running container
+			docker exec -it [container-id] bash - to be able 
+				-i - keep STDIN open even if not attached
+				-t - allocate a pseudo-TTY
+		
 	Container, images location:
 		- if using linux containers, the location is the MobyLinuxVM.vhdx that is automatically started using Hyper-V
 			/var/lib/docker
@@ -265,79 +277,120 @@ Docker:
 			"windowsfilter" folder contains the real container filesystem (pick one based on the identifier --> "Files" and there you see the installed filesystem (windows OS is shared with the host and linux is not supported), the libraries (php, inetpub iis) and your application
 			
 	Docker related commands (to be used in Dockerfile scripts)
-		ADD
-			The ADD command gets two arguments: a source and a destination. It basically copies the files from the source on the host into the container's own filesystem at the set destination. If, however, the source is a URL (e.g. http://github.com/user/file/), then the contents of the URL are downloaded and placed at the destination.
-			# Usage: ADD [source directory or URL] [destination directory]
-			ADD /my_app_folder /my_app_folder
+		ADD 
+			ADD <src>... <dest> 
+			or ADD ["<src>",... "<dest>"] (this form is required for paths containing whitespace)
+			
+			The ADD instruction copies new files, directories or remote file URLs from <src> and adds them to the filesystem of the image at the path <dest>.
+			The <dest> is an absolute path, or a path relative to WORKDIR, into which the source will be copied inside the destination container.
+			
+			ADD test relativeDir/          # adds "test" to `WORKDIR`/relativeDir/
+			ADD test /absoluteDir/         # adds "test" to /absoluteDir/
 			
 		CMD
-			The command CMD, similarly to RUN, can be used for executing a specific command. However, unlike RUN it is not executed during build, but when a container is instantiated using the image being built. Therefore, it should be considered as an initial, default command that gets executed (i.e. run) with the creation of containers based on the image.
-
-			To clarify: an example for CMD would be running an application upon creation of a container which is already installed using RUN (e.g. RUN apt-get install …) inside the image. This default application execution command that is set with CMD becomes the default and replaces any command which is passed during the creation.
-			# Usage 1: CMD application "argument", "argument", ..
-			CMD "echo" "Hello docker!"
+			CMD ["executable","param1","param2"] (exec form, this is the preferred form)
+			CMD ["param1","param2"] (as default parameters to ENTRYPOINT)
+			CMD command param1 param2 (shell form)
+			
+			There can only be one CMD instruction in a Dockerfile. If you list more than one CMD then only the last CMD will take effect.
+			The main purpose of a CMD is to provide defaults for an executing container. These defaults can include an executable, or they can omit the executable, in which case you must specify an ENTRYPOINT instruction as well.
+			
+			When used in the shell or exec formats, the CMD instruction sets the command to be executed when running the image.
+			If you use the shell form of the CMD, then the <command> will execute in /bin/sh -c
+			
+		COPY
+			COPY <src>... <dest>
+			COPY ["<src>",... "<dest>"] (this form is required for paths containing whitespace)
+			
+			The COPY instruction copies new files or directories from <src> and adds them to the filesystem of the container at the path <dest>.
+			
+		ENV
+			ENV <key> <value>
+			ENV <key>=<value> ...
+			
+			The ENV instruction sets the environment variable <key> to the value <value>. This value will be in the environment of all “descendant” Dockerfile commands and can be replaced inline in many as well.
+			The ENV instruction has two forms. The first form, ENV <key> <value>, will set a single variable to a value. The entire string after the first space will be treated as the <value> - including characters such as spaces and quotes.
+			The second form, ENV <key>=<value> ..., allows for multiple variables to be set at one time. 
+			
+			ENV myName="John Doe" myDog=Rex\ The\ Dog \
+				myCat=fluffy
+			ENV myName John Doe
+			ENV myDog Rex The Dog
+			ENV myCat fluffy
 			
 		ENTRYPOINT
-			ENTRYPOINT argument sets the concrete default application that is used every time a container is created using the image. For example, if you have installed a specific application inside an image and you will use this image to only run that application, you can state it with ENTRYPOINT and whenever a container is created from that image, your application will be the target.
-
-			If you couple ENTRYPOINT with CMD, you can remove "application" from CMD and just leave "arguments" which will be passed to the ENTRYPOINT.
-			# Usage: ENTRYPOINT application "argument", "argument", ..
-			# Remember: arguments are optional. They can be provided by CMD
-			#           or during the creation of a container. 
-			ENTRYPOINT echo
-
-			# Usage example with CMD:
-			# Arguments set with CMD can be overridden during *run*
-			CMD "Hello docker!"
-			ENTRYPOINT echo  
-		
-		ENV
-			The ENV command is used to set the environment variables (one or more). These variables consist of “key = value” pairs which can be accessed within the container by scripts and applications alike. This functionality of docker offers an enormous amount of flexibility for running programs.
-			# Usage: ENV key value
-			ENV SERVER_WORKS 4
+			ENTRYPOINT ["executable", "param1", "param2"] (exec form, preferred)
+			ENTRYPOINT command param1 param2 (shell form)
+			An ENTRYPOINT allows you to configure a container that will run as an executable.
 			
 		EXPOSE
-			The EXPOSE command is used to associate a specified port to enable networking between the running process inside the container and the outside world (i.e. the host).
-			# Usage: EXPOSE [port]
-			EXPOSE 8080
+			EXPOSE <port> [<port>...]
+			
+			The EXPOSE instruction informs Docker that the container listens on the specified network ports at runtime. EXPOSE does not make the ports of the container accessible to the host. To do that, you must use either the -p flag to publish a range of ports or the -P flag to publish all of the exposed ports. You can expose one port number and publish it externally under another number.
+			
+			This is used for communication between containers, but not with the host OS.
 			
 		FROM
-			FROM directive is probably the most crucial amongst all others for Dockerfiles. It defines the base image to use to start the build process. It can be any image, including the ones you have created previously. If a FROM image is not found on the host, docker will try to find it (and download) from the docker image index. It needs to be the first command declared inside a Dockerfile.
-			# Usage: FROM [image name]
-			FROM ubuntu
+			FROM <image>
+			FROM <image>:<tag>
+			FROM <image>@<digest>
 			
-		MAINTAINER
-			One of the commands that can be set anywhere in the file - although it would be better if it was declared on top - is MAINTAINER. This non-executing command declares the author, hence setting the author field of the images. It should come nonetheless after FROM.
-			# Usage: MAINTAINER [name]
-			MAINTAINER authors_name
+			The FROM instruction sets the Base Image for subsequent instructions. As such, a valid Dockerfile must have FROM as its first instruction. The image can be any valid image – it is especially easy to start by pulling an image from the Public Repositories.
+			
+		LABEL
+			LABEL <key>=<value> <key>=<value> <key>=<value> ...
+			The LABEL instruction adds metadata to an image.
+			
+		MAINTAINER (deprecated)
+			MAINTAINER <name>
+			
+			The MAINTAINER instruction sets the Author field of the generated images. The LABEL instruction is a much more flexible version of this and you should use it instead.
+			
+			LABEL maintainer "SvenDowideit@home.org.au"
 			
 		RUN
-			The RUN command is the central executing directive for Dockerfiles. It takes a command as its argument and runs it to form the image. Unlike CMD, it actually is used to build the image (forming another layer on top of the previous one which is committed).
-			# Usage: RUN [command]
-			RUN aptitude install -y riak
-
-		USER
-			The USER directive is used to set the UID (or username) which is to run the container based on the image being built.
-			# Usage: USER [UID]
-			USER 751
-
-		VOLUME
-			The VOLUME command is used to enable access from your container to a directory on the host machine (i.e. mounting it).
-			# Usage: VOLUME ["/dir_1", "/dir_2" ..]
-			VOLUME ["/my_files"]
+			RUN <command> (shell form, the command is run in a shell, which by default is /bin/sh -c on Linux or cmd /S /C on Windows)
+			RUN ["executable", "param1", "param2"] (exec form)
 			
-			docker run -d --name web -v /src/webapp:/webapp	# mount the host's /src/webapp folder to the container's /webapp folder. When the files change on the host they are automatically refresh in the container as well without the need to build a new image and start it. Later we can "docker commit" the modified container to a new/existing image
-
+			The RUN instruction will execute any commands in a new layer on top of the current image and commit the results. The resulting committed image will be used for the next step in the Dockerfile.
+			Layering RUN instructions and generating commits conforms to the core concepts of Docker where commits are cheap and containers can be created from any point in an image’s history, much like source control.
+			The exec form makes it possible to avoid shell string munging, and to RUN commands using a base image that does not contain the specified shell executable.
+			
+		USER
+			USER daemon
+			The USER instruction sets the user name or UID to use when running the image and for any RUN, CMD and ENTRYPOINT instructions that follow it in the Dockerfile.
+			
+		VOLUME
+			VOLUME ["/data"] - mounts the host's /var/lib/docker folder to the container's /data folder
+			The VOLUME instruction creates a mount point with the specified name and marks it as holding externally mounted volumes from native host or other containers. The value can be a JSON array, VOLUME ["/var/log/"], or a plain string with multiple arguments, such as VOLUME /var/log or VOLUME /var/log /var/db.
+			
 		WORKDIR
-			The WORKDIR directive is used to set where the command defined with CMD is to be executed.
-			# Usage: WORKDIR /path
-			WORKDIR ~/
+			WORKDIR /path/to/workdir
+			The WORKDIR instruction sets the working directory for any RUN, CMD, ENTRYPOINT, COPY and ADD instructions that follow it in the Dockerfile. If the WORKDIR doesn’t exist, it will be created even if it’s not used in any subsequent Dockerfile instruction.
+
+			It can be used multiple times in the one Dockerfile. If a relative path is provided, it will be relative to the path of the previous WORKDIR instruction. For example:
+				WORKDIR /a
+				WORKDIR b
+				WORKDIR c
+				RUN pwd
+				The output of the final pwd command in this Dockerfile would be /a/b/c.
+	
 			
 		Prefer ENTRYPOINT to CMD when building executable Docker image and you need a command always to be executed. Additionally use CMD if you need to provide extra default arguments that could be overwritten from command line when docker container runs.
 		
 			- RUN executes command(s) in a new layer and creates a new image. E.g., it is often used for installing software packages.
 			- CMD sets default command and/or parameters, which can be overwritten from command line when docker container runs.
 			- ENTRYPOINT configures a container that will run as an executable.
+			
+		EXPOSE vs -p (port)
+			Basically, you have three options:
+				- Neither specify EXPOSE nor -p.
+				- Only specify EXPOSE.
+				- Specify EXPOSE and -p.
+				
+			If you do not specify any of those, the service in the container will not be accessible from anywhere except from inside the container itself.
+			If you EXPOSE a port, the service in the container is not accessible from outside Docker, but from inside other Docker containers. So this is good for inter-container communication.
+			If you EXPOSE and -p a port, the service in the container is accessible from anywhere, even outside Docker.
 			
 		Shell and Exec forms
 			All three instructions (RUN, CMD and ENTRYPOINT) can be specified in shell form or exec form.
@@ -350,7 +403,7 @@ Docker:
 				When instruction is executed in shell form it calls /bin/sh -c <command> under the hood and normal shell processing happens. For example, the following snippet in Dockerfile
 					ENV name John Dow  
 					ENTRYPOINT echo "Hello, $name"  
-				when container runs as docker run -it <image> will produce output: Hello, John Dow  
+				when container runs as "docker run -it <image>" will produce output: Hello, John Dow  
 				
 			Exec form: <instruction> ["executable", "param1", "param2", ...], this is the preferred form for CMD and ENTRYPOINT instructions.
 				RUN ["apt-get", "install", "python3"]  
@@ -360,7 +413,7 @@ Docker:
 				When instruction is executed in exec form it calls executable directly, and shell processing does not happen. For example, the following snippet in Dockerfile
 					ENV name John Dow  
 					ENTRYPOINT ["/bin/echo", "Hello, $name"]  
-				when container runs as docker run -it <image> will produce output: Hello, $name  
+				when container runs as "docker run -it <image>" will produce output: Hello, $name  
 				
 		
 		
@@ -455,6 +508,8 @@ Docker Compose
 																  Commands are by default allocating a TTY, so you can do 	e.g. docker-compose exec web sh to get an interactive prompt.
 			
 	docker-compose related commands (to be used in docker-compose.yml files)
+		config - check our build-file for syntax-errors
+	
 		build: . - use the current folder and look for "Dockerfile"
 		
 		build:
@@ -469,13 +524,85 @@ Docker Compose
 			without specifying the container_name the default name of the contaimer is going to be {image_name}_1
 		
 		expose - expose ports without publishing them to the host machine - they’ll only be accessible to linked services. Only the internal port can be specified.
+		
 		image - Specify the image to start the container from. Can either be a repository/tag or a partial image ID.
 				In this case the "build" command is not specified.
+				
 		ports - publishes ports on the container to the host OS so it can be reached from the host
 				Either specify both ports (HOST:CONTAINER), or just the container port (a random host port will be chosen).
 				docker ps - will display the running containers alongs with the port mappings
+				
 		volumes - Mount host paths or named volumes. Named volumes must be defined in the top-level volumes key.
 				  If we make modifications into the mounted on the host OS, then we see changes immediately without having to rebuild the image.
+				  
+		depends_on 
+			express dependency between services, which has two effects:
+				docker-compose up will start services in dependency order. In the following example, db and redis will be started before web.
+				docker-compose up SERVICE will automatically include SERVICE’s dependencies. In the following example, docker-compose up web will also create and start db and redis.
+								
+				version: '3'
+				services:
+				  web:
+					build: .
+					depends_on:
+					  - db
+					  - redis
+				  redis:
+					image: redis
+				  db:
+					image: postgres
+					
+		networks - this is the identifier of the named networks to use. A given name-value must be listed in the networks section
+		links
+			ink to containers in another service. Either specify both the service name and a link alias (SERVICE:ALIAS), or just the service name.
+			
+			This will create an internal network link between this service and the listed service. This service will be able to connect to the listed service, whereby the part before the colon specifies a service-name from the services section and the part after the colon specifies the hostname at which the service is listening on an exposed port
+			
+			version: '2'
+			services:
+				config-server:
+					container_name: config-server
+					build:
+						context: .
+						dockerfile: Dockerfile.server
+					image: config-server:latest
+					expose:
+						- 8888
+					networks:
+						- spring-cloud-network
+					volumes:
+						- spring-cloud-config-repo:/var/lib/spring-cloud/config-repo
+					logging:
+						driver: json-file
+				config-client:
+					container_name: config-client
+					build:
+						context: .
+						dockerfile: Dockerfile.client
+					image: config-client:latest
+					entrypoint: /opt/spring-cloud/bin/config-client-entrypoint.sh
+					environment:
+						SPRING_APPLICATION_JSON: \
+						  '{"spring": {"cloud":  \
+						  {"config": {"uri": "http://config-server:8888"}}}}'
+					expose:
+						- 8080
+					ports:
+						- 8080:8080
+					networks:
+						- spring-cloud-network
+					links:
+						- config-server:config-server
+					depends_on:
+						- config-server
+					logging:
+						driver: json-file
+			networks:
+				spring-cloud-network:
+					driver: bridge
+			volumes:
+				spring-cloud-config-repo:
+					external: true
 		
 		
 	Example:
