@@ -1,5 +1,9 @@
 version: '2'
 services:
+  ssh:
+    image: danielguerra/alpine-sshd
+    ports:
+     - "5022:22"
   web:
     build: .
     ports:
