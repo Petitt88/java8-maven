@@ -429,6 +429,16 @@ Docker:
 		2. docker images: snapshots of containers or base OS (e.g. Ubuntu) images
 		3. Dockerfiles: scripts automating the building process of images
 		
+	- An image is a lightweight, stand-alone, executable package that includes everything needed to run a piece of software, including the code, a runtime, libraries, environment variables, and config files.
+
+	- A container is a runtime instance of an image – what the image becomes in memory when actually executed. It runs completely isolated from the host environment by default, only accessing host files and ports if configured to do so.
+
+	- Containers run apps natively on the host machine’s kernel. They have better performance characteristics than virtual machines that only get virtual access to host resources through a hypervisor. Containers can get native access, each one running in a discrete process, taking no more memory than any other executable.
+	
+	- Virtual machines run guest operating systems – note the OS layer in each box. This is resource intensive, and the resulting disk image and application state is an entanglement of OS settings, system-installed dependencies, OS security patches, and other easy-to-lose, hard-to-replicate ephemera.
+	
+	- Containers can share a single kernel, and the only information that needs to be in a container image is the executable and its package dependencies, which never need to be installed on the host system. These processes run like native processes, and you can manage them individually by running commands like docker ps – just like you would run ps on Linux to see active processes. Finally, because they contain all their dependencies, there is no configuration entanglement; a containerized app “runs anywhere.”
+		
 	Each container is layered like an onion and each action taken within a container consists of putting another block (which actually translates to a simple change within the file system) on top of the previous one. And various tools and configurations make this set-up work in a harmonious way altogether (e.g. union file-system).
 
 	Docker containers:
@@ -554,7 +564,7 @@ Docker Compose
 					
 		networks - this is the identifier of the named networks to use. A given name-value must be listed in the networks section
 		links
-			ink to containers in another service. Either specify both the service name and a link alias (SERVICE:ALIAS), or just the service name.
+			link to containers in another service. Either specify both the service name and a link alias (SERVICE:ALIAS), or just the service name.
 			
 			This will create an internal network link between this service and the listed service. This service will be able to connect to the listed service, whereby the part before the colon specifies a service-name from the services section and the part after the colon specifies the hostname at which the service is listening on an exposed port
 			
@@ -629,6 +639,44 @@ Docker Compose
 			
 		As with docker run, options specified in the Dockerfile (e.g., CMD, EXPOSE, VOLUME, ENV) are respected by default - you don’t need to specify them again in docker-compose.yml.
 		
+	Example 2:
+		It’s time to begin building an app the Docker way. We’ll start at the bottom of the hierarchy of such an app, which is a container, which we cover on this page. Above this level is a service, which defines how containers behave in production, covered in Part 3. Finally, at the top level is the stack, defining the interactions of all the services, covered in Part 5.
+			- Stack
+			- Services
+			- Container (you are here)
+			
+		Dockerfile will define what goes on in the environment inside your container. Access to resources like networking interfaces and disk drives is virtualized inside this environment, which is isolated from the rest of your system, so you have to map ports to the outside world, and be specific about what files you want to “copy in” to that environment. However, after doing that, you can expect that the build of your app defined in this Dockerfile will behave exactly the same wherever it runs.
+		
+		A service really just means, “containers in production.” A service only runs one image, but it codifies the way that image runs – what ports it should use, how many replicas of the container should run so the service has the capacity it needs, and so on. Scaling a service changes the number of container instances running that piece of software, assigning more computing resources to the service in the process.
+		
+		A docker-compose.yml file is a YAML file that defines how Docker containers should behave in production.
+		The example above is meant to be used in production (contains the deploy settings) so that use it with "docker stack deploy" instead of "docker-compo". 
+		Note: the latter does not know about the "deploy" settings: defining the running instances, maximum used computer resources, etc.
+			version: "3"
+			services:
+			  web:
+				image: username/repository:tag
+				deploy:
+				  replicas: 5
+				  resources:
+					limits:
+					  cpus: "0.1"
+					  memory: 50M
+				  restart_policy:
+					condition: on-failure
+				ports:
+				  - "80:80"
+				networks:
+				  - webnet
+			networks:
+			  webnet:
+				
+			- Run five instances of the image we uploaded in step 2 as a service called web, limiting each one to use, at most, 10% of the CPU (across all cores), and 50MB of RAM.
+			- Immediately restart containers if one fails.
+			- Map port 80 on the host to web’s port 80.
+			- Instruct web’s containers to share port 80 via a load-balanced network called webnet. (Internally, the containers themselves will publish to web’s port 80 at an ephemeral port.)
+			- Define the webnet network with the default settings (which is a load-balanced overlay network).
+
 		
 docker vs docker-compose
 	The docker cli is used when managing individual containers on a docker engine. It is the client command line to access the docker daemon api.
@@ -637,10 +685,79 @@ docker vs docker-compose
 	
 	Update for Swarm Mode
 
-		Since this answer was posted, docker has added a second use of docker-compose.yml files. Starting with the version 3 yml format and docker 1.13, you can use the yml with docker-compose and also to define a stack in docker's swarm mode. To do the latter you need to use docker stack deploy -c docker-compose.yml $stack_name instead of docker-compose up and then manage the stack with docker commands instead of docker-compose commands. The mapping is a one for one between the two uses:
+		Since this answer was posted, docker has added a second use of docker-compose.yml files. Starting with the version 3 yml format and docker 1.13, you can use the yml with docker-compose and also define a stack in docker's swarm mode. To do the latter you need to use docker stack deploy -c docker-compose.yml $stack_name instead of docker-compose up and then manage the stack with docker commands instead of docker-compose commands. The mapping is a one for one between the two uses:
 
 		- Compose Project -> Swarm Stack: A group of services for a specific purpose
 		- Compose Service -> Swarm Service: One image and it's configuration, possibly scaled up.
 		- Compose Container -> Swarm Task: A single container in a service
+		
+		docker swarm init - to enable swarm mode and make your current machine a swarm manager
+		docker stack deploy -c docker-compose.deploy.yml getstartedlab - run the app with the name "getstartedlab"
+		docker stack ps getstartedlab - list the running containers
+			You can scale the app by changing the replicas value in docker-compose.yml, saving the change, and re-running the docker stack deploy command:	docker stack deploy -c docker-compose.deploy.yml getstartedlab
+		docker stack rm getstartedlab - take down the app
+		docker swarm leave - to leave the swarm as a worker
+		docker swarm leave --force - to leave the swarm as a manager (manager creates the swarm)
+		
+Swarm: is a cluster of machines running Docker, and deployed an application to it, with containers running in concert on multiple machines.
+Stack: is a group of interrelated services that share dependencies, and can be orchestrated and scaled together.
 
+	Commands:
+		docker swarm init - to enable swarm mode and make your current machine a swarm manager
+		docker swarm join - on other machines to have them join the swarm as a worker
+		
+	docker-machine - create a couple of virtual machines using our node management tool
+	docker-machine create -d hyperv --hyperv-virtual-switch "myswitch" myvm1
+	docker-machine ssh - you can send commands to your VMs
+
+	A swarm is a group of machines that are running Docker and have been joined into a cluster. After that has happened, you continue to run the Docker commands you’re used to, but now they are executed on a cluster by a swarm manager. The machines in a swarm can be physical or virtual. After joining a swarm, they are referred to as nodes.
 	
+	Up until now you have been using Docker in a single-host mode on your local machine. But Docker also can be switched into swarm mode, and that’s what enables the use of swarms. Enabling swarm mode instantly makes the current machine a swarm manager. From then on, Docker will run the commands you execute on the swarm you’re managing, rather than just on the current machine.
+	
+	A swarm is made up of multiple nodes, which can be either physical or virtual machines. The basic concept is simple enough: run docker swarm init to enable swarm mode and make your current machine a swarm manager, then run docker swarm join on other machines to have them join the swarm as a worker. 
+	
+	
+	In part 4, you learned how to set up a swarm, which is a cluster of machines running Docker, and deployed an application to it, with containers running in concert on multiple machines.
+
+	Here in part 5, you’ll reach the top of the hierarchy of distributed applications: the stack. A stack is a group of interrelated services that share dependencies, and can be orchestrated and scaled together. A single stack is capable of defining and coordinating the functionality of an entire application (though very complex applications may want to use multiple stacks).
+
+	Some good news is, you have technically been working with stacks since part 3, when you created a Compose file and used "docker stack deploy". But that was a single service stack running on a single host, which is not usually what takes place in production. Here, you’re going to take what you’ve learned and make multiple services relate to each other, and run them on multiple machines.
+
+Terminologies:
+	
+	docker images: 
+		Snapshots of containers or base OS (e.g. Ubuntu) images. An image is a lightweight, stand-alone, executable package that includes everything needed to run a piece of software, including the code, a runtime, libraries, environment variables, and config files.
+		
+	docker containers: 
+		Directories containing everything-your-application. A container is a runtime instance of an image – what the image becomes in memory when actually executed. Containers run apps natively on the host machine’s kernel. It runs completely isolated from the host environment by default, only accessing host files and ports if configured to do so. EXPOSE is used to expose ports to other containers, and "-p" flag or docker-compose.yaml's "port" is used to publish ports to the host OS.
+		
+	Dockerfiles:
+		Scripts automating the building process of images.
+		
+	Service: 
+		defines how a container behaves in production. A service really just means, “containers in production.” A service only runs one image, but it codifies the way that image runs – what ports it should use, what volumes (map to host OS's foler(s)), how many replicas of the container should run so the service has the capacity it needs, and so on. Scaling a service changes the number of container instances running that piece of software, assigning more computing resources to the service in the process.
+	
+	Stack: 
+		is a group of interrelated services that share dependencies, and can be orchestrated and scaled together.
+	
+	Swarm: 
+		is a cluster of machines running Docker, and deployed an application to it, with containers running in concert on multiple machines.
+		
+Usages:
+	To use it with docker:
+		docker run -p 5000:80 -d --name web_1 webpythonredis_web
+		docker stop web_1
+		docker start web_1
+		docker rm web_1
+	
+	To use it with docker-compose:
+		docker-compose up
+		docker-compose down
+		docker-compose scale redis=4
+
+	To use it with docker in production (deploy):
+		docker swarm init - to enable swarm mode and make your current machine a swarm manager
+		docker stack deploy -c docker-compose.deploy.yml getstartedlab - run the app with the name "getstartedlab"
+		docker stack ps getstartedlab - list the running containers
+			You can scale the app by changing the replicas value in docker-compose.yml, saving the change, and re-running the docker stack deploy command:	docker stack deploy -c docker-compose.deploy.yml getstartedlab
+		docker stack rm getstartedlab - take down the app

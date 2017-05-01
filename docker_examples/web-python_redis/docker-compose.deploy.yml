@@ -1,0 +1,24 @@
+version: "3"
+services:
+  web:
+    image: webpythonredis_web
+    deploy:
+      replicas: 5
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 50M
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "5000:80"
+    networks:
+      - webnet
+  redis:
+    image: "redis:alpine"
+    ports:
+      - "6379:6739"
+    networks:
+      - webnet
+networks:
+  webnet:
