@@ -734,6 +734,9 @@ Terminologies:
 	Dockerfiles:
 		Scripts automating the building process of images.
 		
+	Compose:
+		Compose is a tool for defining and running multi-container Docker applications. With Compose, you use a Compose file (docker-compose.yml) to configure your application’s services. Then, using a single command, you create and start all the services from your configuration.
+		
 	Service: 
 		defines how a container behaves in production. A service really just means, “containers in production.” A service only runs one image, but it codifies the way that image runs – what ports it should use, what volumes (map to host OS's foler(s)), how many replicas of the container should run so the service has the capacity it needs, and so on. Scaling a service changes the number of container instances running that piece of software, assigning more computing resources to the service in the process.
 	
