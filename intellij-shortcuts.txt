@@ -65,6 +65,8 @@ Alt + Shift + S: open context menu (here we can analyze the current file - inspe
 Ctrl + Alt + R: refactor rename
 Alt + Ins: generate
 
+Ctrl + /: toggle comment
+Ctrl + Alt + T: surround with...
 Ctrl + -: fold
 Ctrl + "+": unfold
 Ctrl + Shift + -: fold everything in file
