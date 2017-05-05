@@ -55,7 +55,11 @@ good to know:
 		- instead we could install just 2 nuget packages and the Oracle providers will get packaged with out application:
 			1. Oracle.ManagedDataAccess							- if only ADO.NET is needed, then this is enought
 			2. Oracle.ManagedDataAccess.EntityFramework			- if we want to use Oracle with EntityFramework we will need this one as well
-		
+	5. If the target framework of some projects inside a solution differs the entry project's target version wins at runtime.
+	6. This situation is the same with App.config/Web.config files: the settings defined in the entry project wins.
+		So for example the <connectionStrings>, <system.serviceModel>, etc. all comes from the entry project at runtime.
+		The designer however uses the settings defined in the corresponding project.
+	
 		
 applicationhost.config:
 
@@ -198,3 +202,36 @@ Docker with Asp.Net Core
 			docker stop [container_id] - to stop the container
 			docker rm [container_id] - to remove the container
 			docker rmi [image_id] - to remove the image
+			
+			
+launchsettings.json:
+
+	{
+	  "iisSettings": {
+		"windowsAuthentication": false,
+		"anonymousAuthentication": true,
+		"iisExpress": {
+		  "applicationUrl": "http://localhost:54435/",
+		  "sslPort": 0
+		}
+	  },
+	  "profiles": {
+		"IIS Express": {
+		  "commandName": "IISExpress",
+		  "launchBrowser": true,
+		  "environmentVariables": {
+			"ASPNETCORE_ENVIRONMENT": "Development"
+		  }
+		},
+		"WebAppDocker": {
+		  "commandName": "Project",
+		  "launchBrowser": true,
+		  "environmentVariables": {
+			"ASPNETCORE_ENVIRONMENT": "Development"
+		  },
+		  "applicationUrl": "http://localhost:54436"
+		}
+	  }
+	}
+
+	The "WebAppDocker" profile tell VS to run the project (i.e. via dotnet.exe) instead of starting up IIS Express and deploy the app to it.
