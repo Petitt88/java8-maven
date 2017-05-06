@@ -650,8 +650,8 @@ Docker Compose
 		A service really just means, “containers in production.” A service only runs one image, but it codifies the way that image runs – what ports it should use, how many replicas of the container should run so the service has the capacity it needs, and so on. Scaling a service changes the number of container instances running that piece of software, assigning more computing resources to the service in the process.
 		
 		A docker-compose.yml file is a YAML file that defines how Docker containers should behave in production.
-		The example above is meant to be used in production (contains the deploy settings) so that use it with "docker stack deploy" instead of "docker-compo". 
-		Note: the latter does not know about the "deploy" settings: defining the running instances, maximum used computer resources, etc.
+		The example above is meant to be used in production (contains the deploy settings) so that use it with "docker stack deploy" instead of "docker-compose". 
+		Note: the latter does not know about the "deploy" settings: defining the running instances, maximum used computer resources, etc. "docker-compose" would simply just throw an error when feeding it with the below docker-compose.yml example file.
 			version: "3"
 			services:
 			  web:
