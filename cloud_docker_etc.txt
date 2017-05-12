@@ -698,9 +698,6 @@ docker vs docker-compose
 		docker stack rm getstartedlab - take down the app
 		docker swarm leave - to leave the swarm as a worker
 		docker swarm leave --force - to leave the swarm as a manager (manager creates the swarm)
-		
-Swarm: is a cluster of machines running Docker, and deployed an application to it, with containers running in concert on multiple machines.
-Stack: is a group of interrelated services that share dependencies, and can be orchestrated and scaled together.
 
 	Commands:
 		docker swarm init - to enable swarm mode and make your current machine a swarm manager
@@ -722,6 +719,57 @@ Stack: is a group of interrelated services that share dependencies, and can be o
 	Here in part 5, you’ll reach the top of the hierarchy of distributed applications: the stack. A stack is a group of interrelated services that share dependencies, and can be orchestrated and scaled together. A single stack is capable of defining and coordinating the functionality of an entire application (though very complex applications may want to use multiple stacks).
 
 	Some good news is, you have technically been working with stacks since part 3, when you created a Compose file and used "docker stack deploy". But that was a single service stack running on a single host, which is not usually what takes place in production. Here, you’re going to take what you’ve learned and make multiple services relate to each other, and run them on multiple machines.
+	
+Multi stage builds:
+	The multi-stage build allows using multiple FROM commands in the same Dockerfile. The last FROM command produces the final Docker image, all other images are intermediate images (no final Docker image is produced, but all layers are cached).
+	The FROM syntax also supports AS keyword. Use AS keyword to give the current image a logical name and reference to it later by this name.
+	To copy files from intermediate images use COPY --from=<image_AS_name|image_number>, where number starts from 0 (but better to use logical name through AS keyword).
+	
+		# ---- Base Node ----
+		FROM alpine:3.5 AS base
+		# install node
+		RUN apk add --no-cache nodejs-npm tini
+		# set working directory
+		WORKDIR /root/chat
+		# Set tini as entrypoint
+		ENTRYPOINT ["/sbin/tini", "--"]
+		# copy project file
+		COPY package.json .
+		 
+		#
+		# ---- Dependencies ----
+		FROM base AS dependencies
+		# install node packages
+		RUN npm set progress=false && npm config set depth 0
+		RUN npm install --only=production 
+		# copy production node_modules aside
+		RUN cp -R node_modules prod_node_modules
+		# install ALL node_modules, including 'devDependencies'
+		RUN npm install
+		 
+		#
+		# ---- Test ----
+		# run linters, setup and tests
+		FROM dependencies AS test
+		COPY . .
+		RUN  npm run lint && npm run setup && npm run test
+		 
+		#
+		# ---- Release ----
+		FROM base AS release
+		# copy production node_modules
+		COPY --from=dependencies /root/chat/prod_node_modules ./node_modules
+		# copy app sources
+		COPY . .
+		# expose port and define CMD
+		EXPOSE 5000
+		CMD npm run start
+		
+		- The above Dockerfile creates 3 intermediate Docker images and single release Docker image (the final FROM).
+		- First image FROM alpine:3.5 AS bas – is a base Node image with: node, npm, tini (init app) and package.json
+		- Second image FROM base AS dependencies – contains all node modules from dependencies and devDependencies with additional copy of dependencies required for final image only
+		- Third image FROM dependencies AS test – runs linters, setup and tests (with mocha); if this run command fail not final image is produced
+		- The final image FROM base AS release – is a base Node image with application code and all node modules from dependencies
 
 Terminologies:
 	
