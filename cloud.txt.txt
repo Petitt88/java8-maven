@@ -1,0 +1,55 @@
+IaaS:
+	Infrastructure as a Service  (IaaS)is a form of Cloud Computing which provides on-demand physical and virtual computing resources, storage, network, firewall, load balancers, etc. To provide virtual computing resources, IaaS uses some form of Hypervisor, like Xen, KVM, VMware ESX/ESXi, Hyper-V, etc.  
+
+	Infrastructure as a Service is the backbone of all cloud services, providing the compute resources. After getting the compute resources, we provide other services on top of that.
+
+	Example
+
+		Let's say that you want to have a set of 10 Linux systems with 4GB RAM each, and two Windows systems with 8GB each to deploy your software. You can go to any of the IaaS providers and request these systems. Generally, a IaaS provider creates the respective VMs in the background, puts them in the same internal network, and shares the credentials with you, thus allowing you to access them.
+
+	Other than VMs, some IaaS providers offer bare-metal machines for provisioning.
+	
+PaaS:
+	Platform as a Service (PaaS) is a class of Cloud Computing services which allows its users to develop, run, and manage applications without worrying about the underlying infrastructure. With PaaS, users can simply focus on building their applications, which is a great help to developers.
+
+	We can either use PaaS services offered by different cloud computing providers like Amazon, Google, Azure, etc., or deploy it on-premise, using software like OpenShift Origin, Deis, etc.
+
+	PaaS can be deployed on top of IaaS, or, independently on VMs, bare-metal, and Containers.
+	
+	
+	Cloud Foundry:
+		Cloud Foundry is an Open Source platform as a service (PaaS) that provides a choice of clouds, developer frameworks, and application services. It can be deployed on-premise or on IaaS, like AWS, vSphere, or OpenStack. There are many commercial CF cloud providers as well, like HPE Helion Cloud Foundry, IBM Bluemix, Pivotal Cloud Foundry, etc.
+		
+	OpenShift:
+		OpenShift is an Open Source PaaS solution provided by Red Hat. The latest release of OpenShift, OpenShift v3, is built on top of the container technology, which uses Docker and Kubernetes underneath. OpenShift v3 can be deployed on top of a full-fledged Linux OS or on a Micro OS which is specifically designed to run containers and Kubernetes. Currently, it is supported only on the Atomic Host Micro OS and its variants.
+		With OpenShift v3, we can deploy any application which is running with Docker containers.
+		As OpenShift v3 uses Kubernetes, we get all the features offered by Kubernetes, like adding or removing nodes at runtime, persistent storage, auto-scaling, etc.
+
+	Heroku:
+		Heroku is a fully-managed container-based cloud platform, with integrated data services and a strong ecosystem. Heroku is used to deploy and run modern applications. It is a Salesforce company.
+		Heroku has multiple products but, at its core, it has the Heroku Platform, which is a PaaS platform used to deploy applications. 
+	
+	Deis:
+		Deis (pronounced DAY-iss) is an Open Source PaaS platform, which runs on top of Docker and CoreOS.
+		
+		The Underlying Technology
+			Docker:
+				Docker is the container runtime used by Deis to run applications. For more information on Docker and containers, please refer to Chapter 5 (Containers). 
+			CoreOS:
+				CoreOS is a lightweight OS to run just containers. We will learn about it in Chapter 6 (Micro OSes for Containers). As of now, CoreOS supports Docker and rkt as container runtime. Deis supports Docker for the time being.
+				
+
+Containers:
+	Operating-System-level virtualization allows us to run multiple isolated user-space instances in parallel. These user-space instances have the application code, the required libraries, and the required runtime to run the application without any external dependencies. These user-space instances are referred to as containers.
+	
+	In the container world, this box (containing our application and all its dependencies) is referred to as an image. A running instance of this box is referred to as a container. We can spin multiple containers from the same image.
+	
+	An image contains the application, its dependencies and the user-space libraries. User-space libraries like glibc enable switching from user-space to kernel-space. An image does not contain any kernel-space components.
+	
+	When a container is created from an image, it runs as a process on the host's kernel. It is the host kernel's job to isolate and provide resources to each container.
+	
+	
+PaaS vs Containers:
+	Each app and service that is pushed to and launched on a platform requires runtime configuration, control resources, and isolate between apps, and the container allows for this.  It also allows for the orchestration of applications and scaling, launching additional instances when needed, and provides a framework for logging. 
+
+For example, today Cloud Foundry utilizes Warden (https://github.com/cloudfoundry/...) and will have support for other containers with the release of the second execution agent, Diego.  Openshift today utilizes SElinux and MCS and will be supporting Docker in V3.
