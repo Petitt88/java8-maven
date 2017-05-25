@@ -1,0 +1,179 @@
+Cloud:
+
+	https://www.youtube.com/watch?v=qVYMQwSbTSk - the definition for private cloud types
+
+	- Public cloud:
+		- service is accessible to multiple customers over the public internet
+		- mutitenancy:  makes some people nervous because mutliple customers sharing the exact same resources
+		
+	- Virtual private cloud:
+		- set of resources on a public cloud
+		- are walled off virtually and assigned to you
+		- we're still on a multitenant environment, but we have some security constraints around what we do
+		- fairly easy
+	
+	- Hosted private cloud
+		- actually walled off
+		- don't put you on a public internet
+		- create an environment specific to you
+		- operates the cloud for you, you use it as it was your own personal resources
+	
+	- Private cloud:
+		- you put the cloud infrastructure and automation on top of resources that are in your own datacenter
+		
+	- Hybrid cloud
+		- A deployment that encompasses both a private cloud and a public cloud is referred to as a hybrid cloud environment, which presents its own set of challenges:
+			– The hardware in the private cloud is different from the hardware in a public cloud so one deployment of the same container might perform differently in a private cloud and in a public cloud.
+		
+	The implication between all of these are both security related and cost related.
+		- Private cloud: 2 major implications
+			- your IT department must run it: you must have the expertise and understanding how to run a cloud - there are very few enterprises that really know how to do it
+			- you have to provide the cloud environment 
+
+IaaS:
+	Infrastructure as a Service  (IaaS)is a form of Cloud Computing which provides on-demand physical and virtual computing resources, storage, network, firewall, load balancers, etc. To provide virtual computing resources, IaaS uses some form of Hypervisor, like Xen, KVM, VMware ESX/ESXi, Hyper-V, etc.  
+
+	Infrastructure as a Service is the backbone of all cloud services, providing the compute resources. After getting the compute resources, we provide other services on top of that.
+
+	Example
+
+		Let's say that you want to have a set of 10 Linux systems with 4GB RAM each, and two Windows systems with 8GB each to deploy your software. You can go to any of the IaaS providers and request these systems. Generally, a IaaS provider creates the respective VMs in the background, puts them in the same internal network, and shares the credentials with you, thus allowing you to access them.
+
+	Other than VMs, some IaaS providers offer bare-metal machines for provisioning.
+	
+PaaS:
+	Platform as a Service (PaaS) is a class of Cloud Computing services which allows its users to develop, run, and manage applications without worrying about the underlying infrastructure. With PaaS, users can simply focus on building their applications, which is a great help to developers.
+
+	We can either use PaaS services offered by different cloud computing providers like Amazon, Google, Azure, etc., or deploy it on-premise, using software like OpenShift Origin, Deis, etc.
+
+	PaaS can be deployed on top of IaaS, or, independently on VMs, bare-metal, and Containers.
+	
+	
+	Cloud Foundry:
+		Cloud Foundry is an Open Source platform as a service (PaaS) that provides a choice of clouds, developer frameworks, and application services. It can be deployed on-premise or on IaaS, like AWS, vSphere, or OpenStack. There are many commercial CF cloud providers as well, like HPE Helion Cloud Foundry, IBM Bluemix, Pivotal Cloud Foundry, etc.
+		
+	OpenShift:
+		OpenShift is an Open Source PaaS solution provided by Red Hat. The latest release of OpenShift, OpenShift v3, is built on top of the container technology, which uses Docker and Kubernetes underneath. OpenShift v3 can be deployed on top of a full-fledged Linux OS or on a Micro OS which is specifically designed to run containers and Kubernetes. Currently, it is supported only on the Atomic Host Micro OS and its variants.
+		With OpenShift v3, we can deploy any application which is running with Docker containers.
+		As OpenShift v3 uses Kubernetes, we get all the features offered by Kubernetes, like adding or removing nodes at runtime, persistent storage, auto-scaling, etc.
+
+	Heroku:
+		Heroku is a fully-managed container-based cloud platform, with integrated data services and a strong ecosystem. Heroku is used to deploy and run modern applications. It is a Salesforce company.
+		Heroku has multiple products but, at its core, it has the Heroku Platform, which is a PaaS platform used to deploy applications. 
+	
+	Deis:
+		Deis (pronounced DAY-iss) is an Open Source PaaS platform, which runs on top of Docker and CoreOS.
+		
+		The Underlying Technology
+			Docker:
+				Docker is the container runtime used by Deis to run applications. For more information on Docker and containers, please refer to Chapter 5 (Containers). 
+			CoreOS:
+				CoreOS is a lightweight OS to run just containers. We will learn about it in Chapter 6 (Micro OSes for Containers). As of now, CoreOS supports Docker and rkt as container runtime. Deis supports Docker for the time being.
+				
+
+Containers:
+	Operating-System-level virtualization allows us to run multiple isolated user-space instances in parallel. These user-space instances have the application code, the required libraries, and the required runtime to run the application without any external dependencies. These user-space instances are referred to as containers.
+	
+	1. In the container world, this box (containing our application and all its dependencies) is referred to as an image. A running instance of this box is referred to as a container. We can spin multiple containers from the same image.
+	
+	2. An image contains the application, its dependencies and the user-space libraries. User-space libraries like glibc enable switching from user-space to kernel-space. An image does not contain any kernel-space components.
+	
+	3. When a container is created from an image, it runs as a process on the host's kernel. It is the host kernel's job to isolate and provide resources to each container.
+	
+	The Union filesystem allows files and directories of separate filesystems, known as layers, to be transparently overlaid on each other, to create a new virtual filesystem.
+	An image used in Docker is made of multiple layers and, while starting a new container, we merge all those layers to create a read-only filesystem. On top of a read-only filesystem, a container gets a read-write layer, which is an ephemeral layer and it is local to the container.
+	
+	Microservices and containerization go hand-in-hand. You do not want to dedicate a full virtual machine for each microservice, but rather you want to install your containerization technology across a cluster of virtual machines and let that containerization technology distribute containers as it deems appropriate. 
+	
+Container orchestration tools:
+
+	Running containers on a single node is fine, but, in production, we need to run containers at scale. That is when we can see the real benefits of containers. To run containers in a multi-host environment at scale, we need to find solutions to numerous problems, which are summarized below:
+		Who can bring multiple hosts together and make them part of a cluster ?
+		Who will schedule the containers to run on specific hosts ?
+		How can containers running on one host reach out to containers running on different hosts ?
+		Who will make sure that the container has the dependent storage, when it is scheduled on a specific host ?
+		Who will make sure that containers are accessible over a service name, so that we do not have to bother about container accessibility over IP addresses?
+		
+	Container orchestration is an umbrella term which encompasses container scheduling and cluster management. Container scheduling allows us to decide on which host a container or a group of containers should be deployed. With the cluster management orchestrator we can manage the existing nodes, add or delete nodes, etc.  Some of the available solutions for container orchestration are:
+		Docker Swarm
+		Kubernetes
+		Mesos Marathon
+		Cloud Foundry Diego
+		Amazon ECS
+		Azure Container Service
+
+
+	Docker Swarm 
+		Docker Swarm is a native container orchestration tool from Docker, Inc. It logically groups multiple Docker engines to create a virtual engine, on which we can deploy and scale applications. 
+		
+			Swarm Manager 
+				It accepts commands on behalf of the cluster and takes the scheduling decisions. One or more nodes can be configured as managers, but they work in active/passive modes.
+				
+			Swarm Agents 
+				They are hosts which run the Docker Engine and participate in the cluster.
+				
+			Swarm Discovery Service 
+				The recommended way to do node discovery is using libkv, which abstracts out multiple Key-Values like etcd, consul, zookeeper.
+				
+			Overlay Networking  
+				Swarm uses libnetwork to configure the Overlay Network, employing VxLAN between different hosts.
+		
+		Docker Machine
+			Docker Machine helps us configure and manage one or more Docker engines running locally or on cloud environments. With Docker Machine we can start, inspect, stop, and restart a managed host, upgrade the Docker client and daemon, and configure a Docker client to talk to our host.
+			
+		Docker Compose
+			Docker Compose  allows us to define and run multi-container applications trough a configuration file. In a configuration file we can define services, images or Dockerfiles to use, network, etc. Below we provide a sample of a compose file:
+				# Mongo DB
+				db:
+				  image: mongo
+				  expose:
+					- 27017
+				  command: --smallfiles
+				# Python App
+				web:
+				  image: nkhare/dockchat:v1
+				  ports:
+					- "5000:5000"
+				  links:
+				   - db:db
+				   
+	Kubernetes
+		Kubernetes is an Apache 2.0-licensed Open Source project for automating deployment, operations, and scaling of containerized applications. It was started by Google, but many other companies like Docker, Red Hat, and VMware contributed to it.
+
+	
+VMs vs Containers:
+	- A Virtual Machine runs on top of a Hypervisor, which emulates different hardware, like CPU, Memory, etc., so that a Guest OS can be installed on top of them. Different kinds of Guest Operating Systems can run on top of one Hypervisor. Between an application running inside a Guest OS and in the outside world, there are multiple layers: the Guest OS, the Hypervisor, the Host OS. 
+	
+	- On the other hand, containers run directly as a process on top of the Host OS. There is no indirection as we see in VMs, which help containers to get near-native performance. Also, as the containers have very little footprint, we can pack a higher number of containers than VMs on the same physical machine. As containers run on the Host OS, we need to make sure containers are compatible with the Host OS.
+	
+	
+PaaS vs Containers:
+	Each app and service that is pushed to and launched on a platform requires runtime configuration, control resources, and isolate between apps, and the container allows for this.  It also allows for the orchestration of applications and scaling, launching additional instances when needed, and provides a framework for logging. 
+	
+	
+Microservices:
+	+ No language or technology lock-in 
+		As each service works independently, we can choose any language or technology to develop it. We just need to make sure its API end points return the expected output.
+	+ Easy Deployment 
+		Each service in a microservice can be deployed independently.
+	+ Updating and Scaling 
+		We do not have to take an entire application down just to update or scale a component. Each service can be updated or scaled independently. This gives us the ability to respond faster.
+	+ No cascading failure
+		If one service fails, then its failure does not have a cascading effect. This helps in debugging as well.
+	+ The ability to reuse 
+		Once the code of a service is written, it can be used in other projects, where the same functionality is needed.
+		
+	- Choosing the right service size 
+		While breaking the monolith application or creating microservices from scratch, it is very important to choose the right functionality for a service. For example, if we create a microservice for each function of a monolith, then we would end up with lots of small services, which would bring unnecessary complexity. 
+	- Deployment
+		We can easily deploy a monolith application. However, to deploy a microservice, we need to use a distributed environment such as Kubernetes. 
+	- Testing 
+		With lots of services and their inter-dependency, sometimes it becomes challenging to do end-to-end testing of a microservice.  
+	- Inter-service communication 
+		Inter-service communication can be very costly if it is not implemented correctly. There are options such as message passing, RPC, etc., and we need to choose the one that fits our requirement and has the least overhead. 
+	- Managing Databases 
+		When it comes to the microservices' architecture, we may decide to implement a database local to a microservice. But, to close a business loop, we might require changes on other related databases. This can create problems (e.g. partitioned databases). 
+	- Monitoring 
+		Monitoring individual services in a microservices environment can be challenging.  This challenge is being addresses, and a new set of tools, like sysdig or Datadog, is being developed to monitor and debug microservices. 
+
+For example, today Cloud Foundry utilizes Warden (https://github.com/cloudfoundry/...) and will have support for other containers with the release of the second execution agent, Diego.  Openshift today utilizes SElinux and MCS and will be supporting Docker in V3.
