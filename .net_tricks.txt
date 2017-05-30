@@ -153,8 +153,24 @@ Reference assmeblies:
 	The others:
 		- core-setup: build tools to pull in all of the above and combine it into the .NET Core Runtime
 		- CLI: the .NET Command Line Interface, so you can dotnet whatever as part of the SDK
-	 
-	 
+
+
+	.NET Core 2.0:
+	
+		Runtime Store
+			.NET Core 2.0 brings a new feature called the Runtime Store. This essentially lets you pre-install packages on a machine, in a central location, so you don't have to include them in the publish output of your individual apps.
+
+			You can think of the Runtime Store as a Global Assembly Cache (GAC) for .NET Core. As well serving as a central location for packages, it can also ngen the libraries so they don't have to be jit-ed by your application, which improves startup times for your app.
+
+		Asp.Net Core 2.0
+
+			The Microsoft.AspNetCore.All metapackage includes every package released by Microsoft as part of ASP.NET Core. This has a number of benefits:
+				- It reduces the package version management burden
+				- It reduces the number of packages that need to be published with the app
+					- because now Asp.Net Core 2.0 is sort of "part" of .Net Core 2.0 - Net Core 2.0 installs it
+					- still not everything gets packaged when publishing the framework along with your app: some new mechanism excludes libraries that you do not use
+				- It makes it easy to use the core packages without having to add them to the solution explicitly
+
 Date handling
 
 	DateTime vs DateTimeOffset
