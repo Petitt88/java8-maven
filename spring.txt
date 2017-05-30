@@ -26,6 +26,10 @@ Spring expression usage: look for "#{beanName.fieldName}" (Spring framework)
 @SessionAttributes("key") - adds the value from the ModelMap that belongs to the specified key to the HttpSession object after the handler executes
 @ResponseBody - @Controller + @ResponseBody = @RestController: write the response to the body (json, xml)
 @RequestBody - for json and xml request payloads: map them to arbitrary java classes
+@ResponseStatus - Controller methods can specify a custom response status code. The default for methods returning a value is 200 OK, and 204 No Content for void methods.
+	@PostMapping
+	@ResponseStatus(HttpStatus.CREATED)
+	public User create(...) {...}
 @PathVariable - to map url/route parameters, like: "tender/{year}/forms"
 @RequestParam - for querystring parameter mapping
 @PathParam
@@ -2910,6 +2914,71 @@ You should only ever add one @EnableAutoConfiguration annotation. We generally r
 
 		// ... getters and setters
 	}
+	
+	
+	@ConfigurationProperties Validation
+		Spring Boot will attempt to validate @ConfigurationProperties classes whenever they are annotated with Spring’s @Validated annotation. You can use JSR 303 Bean Validation javax.validation constraint annotations directly on your configuration classes. The only thing you need is to add a compliant JSR-303 implementation to your classpath: like org.hibernate:hibernate-validator implementation 
+		
+		@Validated
+		@ConfigurationProperties("app")
+		public class ApplicationProperties {
+
+			@Valid
+			@NotNull
+			private Cache cache;
+			@Valid
+			@NotNull
+			private Cors cors;
+
+			public static class Cache {
+
+				private Integer ttl;
+				private Long maxEntries;
+
+				// ... getters and setters
+
+				@Override
+				public String toString() {
+					return "Cache{" +
+							"ttl=" + ttl +
+							", maxEntries=" + maxEntries +
+							'}';
+				}
+			}
+
+			public static class Cors {
+
+				private List<String> allowedOrigins;
+				private String[] allowedMethods;
+				private List<String> allowedHeaders;
+				private Boolean allowCredentials;
+				private Integer maxAge;
+
+				// ... getters and setters
+
+				@Override
+				public String toString() {
+					return "Cors{" +
+							"allowedOrigins=" + allowedOrigins +
+							", allowedMethods=" + Arrays.toString(allowedMethods) +
+							", allowedHeaders=" + allowedHeaders +
+							", allowCredentials=" + allowCredentials +
+							", maxAge=" + maxAge +
+							'}';
+				}
+			}
+
+			// ... getters and setters
+			
+			@Override
+			public String toString() {
+				return "ApplicationProperties{" +
+						"cache=" + cache +
+						", cors=" + cors +
+						'}';
+			}
+		}
+	
 	
 Nested configurations
 

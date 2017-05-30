@@ -170,6 +170,8 @@ Reference assmeblies:
 					- because now Asp.Net Core 2.0 is sort of "part" of .Net Core 2.0 - Net Core 2.0 installs it
 					- still not everything gets packaged when publishing the framework along with your app: some new mechanism excludes libraries that you do not use
 				- It makes it easy to use the core packages without having to add them to the solution explicitly
+				
+			The AspNetCore.All package is included in .NET Core 2.0’s Runtime Store, and is compiled to native code, rather than IL. This means that all of the libraries included in the AspNetCore.All package are pre-compiled as native binaries for the Operating Systems that .NET Core 2.0 supports.
 
 Date handling
 
