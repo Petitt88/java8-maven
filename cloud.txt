@@ -148,7 +148,7 @@ VMs vs Containers:
 	
 	
 PaaS vs Containers:
-	Each app and service that is pushed to and launched on a platform requires runtime configuration, control resources, and isolate between apps, and the container allows for this.  It also allows for the orchestration of applications and scaling, launching additional instances when needed, and provides a framework for logging. 
+	Each app and service that is pushed to and launched on a platform requires runtime configuration, control resources, and isolate between apps, and the container allows for this. It also allows for the orchestration of applications and scaling, launching additional instances when needed, and provides a framework for logging. 
 	
 	
 Microservices:

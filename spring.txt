@@ -154,7 +154,7 @@ Spring:
 													 1 for our source code which can change
 		- in case of a change the lib classloader remains intact, whereas the source-file classloader is recreated. This ensures performance in a microservice world.
 		
-	- Actuator: provides monitoring capabilities that can be reached via http endpoints or via JMX
+	- Actuator: provides monitoring capabilities that can be reached via http endpoints or via JMX. Provides a hypermedia-based “discovery page” for the other endpoints. Requires Spring HATEOAS to be on the classpath.
 
 		- Endpoints Actuator endpoints allow you to monitor and interact with your application. 
 		  Spring Boot includes a number of built-in endpoints and you can also add your own. 
