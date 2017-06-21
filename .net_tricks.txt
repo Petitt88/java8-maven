@@ -132,6 +132,15 @@ Sysinternals, Resource monitor
 	The NETStandard.Library metapackage references a set of NuGet packages that define the .NET Standard library. Like the Microsoft.AspNetCore package from my last post, 
 	the package does not contain dlls itself, but rather references to a number of other packages, hence the name metapackage. 
 	Depending on the target platform of your project, different packages will be added to the project, in line with the appropriate version of .NET Standard the platform implements.
+	
+	
+	NET Standard isn't a runtime. It's not something you can install. It's not an "instance of .NET."  .NET Standard is an interface - a versioned list of APIs that you can call. Each newer version of .NET Standard adds more APIs but leaves older platforms/operating systems behind.
+
+	The runtimes then implement this standard. If someone comes out with a new .NET that runs on a device I've never heard of, BUT it "implements .NET Standard" then I just learned I can write code for it. I can even use my existing .NET Standard libraries.
+	
+	.NET Standard isn't a runtime or a platform. It's not an operating system choice. .NET Standard is a bunch of APIs.
+	
+	.NET Standard is what you target for your libraries, and the apps that USE your library target a platform.
 
 	
 Reference assmeblies:
