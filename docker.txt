@@ -391,6 +391,15 @@ Docker Compose
 					image: postgres
 					
 		networks - this is the identifier of the named networks to use. A given name-value must be listed in the networks section
+		
+			When you run docker-compose up, the following happens:
+				1. A network called myapp_default is created.
+				2. Each container created based on the orchestration of the "services" joins the network "myapp_default" under the container's name.
+				3. These services can communicate with each other.
+				
+			This "networks" section allows us to define custom networks if some tweaking is necessary.
+			
+			You may be wondering why we didn’t do this on the back end service. The front end service needs to talk to that in order to retrieve data, so how is that working? This is where some magic happens. Docker provides a DNS system used to locate containers and docker compose sets up a Docker network for your defined services. All containers that are part of the docker-compose services definition are reachable by other containers on that network. This means that we don’t have to explicitly expose the back end port for the containers to communicate. As we’re not expecting to allow external systems to call the back end API it’s best to avoid exposing it’s port on the host.
 		links
 			link to containers in another service. Either specify both the service name and a link alias (SERVICE:ALIAS), or just the service name.
 			
@@ -634,13 +643,16 @@ Usages:
 		docker rmi webpythonredis_web
 	
 	To use it with docker-compose:
-		docker-compose up
-		docker-compose ps
+		docker-compose up - creates the images (if they do not exist already) and starts the containers from the images
+			docker-compose up --build (build images before starting containers)
+		docker-compose ps - list the containers created by the docker-compose file
 		docker-compose scale redis=4
-		docker-compose down
-		docker-compose images
-		docker-compose start
-		docker-compose stop
+		docker-compose down - stops the containers and removes them (basically this is a "stop" and "rm" command in one)
+			docker-compose down --rmi all (remove all images used by any service)
+		docker-compose images - list the images created by the docker-compose file
+		docker-compose start - starts the containers
+		docker-compose stop - stops the containers
+		docker-compose rm - removes the containers
 
 	To use it with docker in production (deploy):
 		docker swarm init - to enable swarm mode and make your current machine a swarm manager
