@@ -373,6 +373,9 @@ Docker Compose
 		volumes - Mount host paths or named volumes. Named volumes must be defined in the top-level volumes key.
 				  If we make modifications into the mounted on the host OS, then we see changes immediately without having to rebuild the image.
 				  
+		command: VERY IMPORTANT: if specified, the CMD/ENTRYPOINT specified in the Dockerfile gets ignored! So this basically replaces the CMD/ENTRYPOINT. Has the same effect.
+				 Override the default command (from the Dockerfile).
+				  
 		depends_on 
 			express dependency between services, which has two effects:
 				docker-compose up will start services in dependency order. In the following example, db and redis will be started before web.
