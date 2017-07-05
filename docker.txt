@@ -71,9 +71,8 @@ Docker:
 			docker run --expose 80 --name webserver nginx
 				--expopse - this exposes port 80 of the container without publishing the port to the host system’s interfaces.
 				
-			docker run --name=config-server --publish=8888:8888 \
-				--volume=spring-cloud-config-repo:/var/lib/spring-cloud/config-repo \
-     config-server:latest
+			docker run --name=config-server --publish=8888:8888 --volume=spring-cloud-config-repo:/var/lib/spring-cloud/config-repo config-server:latest
+			
 		docker start [container_id] - starts the container
 	
 		docker stop [container_id] - to stop the container
@@ -96,6 +95,9 @@ Docker:
 			docker exec -it [container-id] bash - to be able 
 				-i - keep STDIN open even if not attached
 				-t - allocate a pseudo-TTY
+				
+		docker network inspector nat
+			- to see what IP addresses the containers are running on
 		
 	Container, images location:
 		- if using linux containers, the location is the MobyLinuxVM.vhdx that is automatically started using Hyper-V
