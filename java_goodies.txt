@@ -189,6 +189,10 @@ To specify the gradle of the wrapper to be used:
 	
 To download the wrapper:
 	gradle wrapper --gradle-version 3.2.1
+	
+To ignore tasks during build (in this case "generateTypeScript") won't get executed:
+	gradlew assemble -x generateTypeScript
+
 
 https://docs.gradle.org/current/userguide/tutorial_gradle_command_line.html
 Example multiple tasks:
@@ -689,7 +693,7 @@ In case of an application server, looks up the service from the memory of the ap
 
 
 
-********** Native DLL at runtime***************
+**********Native DLL at runtime***************
 
 https://www.chilkatsoft.com/p/p_499.asp
 https://examples.javacodegeeks.com/java-basics/java-library-path-what-is-it-and-how-to-use/
@@ -707,15 +711,20 @@ https://examples.javacodegeeks.com/java-basics/java-library-path-what-is-it-and-
 	
 
 
-**********TODO**********
+**********Concurrency, multithreading***************
 
-1. read more JSP resources:
-	- apache tiles	- check
-
-2. JAX-RS, JAX-WS (both with and without Maven) - check
-
-3. JDBC, JPA, Hibernate, EclipseLink examples - check
-
-4. Spring - check
-
-5. Unit test, jUnit, Mockito
+Prefer to use ForkJoinPool over Executors. 
+	- ForkJoinPool implements the Executor interface: both are Executors
+	- ForkJoinPool was added in Java7 whereas Executors in Java5
+	- ForkJoinPool by default has as many threads in its pool as the physical number of CPU cores (typically default)
+		- To change this: new ForkJoinPool(100)
+	
+	https://stackoverflow.com/questions/33944471/forkjointask-vs-completablefuture
+	
+CompletableFuture:
+	- this is a Promise
+	- added in Java8
+	- this is the preferred way to initiate asynchronous tasks
+	- CompletableFuture.supplyAsync(()-> supplier, executor).thenAccept(...);
+	- CompletableFuture.supplyAsync(()-> supplier).thenAccept(...); // default ForkJoinPool is used
+	
