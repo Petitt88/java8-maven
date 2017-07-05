@@ -10,6 +10,17 @@ Assembly loading process:
 			GAC is located in C:\Windows\Microsoft.NET\assembly
 	3. if not found in the GAC, probably probes the paths specified in the PATH environment variable
 	4. if not found, tries in the same folder where the app is running
+		this is because of the root web.config: (C:\Windows\Microsoft.NET\Framework64\v4.0.30319\Config\ setting:
+		<system.web> <compilation> <assemblies> <add assembly="*" /> </assemblies> </compilation> </system.web>
+		
+	Once a dll is loaded, it cannot be loaded again with another version. So only one version of a dll can be loaded.
+	What happens when a component requires for instance v1.0 but our code depends on v1.1? In this case that dll wins which gets loaded first.
+	If it is ours the app will use v1.1, otherwise v1.0. To overcome this and make sure no matter which dll is loaded first and the v1.1 is going to be used anyway,
+	we can add assemlby redirects into our web.config:
+		<dependentAssembly>
+			<assemblyIdentity name="Super.Component" publicKeyToken="31bf3856ad364e35" />
+			<bindingRedirect oldVersion="0.0.0.0-1.0.0.0" newVersion="1.1.0.0" />
+		</dependentAssembly>
 	
 	
 machine.config:
@@ -274,3 +285,26 @@ launchsettings.json:
 	}
 
 	The "WebAppDocker" profile tell VS to run the project (i.e. via dotnet.exe) instead of starting up IIS Express and deploy the app to it.
+
+	
+.csproj magic:
+
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net462</TargetFramework>
+		<RunXunitTests Condition="'$(RunXunitTests)' == 'Release'">true</RunXunitTests>
+	</PropertyGroup>
+  
+	// This way "RunXunitTests" task will get executed only if the "Release" is true
+	
+	<PropertyGroup>
+		<TargetFramework>net462</TargetFramework>
+		<OwnProp>true></OwnProp>
+		<RunXunitTests Condition="'$(RunXunitTests)' == '$(OwnProp)'">false</RunXunitTests>
+		<RunXunitTests Condition="'$(RunXunitTests)' == '$(TargetFramework)'">net462</RunXunitTests>
+  </PropertyGroup>
+  
+	// The same as above, but checking a custom defined property this time
+  
+</Project>
