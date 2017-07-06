@@ -118,6 +118,23 @@ Properties files can also have fallback values:
 	
 	https://spring.io/blog/2015/02/11/better-application-events-in-spring-framework-4-2
 	
+	    private final ApplicationEventPublisher publisher;
+		this.publisher.publishEvent(new OrderCreatedEvent(order)); 
+		
+		@Component
+		public class MyComponent {
+			@EventListener(condition = "#creationEvent.awesome")
+			public void handleOrderCreatedEvent(CreationEvent<Order> creationEvent) {
+				... 
+			}
+		}
+		
+		public class OrderCreatedEvent implements CreationEvent<Order> { ... }
+			private boolean awesome;
+			public boolean isAwesome() { return this.awesome; }
+			....
+		}
+
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(securedEnabled = true), @Secured("ROLE_TELLER") - for method-level securing
