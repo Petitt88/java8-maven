@@ -65,6 +65,28 @@ Properties files can also have fallback values:
 @ExceptionHandler
 @ResponseStatus
 
+@SpringBootApplication = @EnableAutoConfiguration + @Configuration + @ComponentScan
+@EnableAutoConfiguration - This annotation tells Spring Boot to “guess” how you will want to configure Spring, based on the jar dependencies that you have added.
+	To exclude a matched AutoConfiguration: @SpringBootApplication(exclude = {MultipartAutoConfiguration.class})
+@Configuration: indicates that a class declares one or more @Bean methods and may be processed by the Spring container to generate bean definitions and service requests for those beans at runtime.
+@ComponentScan: what packages to scan for @Component (@Component, @Repository, @Service, @Controller, @RestController). The default is the package that has @ComponentScan defined on.
+				Spring boot by default scans the base package + all packages beneath it
+				
+				package eu.infralert.admin;
+				@SpringBootApplication
+				public class AdminServiceApplication { ... }
+					in this case "eu.infralert.admin" package and all subpackages get scanned
+					
+				for custom packages to be scanned:
+				@SpringBootApplication
+				@ComponentScan({"eu.infralert.admin", "eu.infralert.data", "eu.infralert.utility"})
+				public class AdminServiceApplication { ... }
+					now Spring boot will scan "eu.infralert.admin", "eu.infralert.data", "eu.infralert.utility" packages + all other that are beneath them
+					
+@EntityScan: Spring boot uses this for JPA @Entity discovery. The scanning strategy is the same as with @ComponentScan.
+			 Because of @EnableAutoConfiguration, Spring boot automatically scans for entities starting from the base package.
+
+
 @Cacheable - to use Spring's cache - implementations can be swapped
 
 @Lazy - lazily initialze beans
@@ -2786,12 +2808,6 @@ To create an executable jar just use the maven/gradle plugin provided by Spring:
 	</build>
 	
 13.1. Spring Boot application starters
-	
-@EnableAutoConfiguration - This annotation tells Spring Boot to “guess” how you will want to configure Spring, based on the jar dependencies that you have added.
-	To exclude a matched AutoConfiguration: @SpringBootApplication(exclude = {MultipartAutoConfiguration.class})
-@SpringBootApplication = @EnableAutoConfiguration + @ComponentScan + @Configuration
-@ComponentScan: what packages to scan for @Component. The default is the package that the class having @ComponentScan is defined
-@EntityScan: what packages to scan for JPA entities
 
 We generally recommend that you locate your main application class in a root package above other classes. 
 	The @EnableAutoConfiguration annotation is often placed on your main class, and it implicitly defines a base “search package” for certain items.
