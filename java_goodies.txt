@@ -750,7 +750,20 @@ Prefer to use ForkJoinPool over Executors.
 CompletableFuture:
 	- this is a Promise
 	- added in Java8
+	- it uses the ForkJoinPool.commonPool() which has the same number of threads as the number of CPU cores
 	- this is the preferred way to initiate asynchronous tasks
 	- CompletableFuture.supplyAsync(()-> supplier, executor).thenAccept(...);
 	- CompletableFuture.supplyAsync(()-> supplier).thenAccept(...); // default ForkJoinPool is used
 	
+	
+
+**********32-bit vs 64-bit compilation**********
+
+Java bytecode is java bytecode, it doesn't matter whether it was built with a 32-bit or 64-bit JDK and there is no way to figure this out.
+
+I think it does not make any difference to have a jar compiled with 32-bit or 64-bit. It should be machine-independent - the JVM will compile it to native 32/64-bit code;
+Unless you have some native library dependency or the java code is directly being compiled to native code.
+
+A pure jar is not compiled to a particular architecture.
+A 32-bit JVM will run the jar in 32-bit, likewise a 64-bit JVM will run the jar in 64-bit.
+Of course, if your jar uses native libraries then the 'bitness' of these will have to match the JVM that you use to run the jar.

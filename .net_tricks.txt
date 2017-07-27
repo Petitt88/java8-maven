@@ -289,22 +289,46 @@ launchsettings.json:
 	
 .csproj magic:
 
-<Project Sdk="Microsoft.NET.Sdk">
+	<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<TargetFramework>net462</TargetFramework>
-		<RunXunitTests Condition="'$(RunXunitTests)' == 'Release'">true</RunXunitTests>
-	</PropertyGroup>
-  
-	// This way "RunXunitTests" task will get executed only if the "Release" is true
+		<PropertyGroup>
+			<TargetFramework>net462</TargetFramework>
+			<RunXunitTests Condition="'$(RunXunitTests)' == 'Release'">true</RunXunitTests>
+		</PropertyGroup>
+	  
+		// This way "RunXunitTests" task will get executed only if the "Release" is true
+		
+		<PropertyGroup>
+			<TargetFramework>net462</TargetFramework>
+			<OwnProp>true></OwnProp>
+			<RunXunitTests Condition="'$(RunXunitTests)' == '$(OwnProp)'">false</RunXunitTests>
+			<RunXunitTests Condition="'$(RunXunitTests)' == '$(TargetFramework)'">net462</RunXunitTests>
+	  </PropertyGroup>
+	  
+		// The same as above, but checking a custom defined property this time
+	  
+	</Project>
+
+
+32-bit vs 64-bit compilation:
+
+	You compile your code to IL which gets executed and compiled to machine code during runtime, this is what's called JIT.
+	The JIT is one aspect of the CLR (Common Language Runtime).
+	Specifically it is the part responsible for changing CIL/MSIL (hereafter called IL) produced by the original language's compiler (csc.exe for Microsoft c# for example) into machine code native to the current processor (and architecture that it exposes in the current process, for example 32/64-bit). If the assembly in question was ngen'd (AOT - Ahead of time compilation) then the the JIT process is completely unnecessary and the CLR will run this code just fine without it.
 	
-	<PropertyGroup>
-		<TargetFramework>net462</TargetFramework>
-		<OwnProp>true></OwnProp>
-		<RunXunitTests Condition="'$(RunXunitTests)' == '$(OwnProp)'">false</RunXunitTests>
-		<RunXunitTests Condition="'$(RunXunitTests)' == '$(TargetFramework)'">net462</RunXunitTests>
-  </PropertyGroup>
-  
-	// The same as above, but checking a custom defined property this time
-  
-</Project>
+	If the app contains only managed code, stick with the "Any CPU" solution build configuration.
+	
+	However, it the app has some libraries that are native (written in unmanaged code - for example the oracle driver), the entrypoint project's platform target may need to be set accordingly
+		- typically to 32-bit on a 64-bit OS - because if the native code is 32-bit it tends to run only inside 32-bit applications
+		- does no need to be set to 64-bit because if the OS is 64-bit then "Any CPU" compilation will result in the JIT compile 64-bit native code from the IL
+		
+		(- 64-bit applications can run only on 64-bit OS)
+		(- 32-bit apps can run on both 64-bit and 32-bit OS)
+	
+		So the JIT compiles our code into native 32/64-bit executable code depending on the current processor.
+		
+		So, Oracle unmanaged driver: because it is written in unamanged (C++) code its compiled dll contains native code already. 
+		It is not IL code --> no JIT is required --> it can run on the current processing immediately (theoritically).
+			--> 64-bit processor needs the 64-bit version of the unmanaged driver, whereas 32-bit processor needs the 32-bit compiled version.
+	
+	C# Code > C# Compiler > IL > .NET Runtime > JIT Compiler > Machinecode > Execution
