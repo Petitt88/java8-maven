@@ -767,3 +767,33 @@ Unless you have some native library dependency or the java code is directly bein
 A pure jar is not compiled to a particular architecture.
 A 32-bit JVM will run the jar in 32-bit, likewise a 64-bit JVM will run the jar in 64-bit.
 Of course, if your jar uses native libraries then the 'bitness' of these will have to match the JVM that you use to run the jar.
+
+
+**********Java 9***************
+
+Unnamed module:
+	- If a request is made to load a type whose package is not defined in any known module then the module system will attempt to load it from the class path
+	- If this succeeds then the type is considered to be a member of a special module known as the unnamed module
+		- to ensure that every type is associated with some module
+	- The unnamed module reads every other module
+		- will thus be able to access the exported types of all other readable modules
+	- The unnamed module exports all of its packages
+	
+Services:
+	- Java has long supported services via the java.util.ServiceLoader class, which locates service providers at run time by searching the class path
+	
+	module java.sql {
+		requires public java.logging;
+		requires public java.xml;
+		exports java.sql;
+		exports javax.sql;
+		exports javax.transaction.xa;
+		uses java.sql.Driver;										- this module uses the Driver
+	}
+	
+	module com.mysql.jdbc {
+		requires java.sql;
+		requires org.slf4j;
+		exports com.mysql.jdbc;
+		provides java.sql.Driver with com.mysql.jdbc.Driver;		- this module provides the implementation of the Driver
+	}

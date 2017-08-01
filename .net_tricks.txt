@@ -332,3 +332,24 @@ launchsettings.json:
 			--> 64-bit processor needs the 64-bit version of the unmanaged driver, whereas 32-bit processor needs the 32-bit compiled version.
 	
 	C# Code > C# Compiler > IL > .NET Runtime > JIT Compiler > Machinecode > Execution
+	
+	
+	
+SQL Server:
+
+	:on error exit
+	:SETVAR databaseName "Ekaer"
+
+	USE [master]
+	
+	CREATE LOGIN [NT SERVICE\EkaerService] FROM WINDOWS WITH DEFAULT_DATABASE=[master]	-- this creates a user under "INSTANCE/Security/Logins" that can login to the db. 
+	GO
+	
+	USE [$(databaseName)]															-- using the "Ekaer" db
+	GO
+	CREATE USER [NT SERVICE\EkaerService] FOR LOGIN [NT SERVICE\EkaerService]		-- add the user to "INSTANCE/Databases/Ekaer/Security/Users", so the user can access the database
+	GO
+	ALTER ROLE [db_datareader] ADD MEMBER [NT SERVICE\EkaerService]					-- adding the necessary roles: equivalent to "User Mapping" if doing: right clik on the "NT SERVICE\EkaerService" --> Properties --> User Mapping
+	GO
+	ALTER ROLE [db_datawriter] ADD MEMBER [NT SERVICE\EkaerService]
+	GO
