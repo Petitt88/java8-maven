@@ -771,6 +771,28 @@ Of course, if your jar uses native libraries then the 'bitness' of these will ha
 
 **********Java 9***************
 
+Module Types:
+	- Platform modules
+		- the JDK is diveded into platform modules
+		- exports packages: explicitly
+	- Application Modules
+		- any JAR containing module-info.class on the module path
+		- Also referred to as “Named Application Modules"
+		- This is what we are going to create. A lot of our third party dependencies will also be application modules
+		- exports packages: explicitly
+		- can read modules: Platform, Application, Automatic
+	- Automatic Modules
+		- any JAR without module-info.class on the module path, allowing your Java 9 project to use pre-Java-9 libraries
+		- for the name, JDK generates one depending on the JAR filename. Basically, it will remove the file extension and the trailing version number (if any), and replace all non-alphanumeric characters by dots, e.g. the file mongo-java-driver-3.3.0.jar will end up as module named mongo.java.driver
+		- export packages: all
+		- can read modules: Platform, Application, Automatic, Unnamed
+	- Unnamed Module
+		- all JARs and classes on the classpath. The classpath is not completely gone yet.
+		- Similar to automatic modules, it exports all packages and reads all other modules
+		- But it does not have a name, obviously
+		- export packages: all
+		- can read modules: Platform, Automatic, Application
+
 Unnamed module:
 	- If a request is made to load a type whose package is not defined in any known module then the module system will attempt to load it from the class path
 	- If this succeeds then the type is considered to be a member of a special module known as the unnamed module
@@ -788,12 +810,23 @@ Services:
 		exports java.sql;
 		exports javax.sql;
 		exports javax.transaction.xa;
-		uses java.sql.Driver;										- this module uses the Driver
+		uses java.sql.Driver;										- this module uses the Driver (this is an interface)
 	}
 	
 	module com.mysql.jdbc {
 		requires java.sql;
 		requires org.slf4j;
 		exports com.mysql.jdbc;
-		provides java.sql.Driver with com.mysql.jdbc.Driver;		- this module provides the implementation of the Driver
+		provides java.sql.Driver with com.mysql.jdbc.Driver;		- this module provides the implementation of the Driver (class and interface)
 	}
+	
+	
+	requires: package name goes here
+	exports:  package name goes here
+	provides: concrete class/interface goes here
+	with:	  concrete implementation class goes here
+	uses: 	  concrete class/interface goes here
+	
+	ServiceLoader.load(EventService.class): 
+		- the call to ServiceLoader.load(Class<T>) returns an Iterable<T>, containing all service implementations of a given interface 
+		  that are being offered by modules on the modulepath using the provides ... with ... statement.
