@@ -830,3 +830,12 @@ Services:
 	ServiceLoader.load(EventService.class): 
 		- the call to ServiceLoader.load(Class<T>) returns an Iterable<T>, containing all service implementations of a given interface 
 		  that are being offered by modules on the modulepath using the provides ... with ... statement.
+		  
+Class loaders (for modules):
+	- Every type is in a module, and at run time every module has a class loader - but does a class loader load just one module?
+		- A class loader can load types from one module or from many modules, so long as the modules do not interfere with each other
+		- and all of the types in any particular module are loaded by just one loader.
+	- it allows us to retain the platform’s existing hierarchy of built-in class loaders
+		- The bootstrap and extension class loaders still exist, and are used to load types from platform modules
+		- The application class loader also still exists, and is used to load types from artifacts found on the module path
+	
