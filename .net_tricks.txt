@@ -353,3 +353,109 @@ SQL Server:
 	GO
 	ALTER ROLE [db_datawriter] ADD MEMBER [NT SERVICE\EkaerService]
 	GO
+	
+	
+Threading:
+
+	- ExecutionContext:
+	
+		--ExecutionContext is actually just a container for other contexts. ExecutionContext is all about “ambient” information, meaning that it stores data relevant to the current environment or “context” in which you’re running.  In many systems, such ambient information is maintained in thread-local storage (TLS), such as in a ThreadStatic field or in a ThreadLocal<T>. 
+		For example, one of the contexts contained by ExecutionContext is SecurityContext, which maintains information like the current “principal” and information about code access security (CAS) denies and permits.
+		
+		// ambient state captured into ec 
+		ExecutionContext ec = ExecutionContext.Capture();
+		
+		ExecutionContext.Run(ec, delegate 
+		{ 
+			… // code here will see ec’s state as ambient 
+		}, null);
+		
+	- SynchronizationContext:
+	
+		--SynchronizationContext is just an abstraction, one that represents a particular environment you want to do some work in.  As an example of such an environment, Windows Forms apps have a UI thread (while it’s possible for there to be multiple, for the purposes of this discussion it doesn’t matter), which is where any work that needs to use UI controls needs to happen.  For cases where you’re running code on a ThreadPool thread and you need to marshal work back to the UI so that this work can muck with UI controls, Windows Forms provides the Control.BeginInvoke method.  You give a delegate to a Control’s BeginInvoke method, and that delegate will be invoked back on the thread with which that control is associated.
+		
+		So, if I’m writing a component that needs to schedule some work to the ThreadPool and then continue with some work back on the UI thread, I can code my component to use Control.BeginInvoke.  But now what if I decide I want to use my component in a WPF app? WPF has the same UI thread constraint that Windows Forms has, but it has a different mechanism for marshaling back to the UI thread: rather than using Control.BeginInvoke on a control associated with the right thread, you use Dispatcher.BeginInvoke (or InvokeAsync) on the Dispatcher instance associated with the right thread. 
+		
+		We now have two different APIs for achieving the same basic operation, so how do I write my component to be agnostic of the UI framework?  By using SynchronizationContext.  SynchronizationContext provides a virtual Post method; this method simply takes a delegate and runs it wherever, whenever, and however the SynchronizationContext implementation deems fit.  Windows Forms provides the WindowsFormSynchronizationContext type which overrides Post to call Control.BeginInvoke.  WPF provides the DispatcherSynchronizationContext type which overrides Post to call Dispatcher.BeginInvoke.  And so on.  As such, I can now code my component to use SynchronizationContext instead of tying it to a specific framework.
+		
+		var sc = SynchronizationContext.Current; 
+		ThreadPool.QueueUserWorkItem(delegate 
+		{ 
+			… // do work on ThreadPool 
+			sc.Post(delegate 
+			{ 
+				… // do work on the original context 
+			}, null); 
+	   }); 
+	   
+	When you flow ExecutionContext, you’re capturing the state from one thread and then restoring that state such that it’s ambient during the supplied delegate’s execution.  That’s not what happens when you capture and use a SynchronizationContext.  The capturing part is the same, in that you’re grabbing data from the current thread, but you then use that state differently.  Rather than making that state current during the invocation of the delegate, with SynchronizationContext.Post you’re simply using that captured state to invoke the delegate.  Where and when and how that delegate runs is completely up to the implementation of the Post method.
+	
+	
+	Async-await: 
+	
+		--The framework automatically flows the ExecutionContext. It cannot be turned off, this is by design.
+		On the other hand, posting back to the SynchronizationContext.Current can be suppressed via task.ConfigureAwait(false).
+		Note that while ConfigureAwait provides explicit, await-related programming model support for changing behavior related to SynchronizationContext, there is no await-related programming model support for suppressing ExecutionContext flow.  This is on purpose.
+	
+		- The framework support behind the async and await keywords automatically interacts with both ExecutionContext and SynchronizationContext.
+		ExecutionContext needs to flow from the code issuing the await through to the continuation delegate’s execution.  That’s handled automatically by the Framework.  When the async method is about to suspend, the infrastructure captures an ExecutionContext. This is what enables the important “ambient” information represented by ExecutionContext to flow across awaits.
+		
+		- The Framework also has support for SynchronizationContext.  The aforementioned support for ExecutionContext is built into the “builders” that represent async methods (e.g. System.Runtime.CompilerServices.AsyncTaskMethodBuilder), and these builders ensure that ExecutionContext is flowed across await points regardless of what kind of awaitable is being used.  In contrast, support for SynchronizationContext is built into the support for awaiting Task and Task<TResult>, specifically.  Custom awaiters could add similar logic themselves, but they don’t get it automatically; that’s by design, as being able to customize when and how the continuation gets invoked is part of why custom awaiters are useful.
+		
+		- When you await a task, by default the awaiter will capture the current SynchronizationContext, and if there was one, when the task completes it’ll Post the supplied continuation delegate back to that context, rather than running the delegate on whatever thread the task completed or rather than scheduling it to run on the ThreadPool. 
+		If a developer doesn’t want this marshaling behavior, it can be controlled by changing the awaitable/awaiter that’s used.  Whereas this behavior is always employed when you await a Task or Task<TResult>, you can instead await the result of calling task.ConfigureAwait(…).  The ConfigureAwait method returns an awaitable that enables this default marshaling behavior to be suppressed.  Whether it’s suppressed is controlled by a Boolean passed to the ConfigureAwait method.  If continueOnCapturedContext is true, then you get the default behavior; if it’s false, the awaiter doesn’t check for a SynchronizationContext, pretending as if there wasn’t one. (Note that when the awaited task completes, regardless of ConfigureAwait, the runtime may check the context that’s current on the resuming thread to determine whether it’s ok to synchronously run the continuation there or whether the continuation must be scheduled asynchronously from that point.)
+		
+		- Note that while ConfigureAwait provides explicit, await-related programming model support for changing behavior related to SynchronizationContext, there is no await-related programming model support for suppressing ExecutionContext flow.  This is on purpose.  ExecutionContext is not something developers writing async code should need to worry about; it’s infrastructure level support that helps to simulate synchronous semantics (i.e. TLS) in an asynchronous world.  Most folks can and should completely ignore that it’s there (and should avoid using the ExecutionContext.SuppressFlow method unless they really know what you’re doing).  In contrast, where code runs is something developers should be cognizant of, and thus SynchronizationContext rises to level of something that does deserve explicit programming model support.  (In fact, as I’ve stated in other posts, most library implementers should consider using ConfigureAwait(false) on every await of a task.)
+		
+	Isn’t SynchronizationContext part of ExecutionContext?
+	
+		- The main thing I glossed over is that of all the contexts ExecutionContext is capable of flowing (e.g. SecurityContext, HostExecutionContext, CallContext, etc.), SynchronizationContext is actually one of them.  This is, I personally believe, a mistake in API design, one that’s caused a few problems since it was instituted in .NET many versions ago.  Nevertheless, it’s the design we have and have had for a long time, and changing it now would be a breaking change.
+
+		- When you call the public ExecutionContext.Capture() method, that checks for a current SynchronizationContext, and if there is one, it stores that into the returned ExecutionContext instance.  Then, when the public ExecutionContext.Run method is used, that captured SynchronizationContext is restored as Current during the execution of the supplied delegate.
+		
+		
+	Await, SynchronizationContext, and Console Apps
+	
+		--SynchronizationContext: 
+		
+			- WPF, Windows Forms, Asp.Net has their own implementation (deriving from System.Threading.SynchronizationContext)
+			- Console apps, Asp.Net Core (afterall this is a console app as well) has no SynchronizationContext: SynchronizationContext.Current is null!
+				--> That means that if you invoke an asynchronous method in your console app, unless you do something special, your asynchronous methods will not have thread affinity: 
+					the continuations within those asynchronous methods could end up running “anywhere.”
+				
+					Anywhere means:
+						- it’ll either end up running on the same thread that completed the awaited task
+						- or it’ll end up running in the ThreadPool.
+			
+
+		- When I discuss the new async language features of C# and Visual Basic, one of the attributes I ascribe to the await keyword is that it “tries to bring you back to where you were.” For example, if you use await on the UI thread of your WPF application, the code that comes after the await completes should run back on that same UI thread.
+		
+		- There are several mechanisms that are used by the async/await infrastructure under the covers to make this marshaling work: SynchronizationContext and TaskScheduler. While the transformation is much more complicated than what I’m about to show, logically you can think of the following code:
+		
+			await FooAsync();
+			RestOfMethod();
+		as being similar in nature to this:
+			var t = FooAsync();
+			var currentContext = SynchronizationContext.Current;
+			t.ContinueWith(delegate
+			{
+				if (currentContext == null)
+					RestOfMethod();
+				else
+					currentContext.Post(delegate { RestOfMethod(); }, null);
+			}, TaskScheduler.Current);
+			
+		- Both SynchronizationContext and TaskScheduler are abstractions that represent a “scheduler”, something that you give some work to, and it determines when and where to run that work. There are many different forms of schedulers. For example, the ThreadPool is a scheduler: you call ThreadPool.QueueUserWorkItem to supply a delegate to run, that delegate gets queued, and one of the ThreadPool’s threads eventually picks up and runs that delegate. Your user interface also has a scheduler: the message pump. A dedicated thread sits in a loop, monitoring a queue of messages and processing each; that loop typically processes messages like mouse events or keyboard events or paint events, but in many frameworks you can also explicitly hand it work to do, e.g. the Control.BeginInvoke method in Windows Forms, or the Dispatcher.BeginInvoke method in WPF.
+		
+		- SynchronizationContext, then, is just an abstract class that can be used to represent such a scheduler. The base class exposes several virtual methods, but we’ll focus on just one: Post. Post accepts a delegate, and the implementation of Post gets to decide when and where to run that delegate.
+		
+		- The default implementation of SynchronizationContext.Post just turns around and passes it off to the ThreadPool via QueueUserWorkItem. But frameworks can derive their own context from SynchronizationContext and override the Post method to be more appropriate to the scheduler being represented. In the case of Windows Forms, for example, the WindowsFormsSynchronizationContext implements Post to pass the delegate off to Control.BeginInvoke. For DispatcherSynchronizationContext in WPF, it calls to Dispatcher.BeginInvoke. And so on.
+		
+		- That’s how await “brings you back to where you were.” It asks for the SynchronizationContext that’s representing the current environment, and then when the await completes, the continuation is posted back to that context. It’s up to the implementation of the captured context to run the delegate in the right place, e.g. in the case of a UI app, that means running the delegate on the UI thread.
+		
+		- This explanation also helps to highlight what happens if the environment didn’t set a SynchronizationContext onto the current thread (and if there’s not special TaskScheduler, as there isn’t in this case). If the context comes back as null, then the continuation could run “anywhere”. I put anywhere in quotes because obviously the continuation can’t run “anywhere,” but logically you can think of it like that… 
+			- it’ll either end up running on the same thread that completed the awaited task
+			- or it’ll end up running in the ThreadPool.
+			
+		- All of the UI application types you can create in Visual Studio will end up having a special SynchronizationContext published on the UI thread. Windows Forms, Windows Presentation Foundation, Metro style apps… they all have one. But there’s one common kind of application that doesn’t have a SynchronizationContext: console apps
+			- When your console application’s Main method is invoked, SynchronizationContext.Current will return null. That means that if you invoke an asynchronous method in your console app, unless you do something special, your asynchronous methods will not have thread affinity: the continuations within those asynchronous methods could end up running “anywhere.”
