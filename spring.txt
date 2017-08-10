@@ -3908,3 +3908,16 @@ class Convert<M, R> {
 		return null;
 	}
 }
+
+********************************
+Spring 5 - Spring Reactive
+********************************
+
+4 players:
+	- Publisher (Observable)
+		2 implementations: 
+			- Mono: produces 0 or 1 value
+			- Flux: produces 0 or N values
+	- Subscriber (Observer)
+	- Subscription
+	- Processor (Subject)
