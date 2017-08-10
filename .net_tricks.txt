@@ -77,6 +77,9 @@ applicationhost.config:
 	IIS: 
 		ApplicationHost.config is the root file of the IIS 7.0 configuration system. It includes definitions of all sites, applications, virtual directories, and application pools, as well as global defaults for the Web server settings. It is in the following location: %windir%\system32\inetsrv\config.
 		
+			The following snippet shows how to chage the application path from the root "/" to "/Admin".
+			- A new <application> node must be set and the root one must not be deleted but point to an empty folder instead.
+		
 			<sites>
 				<site name="Admin-Site" id="2">
 					<application path="/" applicationPool="Clr4IntegratedAppPool">
@@ -91,6 +94,36 @@ applicationhost.config:
 					</bindings>
 				</site>
 			</sites>
+			
+			
+		Another example:
+		
+			- application path is set to the root "/"
+			
+			<site name="WebApplication1" id="2">
+				<application path="/" applicationPool="Clr4IntegratedAppPool">
+					<virtualDirectory path="/" physicalPath="c:\users\petit\onedrive\dokumentumok\visual studio 2017\Projects\WebApplication1\WebApplication1" />
+				</application>
+				<bindings>
+					<binding protocol="https" bindingInformation="*:44350:localhost" />
+                    <binding protocol="http" bindingInformation="*:13000:localhost" />
+				</bindings>
+			</site>
+		
+			- application path is set to "/pet":
+		
+			<site name="WebApplication1" id="2">
+				<application path="/" applicationPool="Clr4IntegratedAppPool">
+					<virtualDirectory path="/" physicalPath="C:\inetpub\empty_folder" />
+				</application>
+				<application path="/pet" applicationPool="Clr4IntegratedAppPool">
+					<virtualDirectory path="/" physicalPath="c:\users\petit\onedrive\dokumentumok\visual studio 2017\Projects\WebApplication1\WebApplication1" />
+				</application>
+				<bindings>
+					<binding protocol="https" bindingInformation="*:44350:localhost" />
+					<binding protocol="http" bindingInformation="*:13000:localhost" />
+				</bindings>
+			</site>
 	
 	Client application directory: 
 		The ApplicationName.config file contains settings for a Windows client application (not a Web application).
