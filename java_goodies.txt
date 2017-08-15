@@ -93,24 +93,24 @@ server.context-path=/champion-portal
 
 a plugin is a collection of goals with a general common purpose
 
-mvn archetype:generate - plugin:goal: execute the "generate" goal of the "archetype plugin"
+mvn archetype:generate 
+	- plugin:goal: execute the "generate" goal of the "archetype plugin"
 
 mvn package - Rather than a goal, this is a phase
-A phase is a step in the build lifecycle, which is an ordered sequence of phases. A phase consists of plugin goals.
-When a phase is given, Maven will execute every phase in the sequence up to and including the one defined. Every goal in these cases is executed.
-For example, if we execute the compile phase, the phases that actually get executed are:
+	A phase is a step in the build lifecycle, which is an ordered sequence of phases. A phase consists of plugin goals.
+	When a phase is given, Maven will execute every phase in the sequence up to and including the one defined. Every goal in these cases is executed.
+	For example, if we execute the compile phase, the phases that actually get executed are:
+		validate
+		generate-sources
+		process-sources
+		generate-resources
+		process-resources
+		compile
 
 mvn -DskipTests=true clean install <-- to excute the "clean" phase of the "clean" lifecycle then the "build" lifecycle's "install" phase but skip the preceeding "test" phase
 
 mvn spring-boot:run: to run a spring boot project (pom.xml is required ofc)
 mvn spring-boot:run --debug
-
-validate
-generate-sources
-process-sources
-generate-resources
-process-resources
-compile
 
 Lifecycles:
  - clean: cleans up artifacts created by prior builds
