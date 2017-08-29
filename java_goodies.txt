@@ -791,7 +791,7 @@ Module Types:
 		- Similar to automatic modules, it exports all packages and reads all other modules
 		- But it does not have a name, obviously
 		- export packages: all
-		- can read modules: Platform, Automatic, Application
+		- can read modules: Platform, Application, Automatic
 
 Unnamed module:
 	- If a request is made to load a type whose package is not defined in any known module then the module system will attempt to load it from the class path
