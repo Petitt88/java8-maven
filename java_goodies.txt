@@ -152,6 +152,23 @@ You can also see that it comes from spring-boot-starter-web.
 To update dependencies shown in eclipse: right click on the project --> Maven --> Update Project... (Maven tends to do this on his own but not always :-()
 
 
+Dependency Scope:
+	- compile: This is the default scope, used if none is specified. Compile dependencies are available in all classpaths of a project. Furthermore, those dependencies are propagated to dependent projects. Gets copied to the final output.
+	- provided: This is much like compile, but indicates you expect the JDK or a container to provide the dependency at runtime. For example, when building a web application for the Java Enterprise Edition, you would set the dependency on the Servlet API and related Java EE APIs to scope provided because the web container provides those classes. This scope is only available on the compilation and test classpath, and is not transitive. Does not get copied to the final output.
+	- runtime: This scope indicates that the dependency is not required for compilation, but is for execution. It is in the runtime and test classpaths, but not the compile classpath. Gets copied to the output.
+	- test: This scope indicates that the dependency is not required for normal use of the application, and is only available for the test compilation and execution phases. This scope is not transitive.
+	- system: This scope is similar to provided except that you have to provide the JAR which contains it explicitly. The artifact is always available and is not looked up in a repository.
+	- import: This scope is only supported on a dependency of type pom in the <dependencyManagement> section. It indicates the dependency to be replaced with the effective list of dependencies in the specified POM's <dependencyManagement> section. Since they are replaced, dependencies with a scope of import do not actually participate in limiting the transitivity of a dependency.
+	
+
+**Maven vs gradle**: 
+	- maven can use dependencies only from the maven repository. 3rd party jars cannot be used, unless installing them to a local maven repository prior.
+	- gradle can use deps from the the maven repository and from the file sytem (3rd party legacy jars)
+		- compile("mysql:mysql-connector-java:5.1.38") 	- group:artifactId:version
+		- compile files("libs/sqljdbc4-4.2.jar")		- this is relative path, but absolute can be given as well
+		- compile project(':VMCPriceDetector')			- multi gradle project
+		
+		
 
 **********Gradle**********
 
