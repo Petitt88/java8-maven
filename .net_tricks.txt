@@ -225,6 +225,37 @@ Reference assmeblies:
 				- It makes it easy to use the core packages without having to add them to the solution explicitly
 				
 			The AspNetCore.All package is included in .NET Core 2.0’s Runtime Store, and is compiled to native code, rather than IL. This means that all of the libraries included in the AspNetCore.All package are pre-compiled as native binaries for the Operating Systems that .NET Core 2.0 supports.
+			
+		Important interfaces:
+			- IConfiguration
+			- ILogger
+			- ILoggerFactory
+			- IHostingEnvironment
+			- IHostedService:
+				- If you register (with the DI container) an IHostedService then ASP.NET Core will call the Start() and Stop() methods of your type during application start and stop respectively.
+			-IHostingStartup
+				- The IHostingStartup interface defines a single method: void Configure(IWebHostBuilder builder);. This method is called while the WebHost is being built in the Program.cs of your ASP.NET Core application and allows code to setup anything that can be configured on a WebHostBuidler, including default services and loggers which is how Application Insights works.
+				- ASP.NET Core will execute any IHostingStartup implementations in the applications assembly as well as any that are listed in an Environment Variable called ASPNETCORE_HOSTINGSTARTUPASSEMBLIES.
+				
+		Tag helpers:
+			- Tag Helpers enable server-side code to participate in creating and rendering HTML elements in Razor files.
+			- Usage:
+				[HtmlTargetElement("email")]									// <email></email>
+				[HtmlTargetElement(Attributes ="myEmail")]						// <div myEmail></div>
+				[HtmlTargetElement("spec-email", Attributes = "veryEmail")]	// <spec-email veryEmail></spec-email>
+				public class EmailVoidTagHelper : TagHelper {}
+				
+				between the [HtmlTargetElement] attributes there is OR relation, while the "Tag" and "Attributes" properties are in AND relation.
+				
+			- Tag Helper usage explicit: @tagHelperPrefix - to restrict usage of tag helpers
+				- in Views/_ViewImports.cshtml: @tagHelperPrefix th:
+				- In the code image above the Tag Helper prefix is set to "th:" --> so only those elements using the prefix "th:" support Tag Helpers
+					- <th:label asp-for="Password"></th:label> 	--> works
+					- <label asp-for="Password"></label			--> won't have any effect
+			
+		ViewComponents:
+			- instead of Html child actions
+			- can be used as tag helpers: <vc:priority-list max-priority="2" is-done="false"></vc:priority-list>
 
 Date handling
 
