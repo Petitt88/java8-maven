@@ -256,6 +256,59 @@ Reference assmeblies:
 		ViewComponents:
 			- instead of Html child actions
 			- can be used as tag helpers: <vc:priority-list max-priority="2" is-done="false"></vc:priority-list>
+		
+		
+		Logging:
+			- structued logging: 
+				- basically involves associating key-value pairs with each log entry, instead of a simple string "message".
+				- Un unstructured message stored as a structured log would essentially be stored as a JSON object making it easily searchable, as something like:
+					unstructured: 
+						info: Microsoft.AspNetCore.Hosting.Internal.WebHost[1]  
+						Request starting HTTP/1.1 GET http://localhost:51919/
+					structued:
+						{
+							"eventLevel" : "Information",
+							"category" : "Microsoft.AspNetCore.Hosting.Internal.WebHost",
+							"eventId" : 1,
+							"message" : "Request starting HTTP/1.1 GET http://localhost:51919/",
+							"protocol" : "HTTP/1.1",
+							"method" : "GET",
+							"url" : "http://localhost:51919/"
+						}
+				- we can add arbitrary data to any log messages by creating a scope via: "_logger.BeginScope<T>(T state)"
+					- but if there is an exception, logging in the catch block would not contain these data
+					- To work around this: there is a lesser known "feature" of exception filters that we can make of here - the code in an exception filter runs in the same context in which the original exception occurred - the stack in unharmed, and is only dumped if the exception filter evaluates to true.
+					
+						_logger.LogInformation("Before");
+						try
+						{
+							using (_logger.BeginScope("Some name"))
+							using (_logger.BeginScope(42))
+							using (_logger.BeginScope("Formatted {WithValue}", 12345))
+							using (_logger.BeginScope(new Dictionary<string, object> { ["ViaDictionary"] = 100 }))
+							{
+								throw new Exception("Oops, something went wrong!");
+								_logger.LogInformation("Hello from the Index!");
+								_logger.LogDebug("Hello is done");
+							}
+
+							_logger.LogInformation("After");
+
+							return new string[] { "value1", "value2" };
+						}
+						catch (Exception ex) when (LogError(ex))
+						{
+							return new string[] { };
+						}
+						
+						bool LogError(Exception ex)
+						{
+							// this will contain the "ViaDictionary", "WithValue", ... scopes
+							_logger.LogError(ex, "An unexpected exception occured");
+							return true;
+						}
+		
+		
 
 Date handling
 
