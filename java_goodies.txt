@@ -788,6 +788,30 @@ Of course, if your jar uses native libraries then the 'bitness' of these will ha
 
 **********Java 9***************
 
+Jigsaw's goals:
+	- Provide stronger encapsulation of components that extend beyond what the JDK currently provides.
+	- Reliable configuration of modules in an application.
+	- Reduce the footprint of the run-time image for an application to what is only needed.
+	
+A module is a jar file which declares it’s dependencies and “public” API via a module descriptor file named module-info.java. The module-info.java file specifies the following:
+	- The name of the module.
+	- The packages it exports.
+	- Other modules it depends on.
+	
+Module Descriptor: (module-info.java)
+	- The module descriptor is the module-info.java file. It specifies the public API of the module. (ie: what it requires and what it depends on)
+	- Required modules are NOT transitively available to transitive consumers, (ie: A requires B requires C means A does not see C automatically) unless requires transitive is specified. Modules are required and packages are exported.
+
+Tools:
+	- JDeps: 
+		- A Java command line driven static dependency management tool for jar files. Results can be filtered and packaged at package level or jar file level.
+		- It can be found in the bin folder of your JDK and has been around since Java 8. Confirming the version of jdeps is as easy as running
+		- jdeps --version.
+	- JLink:
+		- A Java command line driven tool which links / brings together all required modules for an application into a run time image.
+		- This image is usually drastically smaller in size, thus helping reduce the footprint of the application as the entire JRE is not normally needed. jlink will also resolve static dependencies between modules thus guaranteeing the integrity of each module at run time. jlink requires that all artifacts are modules with well defined public contracts (exports, requires etc), thus “Automatic” modules will not suffice.
+		- jlink --version
+	
 Module Types:
 	- Platform modules
 		- the JDK is diveded into platform modules
@@ -838,7 +862,7 @@ Services:
 	}
 	
 	
-	requires: package name goes here
+	requires: module name goes here
 	exports:  package name goes here
 	provides: concrete class/interface goes here
 	with:	  concrete implementation class goes here
