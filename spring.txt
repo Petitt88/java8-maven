@@ -14,7 +14,7 @@ Spring expression usage: look for "#{beanName.fieldName}" (Spring framework)
 @Repository
 @Controller
 @RestController
-@Scope
+@Scope - "singleton", "prototype", "request", "session"
 @Bean
 
 @Valid
