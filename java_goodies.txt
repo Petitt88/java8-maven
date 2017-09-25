@@ -628,75 +628,192 @@ Type parameters "<T>" vs wildcard "?":
 			/// </typeparam>
 			public delegate void Action<in T1>(T1 arg1);
 
-class Worker {
+	class Worker {
 
-	
-	void consume(Consumer<? extends String> cons) {
-		cons.accept("Hello");	// won't compile, ? needs to be "super"
-	}
-	<T extends String> void consume2(Consumer<T> cons) {
-		cons.accept("Hello");	// the same, won't compile. However super cannot be used with type parameters.
-	}
-	void consume3(Consumer<? super String> cons) {
-		cons.accept("Hello");    // Good.
-	}
-	
-	void produce(Supplier<? extends String> prod) {
-		final String s = prod.get();
-	}
-	<T extends String> T produce2(Supplier<T> prod) {
-		final String s = prod.get();
-		return prod.get();
-	}
-
-}
-
-class WorkDelegator {
-	
-	WorkDelegator() {
-		Worker worker = new Worker();
 		
-		// this::processor works for wildcard
-		worker.process(this::processor);
+		void consume(Consumer<? extends String> cons) {
+			cons.accept("Hello");	// won't compile, ? needs to be "super"
+		}
+		<T extends String> void consume2(Consumer<T> cons) {
+			cons.accept("Hello");	// the same, won't compile. However super cannot be used with type parameters.
+		}
+		void consume3(Consumer<? super String> cons) {
+			cons.accept("Hello");    // Good.
+		}
 		
-		// and it also works for the C#-like generic
-		worker.process2(this::processor);
+		void produce(Supplier<? extends String> prod) {
+			final String s = prod.get();
+		}
+		<T extends String> T produce2(Supplier<T> prod) {
+			final String s = prod.get();
+			return prod.get();
+		}
+
 	}
 
-	// cannot use "?" here
-	private <T extends String> void processor(T item) {
-		...
-	}
-}
+	class WorkDelegator {
+		
+		WorkDelegator() {
+			Worker worker = new Worker();
+			
+			// this::processor works for wildcard
+			worker.process(this::processor);
+			
+			// and it also works for the C#-like generic
+			worker.process2(this::processor);
+		}
 
-
-Get method parameter names by reflection at runtime:
-	- works only on concrete classes from java 8
-	- interfaces: there is no way to get the method parameter names for interface as of java 8 --> that is why we use annotations in Spring Data Rest Repositories, Spring Data JPA, Spring Data, MyBatis Mapper interfaces, etc.
-	
-	class Apple {
-		public void calculateSomething(int banana, int orange) {
-			... method parameters can be retained at runtime because apple is a class!
+		// cannot use "?" here
+		private <T extends String> void processor(T item) {
+			...
 		}
 	}
-	
-	interface Apple {
-		void calculateSomething(@Param("banana") int banana, @Param("orange") int orange);	// <-- this is the trick! @Param but it can be anything else. @Param is used and processed, read by Spring Data.
-	}
-	
-	
-********Static imports*********
 
-We can import static members from classes which allows us to use the member without the class qualification:
 
-	import static hu.regens.edgemicro.feature.validation.Building.trySome;
-	
-	trySome();	// - in action
-	
+	Get method parameter names by reflection at runtime:
+		- works only on concrete classes from java 8
+		- interfaces: there is no way to get the method parameter names for interface as of java 8 --> that is why we use annotations in Spring Data Rest Repositories, Spring Data JPA, Spring Data, MyBatis Mapper interfaces, etc.
+		
+		class Apple {
+			public void calculateSomething(int banana, int orange) {
+				... method parameters can be retained at runtime because apple is a class!
+			}
+		}
+		
+		interface Apple {
+			void calculateSomething(@Param("banana") int banana, @Param("orange") int orange);	// <-- this is the trick! @Param but it can be anything else. @Param is used and processed, read by Spring Data.
+		}
+		
+		
+	********Static imports*********
+
+	We can import static members from classes which allows us to use the member without the class qualification:
+
+		import static hu.regens.edgemicro.feature.validation.Building.trySome;
+		
+		trySome();	// - in action
+		
 The static import declaration is analogous to the normal import declaration. Where the normal import declaration imports classes from packages, 
 allowing them to be used without package qualification, the static import declaration imports static members from classes, 
 allowing them to be used without class qualification.
+	
 
+Java vs C#:
+
+	1. Classes and inner classes:
+
+		Java:
+			// notice how "Calculator.this" is used to reach the outer object from the inner:
+			public class Calculator {
+
+				private int howMany = 10;
+
+				public class CalcInner {
+
+					public void doSomething() {
+						System.out.println(Calculator.this.howMany);
+
+						Calculator.this.doCalc();
+					}
+				}
+
+				public static class CalcInnerStat {
+
+					public void doNothing() {
+
+					}
+				}
+
+				public void doCalc() {
+					System.out.println("Cacled!");
+
+					new BackgroundWorkApplier().apply(() -> System.out.println(Calculator.this.howMany));
+
+					CalcInner calcInner = new CalcInner();
+					CalcInnerStat calcInnerStat = new CalcInnerStat();
+				}
+			}
+
+			class App {
+
+				public static void main(String[] args) {
+					Calculator.CalcInner calcInner = new Calculator().new CalcInner();
+					calcInner.doSomething();
+
+					Calculator.CalcInnerStat calcInnerStat = new Calculator.CalcInnerStat();
+					calcInnerStat.doNothing();
+				}
+			}
+
+
+			@FunctionalInterface
+			interface BackgroundWorker {
+				void doWork();
+			}
+
+			class BackgroundWorkApplier {
+
+				public void apply(BackgroundWorker worker) {
+					worker.doWork();
+				}
+			}
+		
+
+		C#:
+
+			class Program
+			{
+				static void Main(string[] args)
+				{
+					Calculator calculator = new Calculator();
+					Calculator.CalcInner calcInner = new Calculator.CalcInner(calculator);
+
+					// can have only static methods
+					Calculator.CalcInnerStat.DoNothing();
+				}
+			}
+
+			public class Calculator
+			{
+				private int _howMany = 10;
+
+				public class CalcInner
+				{
+					private readonly Calculator _calculator;
+					public CalcInner(Calculator calculator)
+					{
+						_calculator = calculator;
+					}
+
+					public void DoSomething()
+					{
+						// see's the private fields, but the Calculator instance has to be provided in the ctor
+						Console.WriteLine(_calculator._howMany);
+					}
+				}
+
+				public static class CalcInnerStat
+				{
+					public static void DoNothing()
+					{
+
+					}
+				}
+
+				public void DoCalc()
+				{
+					ExecutionContext.Run(ExecutionContext.Capture(), _ =>
+					{
+						var _nothing = new Calculator();
+						// this points to the Calculator instance here
+						Console.WriteLine(this._howMany);
+
+						// "this" has to be passed
+						var calc = new CalcInner(this);
+					}, null);
+				}
+			}
+	
 
 
 ********JMX*********
