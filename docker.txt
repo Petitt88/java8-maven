@@ -48,9 +48,10 @@ Docker:
 			. - acting as a build-directory argument
 			--file - name of the Dockerfile (Default is 'PATH/Dockerfile')
 		docker run [image_name] - to create a new contaimer from the image (copies the image into a folder to the disk) 
+			- if the image is not on the disk, first downloads it via "docker pull [image_name]"
 			- the last string segment must be the name of the image!
 			- this command can be run multiple times resulting in more instances (containers) created
-			- but with this we would have to deal  with compley IDs instead of friendly names
+			- but with this we would have to deal with compley IDs instead of friendly names
 			
 			- docker run --name my-mongo_1 -d my_mongodb
 				--name [container_instance_name]
@@ -89,7 +90,7 @@ Docker:
 		
 		docker images - list all images available
 		docker ps - list running containers
-		docker ps -- all - list all containers
+		docker ps -- all - list all containers (or just "docker ps -a")
 		
 		docker exec - run a command in a running container
 			docker exec -it [container-id] bash - to be able 
