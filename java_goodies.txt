@@ -905,6 +905,27 @@ Of course, if your jar uses native libraries then the 'bitness' of these will ha
 
 **********Java 9***************
 
+Running a program:
+	- JDK8:
+		javac xxx.java
+		java xxx.class
+		java -jar xxx.jar
+	- JDK9:
+		java -p mods -m hello.world
+			-p: points to the directory of modules (module path!)
+			-m: name of the module to execute
+		classpath does not need to be set!
+		no missing dependencies
+		no cyclic dependencies
+		no split packages
+			- a package can belong to exactly 1 module
+			- this is the mess we get with the classpath:
+				- packages can reside in multiple jar files
+				- performance bottleneck: all jar files on the classpath have to be scanned for the required package when loading a class
+					- we load some classes from one jar, and other classes from the other jar!
+		modules are not mandatory - classpath still exists!
+
+
 Jigsaw's goals:
 	- Provide stronger encapsulation of components that extend beyond what the JDK currently provides.
 	- Reliable configuration of modules in an application.
@@ -914,10 +935,12 @@ A module is a jar file which declares it’s dependencies and “public” API v
 	- The name of the module.
 	- The packages it exports.
 	- Other modules it depends on.
+A module is a set of packages designed for reuse.
 	
 Module Descriptor: (module-info.java)
 	- The module descriptor is the module-info.java file. It specifies the public API of the module. (ie: what it requires and what it depends on)
-	- Required modules are NOT transitively available to transitive consumers, (ie: A requires B requires C means A does not see C automatically) unless requires transitive is specified. Modules are required and packages are exported.
+	- Required modules are NOT transitively available to transitive consumers, (ie: A requires B requires C means A does not see C automatically) unless requires transitive is specified. 
+	- Modules are required and packages are exported.
 
 Tools:
 	- JDeps: 
@@ -1000,3 +1023,31 @@ Class loaders (for modules):
 		- The bootstrap and extension class loaders still exist, and are used to load types from platform modules
 		- The application class loader also still exists, and is used to load types from artifacts found on the module path
 	
+	
+New language features:
+
+	1. try-with-resources:
+	
+		final Resource r = new Resource();
+		try (r) {
+			...
+		}
+		
+	2. underscore is no longer an identifier name --> syntactic name reclamation
+	
+		int _ = 4;	// compile error
+		new Foo<String, _>();
+		foo.<String, _>bar();
+		
+	3. private interface methods
+	
+		- can be static methods, instance methods as well
+		- usage: helper methods to implement default methods
+		
+	4. Lambda Stream and Optional API extended
+	
+	
+Migrating to JDK9:
+	- Java EE modules: there are some modules that both ship as part of Java SE and as part of an application server / servlet container (Tomcat for example)
+	- these modules (corba, jaxb, jaxws, common annotation) are deprecated in JDK9 and will be removed in a future release
+		- disabled by default in JDK9 (use --add-modules if they are needed)
