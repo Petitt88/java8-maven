@@ -55,7 +55,9 @@ Docker:
 			
 			- docker run --name my-mongo_1 -d my_mongodb
 				--name [container_instance_name]
-				-d - detach, run the in background
+				-d 		- detach, run the in background
+				-ti		- t: attach to terminal, i: interactive mode --> after running the container from the command line, we will get a new command line which is the just fired up docker container's
+						  so basically to start interactive mode and attach the current command line to the terminal of the container
 			
 			docker run -d -p 127.0.0.1:81:80 --name webserver nginx - the same as:
 			docker run -d -p 81:80 --name webserver nginx
@@ -639,7 +641,7 @@ Terminologies:
 		
 Usages:
 	To use it with docker:
-		docker build -t webpythonredis_web .	- creates the image named "webpythonredis_web" from the Dockerfile located in the same folder
+		docker build -t webpythonredis_web .	- creates the image named "webpythonredis_web" from the Dockerfile located in the current folder ("." means build the image from the current directory)
 		docker run -p 5000:80 -d --name web_1 webpythonredis_web
 		docker stop web_1
 		docker start web_1
@@ -667,3 +669,7 @@ Usages:
 			You can scale the app by changing the replicas value in docker-compose.yml, saving the change, and re-running the docker stack deploy command:	docker stack deploy -c docker-compose.deploy.yml getstartedlab
 		docker stack rm getstartedlab - take down the app
 		docker swarm leave --force - to leave the swarm as a manager (manager creates the swarm)
+		
+		
+Useful commands:
+	docker system prune: to remove tangling images (images called "<none>") from the disk and make a lot of free disk space
