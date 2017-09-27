@@ -1046,8 +1046,29 @@ New language features:
 		
 	4. Lambda Stream and Optional API extended
 	
+	5. Collections framework enhancements
+		
+		List.of("a", "b", "c"); 			instead of: Collections.unmodifiableList(Arrays.asList("a", "b", "c"));	--> 
+		Set.of() 							instead of: Collections.unmodifiableSet
+		Map.of()							instead of: Collections.unmodifiableMap(map)
+		
+		Map.entry, Map.ofEntries
+		
+		These static factory methods consume much less disk space than the old way and have less object allocations to initialize an unmodifiable collection.
+		
 	
 Migrating to JDK9:
 	- Java EE modules: there are some modules that both ship as part of Java SE and as part of an application server / servlet container (Tomcat for example)
 	- these modules (corba, jaxb, jaxws, common annotation) are deprecated in JDK9 and will be removed in a future release
 		- disabled by default in JDK9 (use --add-modules if they are needed)
+		
+Garbage collection:
+	- G1 became the default garbage collection in JDK 9 (replacing the Serial and Parallel collectors)
+		- Serial and Parallel collectors: the heap is divided into 2 or 3 regions (young, old generation, metaspace (or the legacy permanent generation))
+		- with G1:
+			- the heap is divided into more regions, usually around 2.000 or so
+			- unlike Serial and Parallel, the marking phase (finding the live objects) is done concurrently, without stopping the Java application
+			- can therefore collect a few regions at a time
+				- fewer objects to collect --> shorter pauses
+				- more information --> more control over pauses
+	- for most scenarios it will deliver better performance
