@@ -1,0 +1,94 @@
+Grid layout:
+	grid:
+	
+		grid-template-columns: 1fr 20px 10% 2fr;			/*4 explicit columns*/		- fr = fragment
+		grid-template-rows: 100px 40px;						/*2 explicit rows*/
+		grid-gap: 15px;				// space between columns and rows
+		grid-auto-columns: 1fr;		/*implicit columns will have the same width, trying to fill all the available spaces*/
+		grid-auto-flow: column;		/*default is row. New grid items will be put in the next column instead of the next row*/
+		
+		grid-auto-rows: 50px;		/*implicit rows beccome 50px high*/
+		
+		grid-template-columns: 200px auto 200px;	/*center column will be the same wide as its content*/
+		grid-template-columns: 200px 1fr 200px;		/*center column will take up all the remaining space*/
+		grid-template-columns: 2fr repeat(3, 1ft);	// 4 columns, the 1st grows twice as the other 3
+		grid-template-columns: minmax(200px, 300px) 300px minmax(50px, auto);	// two columns: 1st is 200px min and 300px max, 2nd is 50px min and maximum the same wide as its content
+		
+		
+		
+		grid-template-columns: 1fr				// column takes all the space available, equally
+		grid-auto-rows: minmax(50px, auto);		// rows became auto high (can grow to any amount based on the content) and no shorter than 50px
+		
+		
+		
+		width: 95%;
+		max-width: 1000px;
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));		// becomes a 3 column layout. On mobile each column stacking on top of eacah other.
+		
+		grid-template-columns: repeat(auto-fill, 150px);	// auto fill as many 150px wide columns as possible (somewhat responsive design)
+		grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));	// auto fill as many 150px wide columns as possible and always fill the whole row. Puts empty tracks if there is not enough columns.
+		grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));	// auto fill as many 150px wide columns as possible and always fill the whole row. Collapses empty tracks.
+		
+		
+	grid lines start from 1.
+	
+		1		2		3		4
+		1------------------------
+		|		|		|		|
+		|		|		|		|
+		2------------------------
+		|		|		|		|
+		|		|		|		|
+		3------------------------
+		
+		
+		header {
+			grid-column-start: 1;
+			grid-column-end: 3;
+			
+			grid-row-start: 2;
+			grid-row-end: 5;
+		}
+		
+		// use negative values to have the element fill up almost the same grid lines, or have the element stick to the same grid line
+		// negative values start from "-1" and in backwards order
+		aside {
+			grid-column-start: 1;
+			grid-column-end: -1;		/*negative number means aside will span to the last column*/ --> -1 is the 1st column from the right. The rest goes like -2, -3, ...
+			grid-column: 1 / -1			// shorthand: start / end
+			
+			grid-row-start: -3;
+			grid-row-end: -1;			/*negative number means aside will span to the last column*/
+			grid-row: -3 / -1			// shorthand: start / end	 --> -1 is the 1st row from the bottom. The rest goes like -2, -3, ...
+		}
+		
+		
+	Grid areas
+		
+		.container {
+			display: grid;
+			grid-template-columns: 2fr 1fr;							// 2 explicit columns
+			grid-template-rows: 100px minmax(200px, 1fr) 100px;		// 3 explicit rows
+			grid-gap: 10px;
+			grid-template-areas:	// each string is a row, and each comma separated word becomes a column
+				"header header" 	// header takes all 2 columns in the 1st row
+				"main aside"		// main takes the 1st column and aside the 2nd in the 2nd row
+				"footer";			// footer takes the 1st column in the 3rd row
+				
+				". header" 			// header takes the 2nd column, 1st one is empty (period)
+				"main aside"		// main spans 2 rows: the 2nd and 3rd in the 1st column. Aside is in the 2nd row's 2nd column.
+				"main footer";		// main is in the 1st, footer takes the 2nd column
+		}
+		
+		header {
+			grid-area: header;
+		}
+		main {
+			grid-area: main;
+		}
+		aside {
+			grid-area: aside;
+		}
+		footer {
+			grid-area: footer;
+		}
