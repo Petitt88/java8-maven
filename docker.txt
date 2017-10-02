@@ -43,11 +43,13 @@ Docker:
 		docker info - prints info about the host VM: OS, OS version, RAM, CPU, containers, running containers, docker root dir, ...
 	
 		docker pull [image_name]] - to pull existing image from Docker Hub
-		docker build -t my_mongodb . - to create an image named "my_mongodb" from the Dockerfile script located in the same folder
-			-t [name of image] - name of the iamge
+		docker build -t my_mongodb . - to create an image named "my_mongodb" with the default tag ":latest" -because it is not specified- from the Dockerfile script located in the same folder
+			-t [name of the image] - name of the image
+				- t [repositoryname:tag] - if "tag" is ommitted, docker will use the default "latest" tag. This goes for the "docker run" command as well.
 			. - acting as a build-directory argument
 			--file - name of the Dockerfile (Default is 'PATH/Dockerfile')
 		docker run [image_name] - to create a new contaimer from the image (copies the image into a folder to the disk) 
+				[image_name] = [repositoryname:tag] - if the tag is missing, docker will substitute ":latest"
 			- if the image is not on the disk, first downloads it via "docker pull [image_name]"
 			- the last string segment must be the name of the image!
 			- this command can be run multiple times resulting in more instances (containers) created
@@ -101,6 +103,35 @@ Docker:
 				
 		docker network inspector nat
 			- to see what IP addresses the containers are running on
+			
+		docker network ls - list the available networks
+						  - docker creates 3 networks automatically (these are built-in to docker by default).
+							- bridge
+							- host
+							- none
+						  - This commands lists the current networks.
+						  - by default docker containers connect to the "bridge" network (but tools like docker-compose may create new networks - or me, the user)
+						  
+		docker inspect network bridge - will display info about the "bridge" network in json. This info contains the containers that currently connect to this network.
+		
+		docker inspect - Return low-level information on Docker objects.
+			docker inspect nginx - returns information about the "nginx" image, for example which port it exposes.
+			
+		docker logs [containerId] - to see the container's logs
+			
+		
+		docker run -it --detach --name=container1 ubuntu	- "--detach" is the same as "-d"
+		docker run -it --detach --name=container2 ubuntu
+		docker ps
+		docker network inspect bridge	- will show that all 2 containers connect to this network. We even see the IP address of the containers.
+										- these IP addresses are NOT accessible from the internet at large nor from the host,
+										- but ARE accessible from container from container
+		docker attach container1 - will attach the container1's entrypoint, which is a bash shell
+								 - now our command prompt is connected to the container's and we are running commands inside the container
+								 - if we type "exit" our command prompt will exit from container1 and get back to the host OS
+									--> shell is the primary process in the contain --> so container1 shuts down
+									
+		docker exec -it mongo /bin/bash - to open a shell in the container. We specified "-it" so we will connect to the starting shell inside the container.
 		
 	Container, images location:
 		- if using linux containers, the location is the MobyLinuxVM.vhdx that is automatically started using Hyper-V
@@ -121,9 +152,16 @@ Docker:
 			ADD test /absoluteDir/         # adds "test" to /absoluteDir/
 			
 		CMD
-			CMD ["executable","param1","param2"] (exec form, this is the preferred form)
-			CMD ["param1","param2"] (as default parameters to ENTRYPOINT)
+			CMD ["executable", "param1", "param2"] (exec form, this is the preferred form)
+			CMD ["param1", "param2"] (as default parameters to ENTRYPOINT)
 			CMD command param1 param2 (shell form)
+			
+			CMD (or Command) is a list of arguments that get passed to the ENTRYPOINT executable.
+				Or if there is no ENTRYPOINT specified, the 1st argument is treated as the executable to be run.
+				As with ENTRYPOINT, we can have only 1 CMD per dockerfile.
+				Unlike ENTRYPOINT parameters, this can be overridden from the commandline!.
+					docker run -p 8080:8080 sample-web-app alternate.py - invoke the image called "sample-web-app" with "alternate.py" parameter (this overrides the CMD inside the dockerfile)
+																		- however, will have no effect, if the python file to be run whould have been specified as an ENTRYPOINT argument, not in a CMD argument.
 			
 			There can only be one CMD instruction in a Dockerfile. If you list more than one CMD then only the last CMD will take effect.
 			The main purpose of a CMD is to provide defaults for an executing container. These defaults can include an executable, or they can omit the executable, in which case you must specify an ENTRYPOINT instruction as well.
@@ -155,6 +193,8 @@ Docker:
 			ENTRYPOINT ["executable", "param1", "param2"] (exec form, preferred)
 			ENTRYPOINT command param1 param2 (shell form)
 			An ENTRYPOINT allows you to configure a container that will run as an executable.
+				Sets an executable to be run each time the container starts.
+				Only 1 ENTRYPOINT per dockerfile is allowed.
 			
 		EXPOSE
 			EXPOSE <port> [<port>...]
@@ -190,7 +230,8 @@ Docker:
 			The exec form makes it possible to avoid shell string munging, and to RUN commands using a base image that does not contain the specified shell executable.
 			
 		USER
-			USER daemon
+			RUN useradd daemon
+			USER daemon - won't create the user "daemon", that is why the previous command
 			The USER instruction sets the user name or UID to use when running the image and for any RUN, CMD and ENTRYPOINT instructions that follow it in the Dockerfile.
 			
 		VOLUME
@@ -215,7 +256,7 @@ Docker:
 			- CMD sets default command and/or parameters, which can be overwritten from command line when docker container runs.
 			- ENTRYPOINT configures a container that will run as an executable.
 			
-		EXPOSE vs -p (port)
+		EXPOSE vs -p (publish)
 			Basically, you have three options:
 				- Neither specify EXPOSE nor -p.
 				- Only specify EXPOSE.
@@ -224,6 +265,16 @@ Docker:
 			If you do not specify any of those, the service in the container will not be accessible from anywhere except from inside the container itself.
 			If you EXPOSE a port, the service in the container is not accessible from outside Docker, but from inside other Docker containers. So this is good for inter-container communication.
 			If you EXPOSE and -p a port, the service in the container is accessible from anywhere, even outside Docker.
+			
+		ADD vs COPY
+		
+			- ADD does everyhing that COPY does, plus:
+			- download files from urls
+			- decompress tar archives
+			
+			- prefer COPY over ADD if the extra functionalities that ADD provides are not needed, because ADD is heavier
+			
+		CMD whoami - by default all docker commands run as the "root" user on the container.
 			
 		Shell and Exec forms
 			All three instructions (RUN, CMD and ENTRYPOINT) can be specified in shell form or exec form.
@@ -669,6 +720,17 @@ Usages:
 			You can scale the app by changing the replicas value in docker-compose.yml, saving the change, and re-running the docker stack deploy command:	docker stack deploy -c docker-compose.deploy.yml getstartedlab
 		docker stack rm getstartedlab - take down the app
 		docker swarm leave --force - to leave the swarm as a manager (manager creates the swarm)
+		
+		
+Containers orchestration
+
+	Let's you easily run many docker containers together, and automatically create new ones when your app needs to scale.
+	Most popular software right now for container orc is Kubernetes.
+	
+	3 softwares are available for orchestration:
+		- Kubernetes
+		- Docker Swarm (from Docker itself)
+		- Apache Mesos
 		
 		
 Useful commands:
