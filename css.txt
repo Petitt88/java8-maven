@@ -25,9 +25,9 @@ Grid layout:
 		max-width: 1000px;
 		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));		// becomes a 3 column layout. On mobile each column stacking on top of eacah other.
 		
-		grid-template-columns: repeat(auto-fill, 150px);				// auto fill as many 150px wide columns as possible (somewhat responsive design)
-		grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));	// auto fill as many 150px wide columns as possible and always fill the whole row. Puts empty tracks if there is not enough columns.
-		grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));	// auto fill as many 150px wide columns as possible and always fill the whole row. Collapses empty tracks.
+		grid-template-columns: repeat(auto-fill, 150px);				// auto fill as many 150px wide columns as possible (somewhat responsive design) - a lot of free spaces arise with this when resizing the browser.
+		grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));	// auto fill as many 150px wide columns as possible and always fill the whole row. Puts empty tracks if there is not enough columns to fill the whole window.
+		grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));	// auto fill as many 150px wide columns as possible and always fill the whole row. Collapses empty tracks. Always takes up all of the window's width.
 		
 		
 	grid lines start from 1.
@@ -81,7 +81,7 @@ Grid layout:
 		}
 		
 		header {
-			grid-area: header;
+			grid-area: header;		// this is the name of the area. The <header> element itself becomes a grid area named "header". This name can be referenced in the grid's "grid-template-areas" property
 		}
 		main {
 			grid-area: main;
