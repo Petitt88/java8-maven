@@ -915,6 +915,7 @@ Running a program:
 			-p: points to the directory of modules (module path!)
 			-m: name of the module to execute
 		classpath does not need to be set!
+			- set the module path instead (the same as the classpath)
 		no missing dependencies
 		no cyclic dependencies
 		no split packages
@@ -947,6 +948,9 @@ Tools:
 		- A Java command line driven static dependency management tool for jar files. Results can be filtered and packaged at package level or jar file level.
 		- It can be found in the bin folder of your JDK and has been around since Java 8. Confirming the version of jdeps is as easy as running
 		- jdeps --version.
+		- makes it possible to analyse our project's static dependencies
+		- can generate module descriptors (module-info.java) for non-module jars
+		- runs on bytecode, not on sourcecode
 	- JLink:
 		- A Java command line driven tool which links / brings together all required modules for an application into a run time image.
 		- This image is usually drastically smaller in size, thus helping reduce the footprint of the application as the entire JRE is not normally needed. jlink will also resolve static dependencies between modules thus guaranteeing the integrity of each module at run time. jlink requires that all artifacts are modules with well defined public contracts (exports, requires etc), thus “Automatic” modules will not suffice.
