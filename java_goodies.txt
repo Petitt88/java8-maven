@@ -711,7 +711,7 @@ Java vs C#:
 				public class CalcInner {
 
 					public void doSomething() {
-						System.out.println(Calculator.this.howMany);
+						System.out.println(Calculator.this.howMany);	// or just type "howMany"
 
 						Calculator.this.doCalc();
 					}
@@ -1067,7 +1067,7 @@ Migrating to JDK9:
 		- disabled by default in JDK9 (use --add-modules if they are needed)
 		
 Garbage collection:
-	- G1 became the default garbage collection in JDK 9 (replacing the Serial and Parallel collectors)
+	- G1 became the default garbage collector in JDK 9 (replacing the Serial and Parallel collectors)
 		- Serial and Parallel collectors: the heap is divided into 2 or 3 regions (young, old generation, metaspace (or the legacy permanent generation))
 		- with G1:
 			- the heap is divided into more regions, usually around 2.000 or so
