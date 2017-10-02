@@ -8,6 +8,32 @@ Spring expression usage: look for "#{beanName.fieldName}" (Spring framework)
 	to use optional dependencies:
 		- @Autowired(required = false) - but you have to check for null in the code
 		- or just Optional<SomeType>
+		
+WebFluxConfigurer
+@EnableAutoConfiguration - This annotation tells Spring Boot to “guess” how you will want to configure Spring, based on the jar dependencies that you have added. 
+						   Since spring-boot-starter-web added Tomcat and Spring MVC, the auto-configuration will assume that you are developing a web application and setup Spring accordingly.
+@EnableConfigurationProperties:
+	@Configuration
+	@EnableConfigurationProperties(FooProperties.class)
+	public class MyConfiguration {
+		// FooProperties can be injected here even though it is not marked as a @Component
+	}
+
+@EnableWebMvc:
+	- If you want to keep Spring Boot MVC features, and you just want to add additional MVC configuration (interceptors, formatters, view controllers etc.) you can add your own @Configuration class of type "WebMvcConfigurer", 
+	  but without @EnableWebMvc.
+	- If you want to take complete control of Spring MVC, you can add your own @Configuration annotated with @EnableWebMvc.
+	
+@EnableWebFlux - if you want to keep Spring Boot WebFlux features, and you just want to add additional WebFlux configuration you can add your own @Configuration class of type WebFluxConfigurer, but without @EnableWebFlux
+@EnableGlobalMethodSecurity - If Spring Security is on the classpath then web applications will be secure by default with ‘basic’ authentication on all HTTP endpoints. 
+							  To add method-level security to a web application you can also add @EnableGlobalMethodSecurity with your desired settings.
+							  
+@EnableWebSecurity - The default security configuration is implemented in SecurityAutoConfiguration and in the classes imported from there (SpringBootWebSecurityConfiguration for web security 
+					 and AuthenticationManagerConfiguration for authentication configuration which is also relevant in non-web applications). To switch off the default web application security 
+					 configuration completely you can add a bean with @EnableWebSecurity (this does not disable the authentication manager configuration or Actuator’s security). 
+					 To customize it you normally use external properties and beans of type WebSecurityConfigurerAdapter (e.g. to add form-based login).
+					 
+@EnableCaching - to make @Cacheable and alike work (@CacheEvict)
 
 @Component
 @Service
