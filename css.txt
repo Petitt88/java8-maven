@@ -12,11 +12,11 @@ Grid layout:
 		grid-template-columns: 200px auto 200px;	/*center column will be the same wide as its content*/
 		grid-template-columns: 200px 1fr 200px;		/*center column will take up all the remaining space*/
 		grid-template-columns: 2fr repeat(3, 1ft);	// 4 columns, the 1st grows twice as the other 3
-		grid-template-columns: minmax(200px, 300px) 300px minmax(50px, auto);	// two columns: 1st is 200px min and 300px max, 2nd is 50px min and maximum the same wide as its content
+		grid-template-columns: minmax(200px, 300px) 300px minmax(50px, auto);	// three columns: 1st is 200px min and 300px max, 2nd is 300px, 3rd is 50px min and maximum the same wide as its content
 		
 		
 		
-		grid-template-columns: 1fr				// column takes all the space available, equally
+		grid-template-columns: 1fr				// 1 column and it takes all the space available
 		grid-auto-rows: minmax(50px, auto);		// rows became auto high (can grow to any amount based on the content) and no shorter than 50px
 		
 		
@@ -50,8 +50,8 @@ Grid layout:
 			grid-row-end: 5;
 		}
 		
-		// use negative values to have the element fill up almost the same grid lines, or have the element stick to the same grid line
-		// negative values start from "-1" and in backwards order
+		// use negative values to have the element fill up almost the same grid lines (no matter how many columns/rows there are), or have the element stick to the same grid line
+		// negative values start from "-1" and in backwards order (column start is on the right, row is at the bottom)
 		aside {
 			grid-column-start: 1;
 			grid-column-end: -1;		/*negative number means aside will span to the last column*/ --> -1 is the 1st column from the right. The rest goes like -2, -3, ...
