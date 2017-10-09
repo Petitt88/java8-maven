@@ -92,3 +92,19 @@ Grid layout:
 		footer {
 			grid-area: footer;
 		}
+		
+		
+SVG:
+
+	Optimization: image sprites
+					<svg...>
+						<symbol id="mail" viewbow="...">
+							<!-- actual svg code goes here -->
+							<path ... />
+						</symbol>
+					</svg>
+					
+					Usage: 	1. Include the one above in the html page
+							2. <svg>
+									<use xlink:href="#mail" />
+							   </svg>
