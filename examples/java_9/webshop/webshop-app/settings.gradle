@@ -1,3 +1,4 @@
 rootProject.name = 'webshop-app'
 
-//include 'webshop-common'
+include 'webshop-common'
+project(':webshop-common').projectDir = new File(settingsDir, '../webshop-common/')
