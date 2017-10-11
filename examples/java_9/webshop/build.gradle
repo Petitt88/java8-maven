@@ -3,8 +3,15 @@ plugins {
 	id 'com.github.johnrengelman.shadow' version '2.0.1'
 }
 
-group 'com.pet'
-version '1.0'
+allprojects {
+	group 'com.pet'
+	version '1.0'
+
+	tasks.withType(JavaCompile) {
+		// incubating feature btw
+		options.incremental = true
+	}
+}
 
 sourceCompatibility = 9
 
@@ -31,13 +38,14 @@ task wrapper(type: Wrapper) {
 
 // to make gradle produce Java 9 modules for all subprojects
 subprojects {
+
 	afterEvaluate {
 		repositories {
 			jcenter()
 		}
 
 		compileJava {
-			inputs.property("moduleName", moduleName)
+			inputs.property('moduleName', moduleName)
 			doFirst {
 				options.compilerArgs = [
 						'--module-path', classpath.asPath,
@@ -47,26 +55,26 @@ subprojects {
 		}
 
 		compileTestJava {
-			inputs.property("moduleName", moduleName)
+			inputs.property('moduleName', moduleName)
 			doFirst {
 				options.compilerArgs = [
 						'--module-path', classpath.asPath,
 						'--add-modules', 'junit',
-						'--add-reads', "$moduleName=junit",
-						'--patch-module', "$moduleName=" + files(sourceSets.test.java.srcDirs).asPath,
+						'--add-reads', '$moduleName=junit',
+						'--patch-module', '$moduleName=' + files(sourceSets.test.java.srcDirs).asPath,
 				]
 				classpath = files()
 			}
 		}
 
 		test {
-			inputs.property("moduleName", moduleName)
+			inputs.property('moduleName', moduleName)
 			doFirst {
 				jvmArgs = [
 						'--module-path', classpath.asPath,
 						'--add-modules', 'ALL-MODULE-PATH',
-						'--add-reads', "$moduleName=junit",
-						'--patch-module', "$moduleName=" + files(sourceSets.test.java.outputDir).asPath,
+						'--add-reads', '$moduleName=junit',
+						'--patch-module', '$moduleName=' + files(sourceSets.test.java.outputDir).asPath,
 				]
 				classpath = files()
 			}

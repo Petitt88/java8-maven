@@ -1,11 +1,11 @@
-group 'com.pet'
-version '1.0'
+plugins {
+	id 'java'
+}
 
 // module name used by gradle
 ext.moduleName = 'webshop-app'
 
-apply plugin: 'java'
-
+// necessary to be here, otherwise IntelliJ sets the java version used for the module back to 8
 sourceCompatibility = 9
 
 repositories {
@@ -21,6 +21,6 @@ jar {
 }
 
 dependencies {
-	compile project(":webshop-common")
+	compile project(':webshop-common')
 	//compileOnly 'org.projectlombok:lombok:1.16.18'
 }
