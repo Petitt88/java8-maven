@@ -1,0 +1,26 @@
+group 'com.pet'
+version '1.0'
+
+// module name used by gradle
+ext.moduleName = 'webshop-app'
+
+apply plugin: 'java'
+
+sourceCompatibility = 9
+
+repositories {
+	mavenCentral()
+}
+
+jar {
+	manifest {
+		attributes(
+				'Main-Class': 'webshop.app.App'
+		)
+	}
+}
+
+dependencies {
+	compile project(":webshop-common")
+	//compileOnly 'org.projectlombok:lombok:1.16.18'
+}

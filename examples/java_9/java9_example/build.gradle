@@ -1,0 +1,70 @@
+plugins {
+	id 'java'
+	id 'com.github.johnrengelman.shadow' version '2.0.1'
+}
+
+sourceCompatibility = 9
+targetCompatibility = 9
+
+repositories {
+	mavenCentral()
+}
+
+jar {
+	baseName "matlabtester"
+	from configurations.runtime
+	manifest {
+		attributes "Main-Class": "matlabtester.App"
+	}
+}
+
+shadowJar {
+	archiveName = "matlabtester.${extension}"
+}
+
+dependencies {
+	compile files("javabuilder.jar")
+}
+
+task wrapper(type: Wrapper) {
+	gradleVersion = '4.2'
+}
+
+ext.moduleName = 'matlabtester'
+
+compileJava {
+	inputs.property("moduleName", moduleName)
+	doFirst {
+		options.compilerArgs = [
+				'--module-path', classpath.asPath,
+		]
+		classpath = files()
+	}
+}
+
+
+compileTestJava {
+	inputs.property("moduleName", moduleName)
+	doFirst {
+		options.compilerArgs = [
+				'--module-path', classpath.asPath,
+				'--add-modules', 'junit',
+				'--add-reads', "$moduleName=junit",
+				'--patch-module', "$moduleName=" + files(sourceSets.test.java.srcDirs).asPath,
+		]
+		classpath = files()
+	}
+}
+
+test {
+	inputs.property("moduleName", moduleName)
+	doFirst {
+		jvmArgs = [
+				'--module-path', classpath.asPath,
+				'--add-modules', 'ALL-MODULE-PATH',
+				'--add-reads', "$moduleName=junit",
+				'--patch-module', "$moduleName=" + files(sourceSets.test.java.outputDir).asPath,
+		]
+		classpath = files()
+	}
+}

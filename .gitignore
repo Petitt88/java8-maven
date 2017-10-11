@@ -4,9 +4,12 @@ build/
 dependency-reduced-pom.xml
 overall-app-container/root.xml
 
+.gradle/
+
 # IntelliJ
 .idea/
 *.iml
+out/
 
 # Eclipse
 .classpath
