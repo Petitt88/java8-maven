@@ -4,10 +4,10 @@ Grid layout:
 		grid-template-columns: 1fr 20px 10% 2fr;			/*4 explicit columns*/		- fr = fragment
 		grid-template-rows: 100px 40px;						/*2 explicit rows*/
 		grid-gap: 15px;				// space between columns and rows
-		grid-auto-columns: 1fr;		/*implicit columns will have the same width, trying to fill all the available spaces*/
 		grid-auto-flow: column;		/*default is row. New grid items will be put in the next column instead of the next row*/
 		
-		grid-auto-rows: 50px;		/*implicit rows beccome 50px high*/
+		grid-auto-columns: 1fr;		/*implicit columns will have the same width, trying to fill all the available spaces*/
+		grid-auto-rows: 50px;		/*implicit rows become 50px high*/
 		
 		grid-template-columns: 200px auto 200px;	/*center column will be the same wide as its content*/
 		grid-template-columns: 200px 1fr 200px;		/*center column will take up all the remaining space*/
@@ -51,7 +51,7 @@ Grid layout:
 		}
 		
 		// use negative values to have the element fill up almost the same grid lines (no matter how many columns/rows there are), or have the element stick to the same grid line
-		// negative values start from "-1" and in backwards order (column start is on the right, row is at the bottom)
+		// negative values start from "-1" and goes in backwards order (column start is on the right, row is at the bottom)
 		aside {
 			grid-column-start: 1;
 			grid-column-end: -1;		/*negative number means aside will span to the last column*/ --> -1 is the 1st column from the right. The rest goes like -2, -3, ...
@@ -158,3 +158,150 @@ SCSS
 		// ...		- will be excluded in the compiled css
 	
 	
+	
+	Partials:
+	
+		- separate files
+		- if filename starts with an underscore, then it is a partial (like _mixins.scss) --> sass compiler will ignore it and not create an _mixins.css files
+		- @import 'partials/variables', 'partials/mixins'
+		
+	
+	Functions:
+		- does not output any css
+		- example:
+			@function divide($a, $b: $max-width) {		// $b has a default value --> not necessary to be specified
+				@return ($a / $b);
+			}
+			
+			to invoke it:
+			.test {
+				line-height: divide(32px, 16px);
+			}
+			
+			@function px-to-pc($target, $context: $max-width) {
+				@return ($target / $context) * 100%;
+			}
+			@function per-line($numberOfItems) {
+				$g-pct: px-to-pc($gutter) * 2;
+				$g-total: $numberOfItems * $g-pct;
+				@return (100% / $numberOfItems) - $g-total;
+			}
+			@media (min-width: $break-s) {
+				flex: 1 per-line(2);	// 2nd argument is the flex-bases itself!
+			}
+			@media (min-width: $break-l) {
+				flex-bases: per-line(3);
+			}
+			
+	
+	Mixins:
+		@mixin roundy($dim, $border: null) {
+			header: $dim;
+			width: $dim;
+			border: $border;	// this rule gets skipped from the generated css if the caller $border does not specify $border (e.g. it is null)
+		}
+		
+		@include roundy ($border: 4px solid white, $dim: 150px);	// named parameters: order can be swapped just like in C#
+		
+		
+	@if:
+	
+		@mixin media-query($break) {
+			$value: map-get($breakpoints, $break);
+			$sm: map-get($breakpoints, 'sm');	// map-get function: gets the value in the $breakpoints map which has the key 'sm' associated with
+		
+			@if $value < $sm {
+				@media (max-width: $value) {
+					@content;
+				}
+			}
+			//@else if $break == 'md' {
+			//	@media (max-width: $break-md) {
+			//		@content;
+			//	}
+			//}
+			@else {
+				@media (min-width: $value) {
+					@content;
+				}
+			}
+		}
+		@include media-query('xs') {
+			color: orange;
+			@include center(90%);
+		}
+		
+	
+	Map: key-value pairs
+	
+		$breakpoints: (
+			'xs': 575px,
+			'sm': 576px,
+			'md': 768px,
+			'lg': 992px
+		);
+		
+		
+		
+		$themes: (
+			'ent': #ffffff,
+			'soc': #000000,
+			'games': #00ff00,
+		);
+		@each $theme, $color in $themes {
+			.icn-#{$theme} {
+				color: $color;
+			}
+		}
+		
+		@mixin themes($map) {
+			@each $map-key, $map-value in $map {
+				&-#{$map-key} {			// referencing the parent select (.icn in this example)
+					color: $map-value;
+				}
+			}
+		}
+		.icn {
+			@include themes($themes);		// will output classes like .icn-ent, .icn-soc, .icn-games
+		}
+		
+		
+	For loop:
+	
+		@for $i from 1 through 10 {
+			.box-#{$i} {
+				background-color: adjust-hue(tomato, $i * 20);
+			}
+		}
+		
+	
+	While loop:
+	
+		$i: 6;
+		@while $i > 0 {
+		  .item-#{$i} { width: 2em * $i; }
+		  $i: $i - 2;
+		}
+		
+		
+	Each loops: used to iterate through lists
+
+		$teachers: ('peter', 'zsofi', 'noni', 'dori', 'flori', 'niki');
+		
+		@each $teacher in $teachers {
+			.teacher-#{$teacher} {
+				background-image: url('img/#{$teacher}.jpg');
+			}
+		}
+		
+		
+	Errors and warnings
+	
+		@mixin mq($break) {
+			$value: map-get($breakpoints, $break);
+			
+			@if $value == null {
+				@error '`#{break}` is not a valid breakpoint.';		// stops the compiler
+				@warn '`#{break}` is not a valid breakpoint.';		// outputs the message but does not stop the compiler
+			}
+		}
