@@ -153,5 +153,8 @@ SCSS
 	}
 	
 	
+	Comments:
+		/* ... */ 	- will appear in the compiled css
+		// ...		- will be excluded in the compiled css
 	
 	
