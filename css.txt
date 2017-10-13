@@ -108,3 +108,50 @@ SVG:
 							2. <svg>
 									<use xlink:href="#mail" />
 							   </svg>
+							   
+							 
+SCSS
+
+	$btn {			// placeholder style --> when @extend-ing, it won't get into the compiled css as a .btn class
+		color: red;
+		
+		&:after {
+			clear: both;
+			content: '';
+			display: $my-display;		// $my-display: variable
+		}
+	}
+	
+	.btn-common {
+		background: blue;
+	}
+	
+	.btn {
+		&-callout {		// &: parent selector
+			@extend $btn;
+		}
+		&-info {
+			@extend $btn;
+			@extend .btn-common;
+			
+			&:hover {
+			}
+		}
+		
+		a {
+		}
+	}
+	
+	
+	@mixin center {
+		margin: 0 auto;
+		width: 90%;
+	}
+	
+	.apples {
+		@include center;		// include the mixin here
+	}
+	
+	
+	
+	
