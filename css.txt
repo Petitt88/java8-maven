@@ -111,46 +111,38 @@ SVG:
 							   
 							 
 SCSS
-
-	$btn {			// placeholder style --> when @extend-ing, it won't get into the compiled css as a .btn class
-		color: red;
+	
+	Extend: extends a rule with another rule's properties
+		.btn-common {	// this is a normal rule --> will make it into the compiled css as .btn-common
+			background: blue;
+		}
 		
-		&:after {
-			clear: both;
-			content: '';
-			display: $my-display;		// $my-display: variable
-		}
-	}
-	
-	.btn-common {
-		background: blue;
-	}
-	
-	.btn {
-		&-callout {		// &: parent selector
-			@extend $btn;
-		}
-		&-info {
-			@extend $btn;
-			@extend .btn-common;
+		$btn {			// placeholder style --> when another rule is extended by this, it won't make it into the compiled css as a .btn class
+						// so there will be no .btn rule
+			color: red;
 			
-			&:hover {
+			&:after {
+				clear: both;
+				content: '';
+				display: $my-display;		// $my-display: variable
 			}
 		}
 		
-		a {
+		.btn {
+			&-callout {		// &: parent selector
+				@extend $btn;
+			}
+			&-info {
+				@extend $btn;			// $btn placeholder's properties get copied here
+				@extend .btn-common;	// .btn-common rule's properties get copied here
+				
+				&:hover {
+				}
+			}
+			
+			a {
+			}
 		}
-	}
-	
-	
-	@mixin center {
-		margin: 0 auto;
-		width: 90%;
-	}
-	
-	.apples {
-		@include center;		// include the mixin here
-	}
 	
 	
 	Comments:
@@ -160,16 +152,15 @@ SCSS
 	
 	
 	Partials:
-	
 		- separate files
-		- if filename starts with an underscore, then it is a partial (like _mixins.scss) --> sass compiler will ignore it and not create an _mixins.css files
+		- if filename starts with an underscore, then it is a partial (like _mixins.scss) --> sass compiler will ignore it and not create an _mixins.css file
 		- @import 'partials/variables', 'partials/mixins'
 		
 	
 	Functions:
 		- does not output any css
 		- example:
-			@function divide($a, $b: $max-width) {		// $b has a default value --> not necessary to be specified
+			@function divide($a, $b: $max-width) {		// $b has a default value --> not necessary to be specified when invoking the function
 				@return ($a / $b);
 			}
 			
@@ -187,7 +178,7 @@ SCSS
 				@return (100% / $numberOfItems) - $g-total;
 			}
 			@media (min-width: $break-s) {
-				flex: 1 per-line(2);	// 2nd argument is the flex-bases itself!
+				flex: 1 per-line(2);	// 2nd argument is the flex-basis itself!
 			}
 			@media (min-width: $break-l) {
 				flex-bases: per-line(3);
@@ -195,24 +186,33 @@ SCSS
 			
 	
 	Mixins:
+		@mixin center {
+			margin: 0 auto;
+			width: 90%;
+		}		
+		.apples {
+			@include center;	// include the mixin here
+		}
+		
+		
 		@mixin roundy($dim, $border: null) {
 			header: $dim;
 			width: $dim;
-			border: $border;	// this rule gets skipped from the generated css if the caller $border does not specify $border (e.g. it is null)
+			border: $border;	// this rule gets skipped from the generated css if the caller does not specify $border (e.g. it is null because its default value is null)
 		}
 		
 		@include roundy ($border: 4px solid white, $dim: 150px);	// named parameters: order can be swapped just like in C#
 		
 		
 	@if:
-	
+
 		@mixin media-query($break) {
 			$value: map-get($breakpoints, $break);
 			$sm: map-get($breakpoints, 'sm');	// map-get function: gets the value in the $breakpoints map which has the key 'sm' associated with
 		
 			@if $value < $sm {
 				@media (max-width: $value) {
-					@content;
+					@content;					// @content: when invoking the mixin with a body (like: @include XXX { /*body goes here*/ }), its content goes here
 				}
 			}
 			//@else if $break == 'md' {
@@ -227,8 +227,8 @@ SCSS
 			}
 		}
 		@include media-query('xs') {
-			color: orange;
-			@include center(90%);
+			color: orange;			// there properties will go where @content is specified in the @mixin named "media-query"
+			@include center(90%);	// mixins can be nested
 		}
 		
 	
@@ -256,7 +256,7 @@ SCSS
 		
 		@mixin themes($map) {
 			@each $map-key, $map-value in $map {
-				&-#{$map-key} {			// referencing the parent select (.icn in this example)
+				&-#{$map-key} {				// referencing the parent selector with the ampersand "&" (.icn in this example)
 					color: $map-value;
 				}
 			}
@@ -284,9 +284,9 @@ SCSS
 		}
 		
 		
-	Each loops: used to iterate through lists
+	Each loops: used to iterate through lists or maps
 
-		$teachers: ('peter', 'zsofi', 'noni', 'dori', 'flori', 'niki');
+		$teachers: ('peter', 'zsofi', 'noni', 'dori', 'flori', 'niki');		// this is a list
 		
 		@each $teacher in $teachers {
 			.teacher-#{$teacher} {
