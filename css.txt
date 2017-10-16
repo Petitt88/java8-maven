@@ -1,6 +1,9 @@
 Grid layout:
 	grid:
 	
+		Consits of explicit and implicit rows/columns. Explicit are the ones that we specify, implicit the ones that we do not specify however they appear because we put more item into the grid,
+		than how many columns/rows we have defined.
+	
 		grid-template-columns: 1fr 20px 10% 2fr;			/*4 explicit columns*/		- fr = fragment
 		grid-template-rows: 100px 40px;						/*2 explicit rows*/
 		grid-gap: 15px;				// space between columns and rows
@@ -70,7 +73,7 @@ Grid layout:
 			grid-template-columns: 2fr 1fr;							// 2 explicit columns
 			grid-template-rows: 100px minmax(200px, 1fr) 100px;		// 3 explicit rows
 			grid-gap: 10px;
-			grid-template-areas:	// each string is a row, and each comma separated word becomes a column
+			grid-template-areas:	// each string is a row, and inside each string each space separated word becomes a column
 				"header header" 	// header takes all 2 columns in the 1st row
 				"main aside"		// main takes the 1st column and aside the 2nd in the 2nd row
 				"footer";			// footer takes the 1st column in the 3rd row
