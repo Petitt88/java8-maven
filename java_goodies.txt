@@ -940,8 +940,12 @@ A module is a set of packages designed for reuse.
 	
 Module Descriptor: (module-info.java)
 	- The module descriptor is the module-info.java file. It specifies the public API of the module. (ie: what it requires and what it depends on)
-	- Required modules are NOT transitively available to transitive consumers, (ie: A requires B requires C means A does not see C automatically) unless requires transitive is specified. 
 	- Modules are required and packages are exported.
+	- Required modules are NOT transitively available to transitive consumers, (ie: A requires B requires C means A does not see C automatically) unless requires transitive is specified. 
+		module-info.java of B should look like this for transitive require:
+			module B {
+				requires transitive C;		// now each module that consumes B will be able to see C's exports automatically.
+			}
 
 Tools:
 	- JDeps: 
