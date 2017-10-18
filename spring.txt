@@ -105,16 +105,16 @@ Properties files can also have fallback values:
 @ComponentScan: what packages to scan for @Component (@Component, @Repository, @Service, @Controller, @RestController). The default is the package that has @ComponentScan defined on.
 				Spring boot by default scans the base package + all packages beneath it
 				
-				package eu.infralert.admin;
+				package pet.business.shop;
 				@SpringBootApplication
-				public class AdminServiceApplication { ... }
-					in this case "eu.infralert.admin" package and all subpackages get scanned
+				public class ShopServiceApplication { ... }
+					in this case "pet.business.shop" package and all subpackages get scanned
 					
 				for custom packages to be scanned:
 				@SpringBootApplication
-				@ComponentScan({"eu.infralert.admin", "eu.infralert.data", "eu.infralert.utility"})
-				public class AdminServiceApplication { ... }
-					now Spring boot will scan "eu.infralert.admin", "eu.infralert.data", "eu.infralert.utility" packages + all other that are beneath them
+				@ComponentScan({"pet.business.shop", "pet.business.data", "pet.business.utility"})
+				public class ShopServiceApplication { ... }
+					now Spring boot will scan "pet.business.shop", "pet.business.data", "pet.business.utility" packages + all other that are beneath them
 					
 @EntityScan: Spring boot uses this for JPA @Entity discovery. The scanning strategy is the same as with @ComponentScan.
 			 Because of @EnableAutoConfiguration, Spring boot automatically scans for entities starting from the base package.
@@ -1518,22 +1518,22 @@ Configuration injection
 		if you want to inject the specified Annotation on the method/class use @annotation(paramName), @within(paramName2) and the function is like: void processThis(AnnotationType1 paramName, AnnotationType2 paramName2) {...}
 		if you don't want to inject the Annotation use the fully qualified name like this: @annotation(com.pet.AnnotationType1), @within(com.pet.AnnotationType2) and the function is like: void processThis() {...}
 	
-	@Before("@annotation(eu.infralert.edge.infrastructure.csrf.ValidateAntiforgery) " +
-			        "|| @within(eu.infralert.edge.infrastructure.csrf.ValidateAntiforgery) && !@annotation(eu.infralert.edge.infrastructure.csrf.IgnoreValidateAntiforgery)")
+	@Before("@annotation(pet.business.shop.infrastructure.csrf.ValidateAntiforgery) " +
+			        "|| @within(pet.business.shop.infrastructure.csrf.ValidateAntiforgery) && !@annotation(pet.business.shop.infrastructure.csrf.IgnoreValidateAntiforgery)")
 	public void validateToken() { }
 	
 	@AfterReturning(value = "@within(com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand)", returning = "ret")
 	public void postProcessFeignIntegrationResult(Object ret) { }
 	
-	@Around("@within(eu.infralert.utility.spring.ApiController)")
+	@Around("@within(pet.business.shop.spring.ApiController)")
 	public Object postProcessResult(ProceedingJoinPoint pjp) throws Throwable { }
 	
-	@Before("@within(authenticated) && !@annotation(eu.infralert.utility.spring.AllowAnonymous) && !@annotation(eu.infralert.utility.spring.Authenticated)")
+	@Before("@within(authenticated) && !@annotation(pet.business.shop.spring.AllowAnonymous) && !@annotation(pet.business.shop.spring.Authenticated)")
 	public void authOnlyController(Authenticated authenticated) {
 		this.handleAuthenticated(authenticated);
 	}
 	
-	@Before("@annotation(authenticated) && !@within(eu.infralert.utility.spring.Authenticated)")
+	@Before("@annotation(authenticated) && !@within(pet.business.shop.spring.Authenticated)")
 	public void authOnlyMethod(Authenticated authenticated) {
 		this.handleAuthenticated(authenticated);
 	}
