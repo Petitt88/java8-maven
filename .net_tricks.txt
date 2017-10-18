@@ -257,6 +257,81 @@ Reference assmeblies:
 			- instead of Html child actions
 			- can be used as tag helpers: <vc:priority-list max-priority="2" is-done="false"></vc:priority-list>
 		
+		RazorPages:
+			- built on top of MVC - it is MVC
+			- the PageModel is kind of like a ViewModel
+				- RazorPages is like MVVM pattern
+				- the PageModel is not just a POCO, but the view can bind methods to it
+					- GET, POST, PUT, DELETE
+				- [BindProperty] - new property in Asp.Net Core 2.0 and works in PageModels AND even in Controllers!
+					[BindProperty]
+					public Customer Customer { get; set; }
+					
+					but this old machanism (approach) from Controllers also works:
+					public void OnPost(Customer customer) {...}
+					
+					In case of a successful Post, the pattern that should be used is Post-Redirect-Get:
+						return RedirectToPage("Index");		// goes to the Index page of the current folder
+						return RedirectToPage("./Index");	// the same as above
+						return RedirectToPage("/Index");	// goes to the Index page in the root (Pages folder)
+						
+			public async Task<IActionResult> OnPostAsync()
+			{
+				if(!ModelState.IsValid)
+				{
+					return Page();
+				}
+				_db.Customers.Add(customer);
+				await _db.SaveChanges();
+				
+				return RedirectToPage("Index");
+			}
+			
+			- TempData: instead of doing this.TempData in the PageModel we can do this instead:
+				- [TempData]	- the cookie gets generated specially for the current user, so we do not have to worry about another user reads it first.
+				  public string Message { get; set; }
+				- this approuch stays in the TempData for not just one request, but until it is read. Then the framework automatically deletes it.
+				- works in Controllers as well
+				- before TempData was stored in the Session, but now the default TempData provider is Cookies! So a cookie is created and deleted right after the stored TempData gets read.
+				
+			-	<form method="post">
+					...
+					<button asp-page-handler="Delete">Delete</button>
+					<button asp-page-handler="Send">Send</button>
+				</form>
+				
+				asp-page-handler: changes the form's defult action (which would be an "OnPost" method) to the one specified: well actually it will map to OnPostDelete and OnPostSend. The "Async" suffix is optional.
+								  This way we do not have to wrap each button into a new <form> tag.
+								  
+					<button asp-page-handler="Send" asp-route-id="@Customer.Id">Send</button>
+					public async Task OnPostSendAsync(int id) {...}
+						But the url becomes like /Customers?id=12&handler=Send
+						Easy to change: in the cshtml: @page "{id:int?}/{handler?}"	- "?" means optional
+						Now the url becomes: /Customers/12/Send
+								  
+				For controller actions to be mapped:
+					<button asp-controller="Customers" asp-action="Delete">Delete</button>
+					
+			- Action method resolution: - can be changed by 2 lines of code btw
+				1. Look for method the start with "On"
+				2. Look for the current HTTP verb after "On"
+				3. If there is a handler specified look for it after the verb
+				4. Look for "Async" specified optionally. And that's it.
+				
+			- To add additional routes for certain pages:
+				services.AddMvc()
+					.AddRazorPagesOptions(options =>
+				{
+					options.Conventions.AddPageRoute("Customers/Index", "AllCustomers");
+				});
+				
+			- Filters: there is a new filter type: IPageFilter and IAsyncPageFilter
+				[Authorize]			// can be added to actions as well (OnXXX)
+				public class NewModel : PageModel {...}
+				
+				- PagesFilter target pages
+					public class LoggingFilter : IPageFilter {...}
+					To use this: services.AddMvc().AddMvcOptions(options => options.Filters.Add<LoggingFilter>())
 		
 		Logging:
 			- structued logging: 
