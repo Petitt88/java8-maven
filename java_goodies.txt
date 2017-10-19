@@ -925,6 +925,9 @@ Running a program:
 				- performance bottleneck: all jar files on the classpath have to be scanned for the required package when loading a class
 					- we load some classes from one jar, and other classes from the other jar!
 		modules are not mandatory - classpath still exists!
+		multi-release JAR files for library authors:
+			- for example RxJava could release a jar that uses Java 9 features (private methods, new API, etc) if targeting Java 9
+			- and releases another jar if the target is pre-java 9 which do not use the new functionalities
 
 
 Jigsaw's goals:
@@ -1012,12 +1015,19 @@ Services:
 		provides java.sql.Driver with com.mysql.jdbc.Driver;		- this module provides the implementation of the Driver (class and interface)
 	}
 	
+	module com.pet.shop {
+		export com.pet.shop.client;
+		
+		opens com.pet.shop.client to javafx.fxml;	- open up the code inside my package to javafx for reflection
+	}
+	
 	
 	requires: module name goes here
 	exports:  package name goes here
 	provides: concrete class/interface goes here
 	with:	  concrete implementation class goes here
 	uses: 	  concrete class/interface goes here
+	opens:	  opens packages to the specified modules up for reflection
 	
 	ServiceLoader.load(EventService.class): 
 		- the call to ServiceLoader.load(Class<T>) returns an Iterable<T>, containing all service implementations of a given interface 
