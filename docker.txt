@@ -253,8 +253,12 @@ Docker:
 		Prefer ENTRYPOINT to CMD when building executable Docker image and you need a command always to be executed. Additionally use CMD if you need to provide extra default arguments that could be overwritten from command line when docker container runs.
 		
 			- RUN executes command(s) in a new layer and creates a new image. E.g., it is often used for installing software packages.
-			- CMD sets default command and/or parameters, which can be overwritten from command line when docker container runs.
-			- ENTRYPOINT configures a container that will run as an executable.
+			- CMD sets default command and/or parameters
+				- command gets executed if ENTRYPOINT is not specified
+				- parameters can be overridden from the commandline when firing up the container
+			- ENTRYPOINT configures a container that will run as an executable
+				- can have parameters - but unlike CMD, these parameters cannot be overridden from the commandline
+				- if both ENTRYPOINT and CMD are specified, ENTRYPOINT gets executed and CMD (all parameters of CMD) becomes its parameters
 			
 		EXPOSE vs -p (publish)
 			Basically, you have three options:
