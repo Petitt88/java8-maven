@@ -29,7 +29,7 @@ Grid layout:
 		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));		// becomes a 3 column layout. On mobile each column stacking on top of eacah other.
 		
 		grid-template-columns: repeat(auto-fill, 150px);				// auto fill as many 150px wide columns as possible (somewhat responsive design) - a lot of free spaces arise with this when resizing the browser.
-		grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));	// auto fill as many 150px wide columns as possible and always fill the whole row. Puts empty tracks if there is not enough columns to fill the whole window.
+		grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));	// auto fill as many 150px wide columns as possible and always fill the whole row. Puts empty tracks if there are not enough columns to fill the whole window.
 		grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));	// auto fill as many 150px wide columns as possible and always fill the whole row. Collapses empty tracks. Always takes up all of the window's width.
 		
 		
@@ -45,6 +45,7 @@ Grid layout:
 		3------------------------
 		
 		
+		grid-column and grid-row can be used to make elements span multiple columns/rows
 		header {
 			grid-column-start: 1;
 			grid-column-end: 3;
@@ -57,11 +58,11 @@ Grid layout:
 		// negative values start from "-1" and goes in backwards order (column start is on the right, row is at the bottom)
 		aside {
 			grid-column-start: 1;
-			grid-column-end: -1;		/*negative number means aside will span to the last column*/ --> -1 is the 1st column from the right. The rest goes like -2, -3, ...
+			grid-column-end: -1;		/*negative number means aside will span to the last column from the 1st column*/ --> -1 is the 1st column from the right. The rest goes like -2, -3, ...
 			grid-column: 1 / -1			// shorthand: start / end
 			
 			grid-row-start: -3;
-			grid-row-end: -1;			/*negative number means aside will span to the last column*/
+			grid-row-end: -1;			/*negative number means aside will span to the last row and starting 2 rows above it*/
 			grid-row: -3 / -1			// shorthand: start / end	 --> -1 is the 1st row from the bottom. The rest goes like -2, -3, ...
 		}
 		
@@ -73,7 +74,7 @@ Grid layout:
 			grid-template-columns: 2fr 1fr;							// 2 explicit columns
 			grid-template-rows: 100px minmax(200px, 1fr) 100px;		// 3 explicit rows
 			grid-gap: 10px;
-			grid-template-areas:	// each string is a row, and inside each string each space separated word becomes a column
+			grid-template-areas:	// each string is a row, and inside each space separated word becomes a column
 				"header header" 	// header takes all 2 columns in the 1st row
 				"main aside"		// main takes the 1st column and aside the 2nd in the 2nd row
 				"footer";			// footer takes the 1st column in the 3rd row
@@ -120,11 +121,11 @@ SCSS
 			background: blue;
 		}
 		
-		$btn {			// placeholder style --> when another rule is extended by this, it won't make it into the compiled css as a .btn class
+		$btn {			// placeholder style (starting with "$") --> when another rule is extended by this, it won't make it into the compiled css as a .btn class
 						// so there will be no .btn rule
 			color: red;
 			
-			&:after {
+			&:after {	// &: parent element selector
 				clear: both;
 				content: '';
 				display: $my-display;		// $my-display: variable
@@ -132,10 +133,10 @@ SCSS
 		}
 		
 		.btn {
-			&-callout {		// &: parent selector
+			&-callout {		// &: parent selector, styles become .btn-callout in the compiled css
 				@extend $btn;
 			}
-			&-info {
+			&-info {		// btn-info
 				@extend $btn;			// $btn placeholder's properties get copied here
 				@extend .btn-common;	// .btn-common rule's properties get copied here
 				
@@ -150,14 +151,13 @@ SCSS
 	
 	Comments:
 		/* ... */ 	- will appear in the compiled css
-		// ...		- will be excluded in the compiled css
-	
+		// ...		- will be excluded from the compiled css
 	
 	
 	Partials:
 		- separate files
 		- if filename starts with an underscore, then it is a partial (like _mixins.scss) --> sass compiler will ignore it and not create an _mixins.css file
-		- @import 'partials/variables', 'partials/mixins'
+		- @import 'partials/variables', 'partials/mixins'		// use this in the top-level scss file to make the partials' contents compiled into the css
 		
 	
 	Functions:
@@ -170,6 +170,7 @@ SCSS
 			to invoke it:
 			.test {
 				line-height: divide(32px, 16px);
+				line-height: divide(32px);	// 2nd parameter gets the default value
 			}
 			
 			@function px-to-pc($target, $context: $max-width) {
@@ -204,7 +205,7 @@ SCSS
 			border: $border;	// this rule gets skipped from the generated css if the caller does not specify $border (e.g. it is null because its default value is null)
 		}
 		
-		@include roundy ($border: 4px solid white, $dim: 150px);	// named parameters: order can be swapped just like in C#
+		@include roundy ($border: 4px solid white, $dim: 150px);	// named parameters: order can be swapped just like in C# or in kotlin
 		
 		
 	@if:
@@ -230,7 +231,7 @@ SCSS
 			}
 		}
 		@include media-query('xs') {
-			color: orange;			// there properties will go where @content is specified in the @mixin named "media-query"
+			color: orange;			// these properties will go where @content is specified in the @mixin named "media-query"
 			@include center(90%);	// mixins can be nested
 		}
 		
@@ -298,7 +299,7 @@ SCSS
 		}
 		
 		
-	Errors and warnings
+	Errors and warnings - these are used to help the developer get better feedback where the exact error is and what is it (default error messages and "stacktrace" of the scss compiler could be better)
 	
 		@mixin mq($break) {
 			$value: map-get($breakpoints, $break);
