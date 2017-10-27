@@ -165,6 +165,29 @@ Sysinternals, Resource monitor
 		Task Mananger --> Performance --> Open Resource Monitor
 		Network tab --> Listening Ports: just like with TcpView we can see which ports are being used by which application
 			Moreover, this even show us whether the port is allowed in our firewall (Firewall Status column)
+			
+
+Application Domains (AppDomain)
+
+	Process:
+		- Windows operating systems protect applications from each other by running each application in its own process. 
+		- If an application fails, only that process is affected; applications in other processes continue to perform. 
+		- Of course, because memory addresses in one process have no meaning in another process, it can be complex to call functions in one process from some other process.
+		- Marshaling is the term given to the events that occur when a call, and any arguments, are packaged in one process and unpackaged in another so that a call across a process boundary can be successful.
+		
+	AppDomain:
+		- There can be multiple running AppDoamins in the same process. To a process can have multiple AppDomains but each domain belongs to only one process
+		- In the managed environment, application domains (or logical processes) and contexts provide isolation and security at less cost and with greater ability to scale well than an operating-system process by relying on, among other things, the fact that managed code is verifiably type-safe. 
+		- Every managed application runs in an application domain, whether another application starts a domain on its behalf or the host environment starts one for it. 
+		- .NET remoting helps to provide the infrastructure to communicate between application domains in a straightforward way, protected by security technologies.
+		
+	- An AppDomain is an isolation unit within a process. AppDomains can be created at runtime, loaded with code, and unloaded. Its an isolation boundary designed to make .NET apps more reliable.
+	- An assembly holds one or more modules, which hold compiled chunks of code. You will typically see an assembly as an .EXE or a .DLL.
+	- A process is an executing application (waaaay oversimplified).
+	- A thread is an execution context. The operating system executes code within a thread. The operating system switches between threads, allowing each to execute in turn, thus giving the impression that multiple applications are running at the same time.
+	- To put it all together (very simplified):
+		A program is executed. A process is created by the operating system, and within its single thread it starts loading code to execute. In a .NET application, a single AppDomain is created by the CLR. The application's executing assembly (the .EXE) is loaded into this AppDomain and begins execution. The application can spawn new processes, create AppDomains, load other assemblies into these domains, and then create new Threads to execute code in any of these AppDomains.
+		Once an assemly is loaded in cannot be unloaded, however AppDomains can be. When tearing down the AppDomain it brings the loaded assemblies (that have been previously loaded into it) with it - but only those assemblies and nothing more.
 
 
 
