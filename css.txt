@@ -115,6 +115,9 @@ SVG:
 							   
 							 
 SCSS
+
+	Variables:
+		$color-brand: #6a5acd;
 	
 	Extend: extends a rule with another rule's properties
 		.btn-common {	// this is a normal rule --> will make it into the compiled css as .btn-common
