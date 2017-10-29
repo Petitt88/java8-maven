@@ -124,7 +124,7 @@ SCSS
 			background: blue;
 		}
 		
-		%btn {			// placeholder style (starting with "$") --> when another rule is extended by this, it won't make it into the compiled css as a .btn class
+		%btn {			// placeholder style (starting with "%") --> when another rule is extended by this, it won't make it into the compiled css as a .btn class
 						// so there will be no .btn rule
 			color: red;
 			
