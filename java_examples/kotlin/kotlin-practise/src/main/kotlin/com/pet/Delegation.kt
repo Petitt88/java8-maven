@@ -1,10 +1,18 @@
 package com.pet
 
+import java.util.*
 import kotlin.reflect.KProperty
 
 class Example {
 	var p: String by Delegate()
 	val p2: Int by Delegate2 { 3 }
+	
+
+	fun classInFunction() {
+		class Message(val id: UUID)
+
+		val mess = Message(UUID.randomUUID())
+	}
 }
 
 class Delegate {
