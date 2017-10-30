@@ -1474,10 +1474,10 @@ Configuration injection
 	org.springframework.core.convert.converter.Converter interface
 	
 11. Aspect Oriented Programming with Spring
-	Aspect: a modularization of a concern that cuts across multiple classes. Transaction management is a good example of a crosscutting 
+	Aspect: a modularization of a concern that cuts across multiple classes. Transaction management is a good example of a cross cutting 
 			concern in enterprise Java applications. In Spring AOP, aspects are implemented using regular classes 
 			(the schema-based approach) or regular classes annotated with the @Aspect annotation (the @AspectJ style).
-	Join point: a point during the execution of a program, such as the execution of a method or the handling of an exception. 
+	Join point: a point during the execution of a program, such as the execution of a method. constructor invocation, or the handling of an exception. 
 			In Spring AOP, a join point always represents a method execution.
 	Advice: action taken by an aspect at a particular join point. Different types of advice include "around," "before" and "after" advice.
 			(Advice types are discussed below.) Many AOP frameworks, including Spring, model an advice as an interceptor, maintaining a chain 
