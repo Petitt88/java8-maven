@@ -32,6 +32,7 @@ WebFluxConfigurer
 					 and AuthenticationManagerConfiguration for authentication configuration which is also relevant in non-web applications). To switch off the default web application security 
 					 configuration completely you can add a bean with @EnableWebSecurity (this does not disable the authentication manager configuration or Actuator’s security). 
 					 To customize it you normally use external properties and beans of type WebSecurityConfigurerAdapter (e.g. to add form-based login).
+@EnableWebFluxSecurity - the same as @EnableWebSecurity but it is for Spring WebFlux (not for Spring Mvc)
 					 
 @EnableCaching - to make @Cacheable and alike work (@CacheEvict)
 
