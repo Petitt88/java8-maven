@@ -12,6 +12,7 @@ fun main(args: Array<String>) {
 	val howManyPants2 = fun(numPandas: Int) { numPandas + numPantsPerPanda }
 	// variable to lambda
 	val howManyPantsLambda = { numPandas: Int -> numPandas + numPantsPerPanda }
+	val howManyPantsLambda2: (Int) -> Int = { it + numPantsPerPanda }
 
 	// local function
 	fun countPandas(area: Int): Int = if (area > 3000) area / 25 else area / 18
@@ -22,6 +23,13 @@ fun main(args: Array<String>) {
 	println(pantsCounter.count(countPandas(area), howManyPants))
 
 	println(pantsCounter::class.java.simpleName)
+
+	val res = run {
+		"return this"
+		//return@run 22
+	}
+	// prints "return this" or 22
+	println(res)
 }
 
 
