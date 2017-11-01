@@ -1,11 +1,15 @@
 package com.pet
 
+import kotlinx.coroutines.experimental.async
+import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.experimental.runBlocking
 import kotlin.coroutines.experimental.buildSequence
 
 fun main(args: Array<String>) {
 
 	// coroutine builder
 	val mySequence = buildSequence {
+		// yields execution back to the caller
 		yield(1)
 		println("First went")
 		yield(2)
@@ -14,6 +18,28 @@ fun main(args: Array<String>) {
 	for (i in mySequence) {
 		println(i)
 	}
+
+	// "launch": has no result, returns a Job. Kinda like fire-and-forget
+	// Job can be cancelled, waited by join()
+	val job = launch { }
+	runBlocking(block = { job.join() })
+
+	// Deferred inherits from job
+	val deferreds = (1..1_000_000).map {
+		// async: returning a value from a coroutine. As opposed to "launch", "async" has result that can be awaited (or joined)
+		async {
+			// this gets returned from the lambda
+			it
+		}
+	}
+
+	// deferreds can only be suspended in coroutine contexts
+	// runBlocking: starts a coroutine context and blocks the current thread until the lambda keeps executing - can call suspending functions in it
+	runBlocking {
+		// await has result: the Int
+		deferreds.sumBy { it.await() }
+	}
+	// at this point the deferreds are complete...
 }
 
 fun play2() {
