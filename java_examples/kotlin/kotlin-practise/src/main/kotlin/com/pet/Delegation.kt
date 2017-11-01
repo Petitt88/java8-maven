@@ -1,9 +1,6 @@
 package com.pet
 
-import kotlinx.coroutines.experimental.Job
-import kotlinx.coroutines.experimental.Unconfined
-import kotlinx.coroutines.experimental.launch
-import kotlinx.coroutines.experimental.runBlocking
+import kotlinx.coroutines.experimental.*
 import java.util.*
 import kotlin.coroutines.experimental.Continuation
 import kotlin.reflect.KProperty
@@ -22,6 +19,10 @@ class Example {
 					val jobs = mutableListOf<Job>()
 
 					jobs += launch(this.coroutineContext) {
+
+					}
+					delay(1000)
+					jobs += async(CommonPool) {
 
 					}
 					val res = myAsyncFunc()
