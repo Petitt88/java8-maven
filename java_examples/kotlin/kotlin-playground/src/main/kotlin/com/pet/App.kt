@@ -1,6 +1,22 @@
 package com.pet
 
+import kotlin.coroutines.experimental.buildSequence
+
 fun main(args: Array<String>) {
+
+	// coroutine builder
+	val mySequence = buildSequence {
+		yield(1)
+		println("First went")
+		yield(2)
+		println("Second went")
+	}
+	for (i in mySequence) {
+		println(i)
+	}
+}
+
+fun play2() {
 	val numBackUpPairsByRegion = mapOf("Africa" to 4, "Antarctica" to 7, "Asia" to 3, "Australia" to 2, "Europe" to 2, "North America" to 3, "South America" to 4)
 	val region = "Antarctica"
 	val area = 14000000
@@ -31,7 +47,6 @@ fun main(args: Array<String>) {
 	// prints "return this" or 22
 	println(res)
 }
-
 
 fun play(args: Array<String>) {
 	val favNums = arrayOf(11, 38, 74, 15)

@@ -1,40 +1,10 @@
 package com.pet
 
-import kotlinx.coroutines.experimental.*
-import java.util.*
-import kotlin.coroutines.experimental.Continuation
 import kotlin.reflect.KProperty
 
-class Example {
+class DelegateExample {
 	var p: String by Delegate()
 	val p2: Int by Delegate2 { 3 }
-
-
-	fun classInFunction() {
-		class Message(val id: UUID) {
-			private val myId = Message(UUID.randomUUID())
-
-			fun asyncMessageMagic() {
-				runBlocking(Unconfined) {
-					val jobs = mutableListOf<Job>()
-
-					jobs += launch(this.coroutineContext) {
-
-					}
-					delay(1000)
-					jobs += async(CommonPool) {
-
-					}
-					val res = myAsyncFunc()
-
-					jobs.forEach { it.join() }
-				}
-			}
-		}
-
-		val mess = Message(UUID.randomUUID())
-	}
-
 }
 
 class Delegate {
@@ -56,12 +26,3 @@ class Delegate2<out T : Int>(val initializer: () -> T) {
 }
 
 private inline operator fun <T : Int> Delegate2<T>.getValue(thisRef: Any?, property: KProperty<*>): Int = value
-
-suspend fun myAsyncFunc(): Int {
-	TODO("Not implemented yet")
-}
-
-// The startCoroutine2 is defined in as an extension for suspending function type.
-fun <T> (suspend () -> T).startCoroutine2(completion: Continuation<T>) {
-
-}
