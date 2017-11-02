@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>Thymeleaf WebFlux Sandbox</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+
+<body>
+
+<p>Using template engine: <strong>Thymeleaf</strong></p>
+
+<h2>Movies from ReactiveDataDriverContextVariable - Flux must be used</h2>
+
+<table>
+	<thead>
+	<tr>
+		<th>Id</th>
+		<th>Name</th>
+
+	</tr>
+	</thead>
+	<tbody>
+	<tr th:each="movie : ${movies}">
+		<td class="teamA">[[${movie.id}]]</td>
+		<td class="score">[[${movie.name}]]</td>
+	</tr>
+	</tbody>
+</table>
+
+<h2>Movies after coroutine suspend on a Flux</h2>
+
+<table>
+	<thead>
+	<tr>
+		<th>Id</th>
+		<th>Name</th>
+
+	</tr>
+	</thead>
+	<tbody>
+	<tr th:each="movie : ${superMovies}">
+		<td class="teamA">[[${movie.id}]]</td>
+		<td class="score">[[${movie.name}]]</td>
+	</tr>
+	</tbody>
+</table>
+
+</body>
+
+</html>
