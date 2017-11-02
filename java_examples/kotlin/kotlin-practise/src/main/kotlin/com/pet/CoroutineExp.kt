@@ -20,13 +20,17 @@ fun classInFunction() {
 			val jobs = mutableListOf<Job>()
 
 			// coroutine builder
+			// launch has no result, returns a job that can be waited in a coroutine context by ".join()" which is a suspend function
 			jobs += launch {
 				val res = myAsyncFunc()
 			}
 
 			// coroutine builder
+			// async has result, ".await()" can be used to retrieve it (it is suspending just like join)
 			jobs += async {
 				val res = myAsyncFunc()
+				// will be the result of the async builder
+				res
 			}
 
 			// coroutine builder
@@ -47,28 +51,33 @@ fun classInFunction() {
 			}
 
 			// coroutine builder
-			val fib = buildSequence {
+			val seq = buildSequence {
 				yield(1)
 
 				yield(2)
 			}
-			for (i in fib.take(10)) {
+			for (i in seq.take(10)) {
 
 			}
 
 			// coroutine builder
-			future {
+			// returns a CompletableFuture
+			val fut = future {
 				val c1 = CompletableFuture<Int>()
 				val res = c1.await()
+				// will be the result of the future builder
+				res
 			}
 
 			// coroutine builder
-			mono {
+			// returns a mono
+			val mon = mono {
 
 			}
 
 			// coroutine builder
-			flux<Int>(CommonPool) {
+			// returns a flux
+			val flu = flux<Int>(CommonPool) {
 
 			}
 		}

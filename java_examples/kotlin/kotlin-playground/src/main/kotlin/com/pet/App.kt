@@ -22,6 +22,7 @@ fun main(args: Array<String>) {
 	// "launch": has no result, returns a Job. Kinda like fire-and-forget
 	// Job can be cancelled, waited by join()
 	val job = launch { }
+	//job.cancel()
 	runBlocking(block = { job.join() })
 
 	// Deferred inherits from job
