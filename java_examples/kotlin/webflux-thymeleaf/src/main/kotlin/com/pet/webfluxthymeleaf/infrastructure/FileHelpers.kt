@@ -7,22 +7,19 @@ import java.nio.channels.AsynchronousFileChannel
 
 
 inline suspend fun <reified T> AsynchronousFileChannel.readToEnd(mapper: ObjectMapper): T {
+
 	val bytes = ByteArray(this.size().toInt())
-
-	val buf = ByteBuffer.allocate(4096)
+	val buffer = ByteBuffer.allocate(4096)
 	var pos = 0L
-	while (true) {
 
-		val bytesRead = this.aRead(buf, pos)
+	while (true) {
+		val bytesRead = this.aRead(buffer, pos)
 		if (bytesRead == -1)
 			break;
 
-		buf.array()
+		buffer.array()
 				.take(bytesRead)
-				.forEachIndexed { index, value ->
-					println(index + pos.toInt())
-					bytes[index + pos.toInt()] = value
-				}
+				.forEachIndexed { index, value -> bytes[index + pos.toInt()] = value }
 
 		pos += bytesRead
 	}
