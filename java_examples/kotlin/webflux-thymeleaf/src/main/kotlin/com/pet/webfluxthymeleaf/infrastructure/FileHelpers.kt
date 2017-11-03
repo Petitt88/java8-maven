@@ -27,6 +27,9 @@ inline suspend fun <reified T> AsynchronousFileChannel.readToEnd(mapper: ObjectM
 		pos += bytesRead
 	}
 
+	//mapper.readValue(bytes, Array<Movie>::class.java)
+	//mapper.readValue(bytes, object : TypeReference<List<Movie>>() {})
+
 	val result = mapper.readValue(bytes, T::class.java)
 	return result
 }
