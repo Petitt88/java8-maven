@@ -1,7 +1,7 @@
 package com.pet.webfluxthymeleaf
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.pet.webfluxthymeleaf.infrastructure.readToEnd
+import com.pet.webfluxthymeleaf.infrastructure.parseJson
 import com.pet.webfluxthymeleaf.movie.Movie
 import com.pet.webfluxthymeleaf.movie.MovieService
 import kotlinx.coroutines.experimental.Unconfined
@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.reactive.function.client.WebClient
 import org.thymeleaf.spring5.context.webflux.ReactiveDataDriverContextVariable
 import reactor.core.publisher.Mono
+import java.lang.Exception
 import java.nio.channels.AsynchronousFileChannel
 import java.nio.file.Paths
 import java.time.Duration
@@ -38,9 +39,13 @@ class HomeController(private val movieService: MovieService,
 	@GetMapping("/")
 	fun index(model: Model): Mono<String> = mono(Unconfined) {
 
+		model.addAttribute("firstSourceTitle", "Movies from ReactiveDataDriverContextVariable - Flux must be used")
+				.addAttribute("secondSourceTitle", "Movies from Mongo database after with coroutine suspending on a Flux")
+
 		model.addAttribute("movies", ReactiveDataDriverContextVariable(movieService.getMoviesFromDb(10)))
 
-		val movies = movieService.getMoviesFromDb().collectList().awaitFirst()
+		var movies = movieService.getMoviesFromDb().collectList().awaitFirst()
+		movies = movies.sortedBy { it.id }
 		model.addAttribute("superMovies", movies);
 
 		"index";
@@ -49,12 +54,15 @@ class HomeController(private val movieService: MovieService,
 	@GetMapping("/long")
 	fun longRunningSimulation(model: Model) = mono {
 
+		model.addAttribute("firstSourceTitle", "Fixed movies from already resolved Flux via ReactiveDataDriverContextVariable")
+				.addAttribute("secondSourceTitle", "Movies from an infinite Flux stream. Queried only the first 5, each one took 1 second to get.")
+
 		val view = Mono
 				.delay(Duration.ofSeconds(1))
 				.map { "index" }
 				.awaitFirst()
 
-		model.addAttribute("movies", movieService.getMoviesFix())
+		model.addAttribute("movies", ReactiveDataDriverContextVariable(movieService.getMoviesFix("Super")))
 
 		// getMoviesWithGenerate is an infinite stream
 		val movies = movieService.getMoviesWithGenerate("Super")
@@ -73,20 +81,28 @@ class HomeController(private val movieService: MovieService,
 	@GetMapping("/file")
 	fun files(model: Model) = mono {
 
-		val moviesFromExternalSystem = webClient
-				.get()
-				.uri("/movies")
-				.retrieve()
-				.bodyToFlux(Movie::class.java)
-				.collectList()
-				.awaitFirst()
+		model.addAttribute("firstSourceTitle", "Movies read asynchronously from external system")
+				.addAttribute("secondSourceTitle", "Movies read asynchronously from the filesystem")
 
-		model.addAttribute("movies", moviesFromExternalSystem)
+		// maybe the server is down for some reason
+		try {
+			val moviesFromExternalSystem = webClient
+					.get()
+					.uri("/movies")
+					.retrieve()
+					.bodyToFlux(Movie::class.java)
+					.collectList()
+					.awaitFirst()
+			model.addAttribute("movies", moviesFromExternalSystem)
+		} catch (e: Exception) {
+			println(e.message)
+		}
+
 
 		var channel: AsynchronousFileChannel? = null;
 		try {
 			channel = AsynchronousFileChannel.open(Paths.get(ClassLoader.getSystemResource("movies.json").toURI()))
-			val moviesFromFile = channel.readToEnd<Array<Movie>>(mapper)
+			val moviesFromFile = channel.parseJson<Array<Movie>>(mapper)
 
 			model.addAttribute("superMovies", moviesFromFile);
 		} finally {

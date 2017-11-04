@@ -6,7 +6,7 @@ import java.nio.ByteBuffer
 import java.nio.channels.AsynchronousFileChannel
 
 
-inline suspend fun <reified T> AsynchronousFileChannel.readToEnd(mapper: ObjectMapper): T {
+inline suspend fun <reified T> AsynchronousFileChannel.parseJson(mapper: ObjectMapper): T {
 
 	val bytes = ByteArray(this.size().toInt())
 	val buffer = ByteBuffer.allocate(4096)
