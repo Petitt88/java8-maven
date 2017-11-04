@@ -84,7 +84,7 @@ class HomeController(private val movieService: MovieService,
 		model.addAttribute("firstSourceTitle", "Movies read asynchronously from external system")
 				.addAttribute("secondSourceTitle", "Movies read asynchronously from the filesystem")
 
-		// maybe the server is down for some reason
+		// the server may be down for some reason
 		try {
 			val moviesFromExternalSystem = webClient
 					.get()
