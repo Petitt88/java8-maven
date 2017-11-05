@@ -22,6 +22,7 @@ inline suspend fun <reified T> AsynchronousFileChannel.parseJson(mapper: ObjectM
 				.forEachIndexed { index, value -> bytes[index + pos.toInt()] = value }
 
 		pos += bytesRead
+		buffer.flip()
 	}
 
 	//mapper.readValue(bytes, Array<Movie>::class.java)
