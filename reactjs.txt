@@ -27,6 +27,99 @@ Prevent component from rendering:
 Thinking in React
 	The original list of products is passed in as props, so that’s not state. The search text and the checkbox seem to be state since they change over time and can’t be computed from anything. And finally, the filtered list of products isn’t state because it can be computed by combining the original list of products with the search text and value of the checkbox.
 	
+Lifecycle events: works only on class components (not on functional components)
+	componentDidMount		- hook runs after the component output has been rendered to the DOM
+	componentWillUnmount	- runs before the component is about to be removed from the DOM
+	
+JSX:
+	- Fundamentally, JSX just provides syntactic sugar for the React.createElement(component, props, ...children) function. The JSX code:
+		<MyButton color="blue" shadowSize={2}>
+		  Click Me
+		</MyButton>
+		
+		compiles to: React.createElement(MyButton, {color: 'blue', shadowSize: 2}, 'Click Me')
+		
+		- Capitalized types indicate that the JSX tag is referring to a React component. 
+			These tags get compiled into a direct reference to the named variable, so if you use the JSX <Foo /> expression, Foo must be in scope.
+			lowercase types (like div, span) get passed as strings to React.createElement:
+				React.createElement(Foo, props, ...children)
+				React.createElement("div", props, ...children)
+		
+		User-Defined Components Must Be Capitalized
+			When an element type starts with a lowercase letter, it refers to a built-in component like <div> or <span> and results in a string 'div' or 'span' passed to React.createElement. Types that start with a capital letter like <Foo /> compile to React.createElement(Foo) and correspond to a component defined or imported in your JavaScript file.		
+		
+		- React Must Be in Scope since JSX compiles into calls to React.createElement, the React library must also always be in scope from your JSX code.
+		
+		- Children:
+			- Booleans, Null, and Undefined Are Ignored
+			- can be string or expression
+			
+Ref attribute: works only on DOM elements and custom elements that are classes
+	- the "ref" attribute makes it possible to store the DOM element/React component (only if it is a class, not a function!) in our component
+		<CustomTextInput ref={(input) => { this.textInput = input; }} />	- CustomTextInput extends from React.Component
+	- does not work on functional components because they don’t have instances
+		function MyFunctionalComponent() {
+		  return <input />;
+		}
+	
+	- There are a few good use cases for refs:
+		Managing focus, text selection, or media playback.
+		Triggering imperative animations.
+		Integrating with third-party DOM libraries.
+		
+	- Exposing DOM Refs to Parent Components: this works both for classes and for functional components.
+	
+		function CustomTextInput(props) {
+		  return (
+			<div>
+			  <input ref={props.inputRef} />
+			</div>
+		  );
+		}
+		class Parent extends React.Component {
+		  render() {
+			return (
+			  <CustomTextInput
+				inputRef={el => this.inputElement = el}
+			  />
+			);
+		  }
+		}
+		
+		
+		function CustomTextInput(props) {
+		  return (
+			<div>
+			  <input ref={props.inputRef} />
+			</div>
+		  );
+		}
+		function Parent(props) {
+		  return (
+			<div>
+			  My input: <CustomTextInput inputRef={props.inputRef} />
+			</div>
+		  );
+		}
+		class Grandparent extends React.Component {
+		  render() {
+			return (
+			  <Parent
+				inputRef={el => this.inputElement = el}
+			  />
+			);
+		  }
+		}
+	
+	
+Controlled Components
+	In HTML, form elements such as <input>, <textarea>, and <select> typically maintain their own state and update it based on user input. In React, mutable state is typically kept in the state property of components, and only updated with setState().
+	We can combine the two by making the React state be the “single source of truth”. Then the React component that renders a form also controls what happens in that form on subsequent user input. An input form element whose value is controlled by React in this way is called a “controlled component”.
+	
+	<input type="text" value={this.state.value} onChange={this.handleChange} />
+	handleChange(event) {
+		this.setState({value: event.target.value});
+	}
 	
 ES6:
 	computed property name: 
