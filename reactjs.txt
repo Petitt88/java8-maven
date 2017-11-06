@@ -1,0 +1,39 @@
+Components:
+	- Conceptually, components are like JavaScript functions. They accept arbitrary inputs (called “props”) and return React elements describing what should appear on the screen.
+		function Welcome(props) {
+		  return <h1>Hello, {props.name}</h1>;
+		}
+		
+Props:
+	- input parameters, readonly
+
+State:
+	- State is similar to props, but it is private and fully controlled by the component.
+	- We mentioned before that components defined as classes have some additional features. Local state is exactly that: a feature available only to classes.
+	- While this.props is set up by React itself and this.state has a special meaning, you are free to add additional fields to the class manually if you need to store something that is not used for the visual output.
+	- If you don’t use something in render(), it shouldn’t be in the state.
+	
+	- In React apps, whether a component is stateful or stateless is considered an implementation detail of the component that may change over time. You can use stateless components inside stateful components, and vice versa.
+	- this.setState({value: event.target.value}); - MERGES the state - not overrides the state the passed object, but merges it with it.
+	- Also, since setState() automatically merges a partial state into the current state, we only needed to call it with the changed parts
+	
+	- State is reserved only for interactivity, that is, data that changes over time
+
+Prevent component from rendering:
+	- return null from the "render" function
+	- Returning null from a component’s render method does not affect the firing of the component’s lifecycle methods. For instance, componentWillUpdate and componentDidUpdate will still be called.
+	
+	
+Thinking in React
+	The original list of products is passed in as props, so that’s not state. The search text and the checkbox seem to be state since they change over time and can’t be computed from anything. And finally, the filtered list of products isn’t state because it can be computed by combining the original list of products with the search text and value of the checkbox.
+	
+	
+ES6:
+	computed property name: 
+		this.setState({
+		  [name]: value
+		});
+		It is equivalent to this ES5 code:
+		var partialState = {};
+		partialState[name] = value;
+		this.setState(partialState);
