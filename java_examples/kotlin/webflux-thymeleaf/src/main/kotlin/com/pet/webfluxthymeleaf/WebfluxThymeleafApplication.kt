@@ -8,8 +8,8 @@ import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.reactive.awaitFirst
 import kotlinx.coroutines.experimental.reactive.awaitFirstOrDefault
 import org.springframework.boot.ApplicationRunner
-import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.web.reactive.function.client.WebClient
 import java.time.LocalDateTime
@@ -55,5 +55,5 @@ class WebfluxThymeleafApplication {
 }
 
 fun main(args: Array<String>) {
-	SpringApplication.run(WebfluxThymeleafApplication::class.java, *args)
+	runApplication<WebfluxThymeleafApplication>(*args)
 }
