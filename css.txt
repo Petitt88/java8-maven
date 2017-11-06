@@ -1,7 +1,7 @@
 Grid layout:
 	grid:
 	
-		Consits of explicit and implicit rows/columns. Explicit are the ones that we specify, implicit the ones that we do not specify however they appear because we put more item into the grid,
+		Consists of explicit and implicit rows/columns. Explicit are the ones that we specify, implicit the ones that we do not specify however they appear because we put more item into the grid,
 		than how many columns/rows we have defined.
 	
 		grid-template-columns: 1fr 20px 10% 2fr;			/*4 explicit columns*/		- fr = fragment
@@ -14,7 +14,7 @@ Grid layout:
 		
 		grid-template-columns: 200px auto 200px;	/*center column will be the same wide as its content*/
 		grid-template-columns: 200px 1fr 200px;		/*center column will take up all the remaining space*/
-		grid-template-columns: 2fr repeat(3, 1ft);	// 4 columns, the 1st grows twice as the other 3
+		grid-template-columns: 2fr repeat(3, 1fr);	// 4 columns, the 1st grows twice as the other 3
 		grid-template-columns: minmax(200px, 300px) 300px minmax(50px, auto);	// three columns: 1st is 200px min and 300px max, 2nd is 300px, 3rd is 50px min and maximum the same wide as its content
 		
 		
@@ -128,7 +128,7 @@ SCSS
 						// so there will be no .btn rule
 			color: red;
 			
-			&:after {	// &: parent element selector
+			&:after {						// &: parent element selector
 				clear: both;
 				content: '';
 				display: $my-display;		// $my-display: variable
@@ -136,10 +136,10 @@ SCSS
 		}
 		
 		.btn {
-			&-callout {		// &: parent selector, styles become .btn-callout in the compiled css
+			&-callout {		// &: parent selector, rule becomes .btn-callout in the compiled css
 				@extend %btn;
 			}
-			&-info {		// btn-info
+			&-info {					// .btn-info
 				@extend %btn;			// %btn placeholder's properties get copied here
 				@extend .btn-common;	// .btn-common rule's properties get copied here
 				
@@ -188,7 +188,7 @@ SCSS
 				flex: 1 per-line(2);	// 2nd argument is the flex-basis itself!
 			}
 			@media (min-width: $break-l) {
-				flex-bases: per-line(3);
+				flex-basis: per-line(3);
 			}
 			
 	
@@ -208,7 +208,7 @@ SCSS
 			border: $border;	// this rule gets skipped from the generated css if the caller does not specify $border (e.g. it is null because its default value is null)
 		}
 		
-		@include roundy($border: 4px solid white, $dim: 150px);	// named parameters: order can be swapped just like in C# or in kotlin
+		@include roundy($border: 4px solid white, $dim: 150px);	// named parameters: order can be swapped just like in C# or in Kotlin
 		
 		
 	@if:
@@ -219,7 +219,7 @@ SCSS
 		
 			@if $value < $sm {
 				@media (max-width: $value) {
-					@content;					// @content: when invoking the mixin with a body (like: @include XXX { /*body goes here*/ }), its content goes here
+					@content;					// @content: when invoking the mixin with a body (like: @include XXX { /*body goes here*/ }), its content (the body itself) goes here
 				}
 			}
 			//@else if $break == 'md' {
@@ -302,7 +302,7 @@ SCSS
 		}
 		
 		
-	Errors and warnings - these are used to help the developer get better feedback where the exact error is and what is it (default error messages and "stacktrace" of the scss compiler could be better)
+	Errors and warnings - these are used to help the developer get better feedback where the exact error is and what it is (default error messages and "stacktrace" of the scss compiler could be better)
 	
 		@mixin mq($break) {
 			$value: map-get($breakpoints, $break);
