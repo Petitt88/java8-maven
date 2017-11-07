@@ -113,14 +113,59 @@ Ref attribute: works only on DOM elements and custom elements that are classes
 	
 	
 Controlled Components
-	In HTML, form elements such as <input>, <textarea>, and <select> typically maintain their own state and update it based on user input. In React, mutable state is typically kept in the state property of components, and only updated with setState().
+	- In HTML, form elements such as <input>, <textarea>, and <select> typically maintain their own state and update it based on user input. In React, mutable state is typically kept in the state property of components, and only updated with setState().
 	We can combine the two by making the React state be the “single source of truth”. Then the React component that renders a form also controls what happens in that form on subsequent user input. An input form element whose value is controlled by React in this way is called a “controlled component”.
+	- A controlled input accepts its current value as a prop, as well as a callback to change that value. You could say it’s a more “React way” of approaching this (which doesn’t mean you should always use it).
+	- This flow kind of ‘pushes’ the value changes to the form component
+	- This means your data (state) and UI (inputs) are always in sync. The state gives the value to the input, and the input asks the Form to change the current value.
+	- A form element becomes “controlled” if you set its value via a prop. That’s all.
 	
 	<input type="text" value={this.state.value} onChange={this.handleChange} />
 	handleChange(event) {
 		this.setState({value: event.target.value});
+
 	}
 	
+Uncontrolled Components
+	- Controlled components are the recommended approach
+	- In this case form data is handled by the DOM, not by React
+	- To write an uncontrolled component, instead of writing an event handler for every state update, you can use a ref to get form values from the DOM.
+	- you have to ‘pull’ the value from the field when you need it
+	
+	<input
+          defaultValue="Bob"
+          type="text"
+          ref={(input) => this.input = input} />
+		  
+Performance:	
+	React builds and maintains an internal representation of the rendered UI. It includes the React elements you return from your components.
+	This representation lets React avoid creating DOM nodes and accessing existing ones beyond necessity, as that can be slower than operations on JavaScript objects.
+	Sometimes it is referred to as a “virtual DOM”, but it works the same way on React Native.
+
+	When a component’s props or state change, React decides whether an actual DOM update is necessary by comparing the newly returned element with the previously rendered one. When they are not equal, React will update the DOM.
+	In some cases, your component can speed all of this up by overriding the lifecycle function shouldComponentUpdate, which is triggered before the re-rendering process starts. The default implementation of this function returns true, leaving React to perform the update:
+	shouldComponentUpdate(nextProps, nextState) {
+	  return true;
+	}
+	
+	Scnenario:
+		shouldComponentUpdate: tells whether React should rerender the component and call its "render()" function.
+		if shouldComponentUpdate returns false, we are done
+		if shouldComponentUpdate returns true, react call the render() method and checks whether the react element is equivalent to the one stored on the Virtual DOM
+			- this is just a javascript comparison it should be relatively fast
+		if they aren't equivalent react has to update the DOM, otherwise no DOM operation is performed
+		
+
+	React.PureComponent: shouldComponentUpdate is just do a “shallow comparison” between all the fields of props and state to determine if the component should update
+	
+	pure function: they do not attempt to change their inputs, and always return the same result for the same inputs.
+		function sum(a, b) {
+		  return a + b;
+		}
+		
+		
+		
+		
 ES6:
 	computed property name: 
 		this.setState({
