@@ -8,17 +8,20 @@ import kotlinx.coroutines.experimental.Unconfined
 import kotlinx.coroutines.experimental.reactive.awaitFirst
 import kotlinx.coroutines.experimental.reactor.mono
 import kotlinx.coroutines.experimental.time.delay
+import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.validation.BindingResult
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.server.ServerResponse
 import org.thymeleaf.spring5.context.webflux.ReactiveDataDriverContextVariable
 import reactor.core.publisher.Mono
 import java.lang.Exception
 import java.nio.channels.AsynchronousFileChannel
 import java.nio.file.Paths
 import java.time.Duration
+import javax.validation.Valid
 
 
 @Controller
@@ -110,5 +113,21 @@ class HomeController(private val movieService: MovieService,
 		}
 
 		"index"
+	}
+
+	@PostMapping("/")
+	@ResponseBody
+	fun createMovie(@RequestBody @Valid movie: Movie, bindingResult: BindingResult) = mono<ServerResponse> {
+
+		if (!bindingResult.hasErrors()) {
+			println(bindingResult)
+			return@mono ServerResponse.badRequest().syncBody(bindingResult.allErrors).awaitFirst()
+		}
+
+		movieService.createMovie(movie).awaitFirst()
+		ServerResponse.ok()
+				.header(HttpHeaders.CONTENT_TYPE, "application/json")
+				.syncBody(movie)
+				.awaitFirst()
 	}
 }

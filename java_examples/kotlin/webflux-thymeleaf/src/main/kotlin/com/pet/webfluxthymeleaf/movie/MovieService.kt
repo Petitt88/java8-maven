@@ -26,5 +26,7 @@ class MovieService(private val mr: MovieRepository) {
 			// delay each new element by 1 second
 			.delayElements(Duration.ofSeconds(1L))
 
+	fun createMovie(movie: Movie) = mr.save(movie)
+
 	private fun createMovie(id: Int, name: String) = Movie(id, name)
 }
