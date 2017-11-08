@@ -119,7 +119,7 @@ class HomeController(private val movieService: MovieService,
 	fun createMovie(@RequestBody @Valid movie: Movie) = mono {
 
 		// do NOT put bindingResult: BindingResult in the url because WebFlux cannot provide it and exception will be thrown!
-		// the request is refused (400 becomes the reponse's status automatically) if the movie is invalid automatically, no need to manually handle it
+		// the request is refused (400 becomes the response's status automatically) if the movie is invalid automatically, no need to manually handle it
 //		if (!bindingResult.hasErrors()) {
 //			println(bindingResult)
 //			return@mono ServerResponse.badRequest().syncBody(bindingResult.allErrors).awaitFirst()
