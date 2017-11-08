@@ -8,16 +8,15 @@ import kotlinx.coroutines.experimental.Unconfined
 import kotlinx.coroutines.experimental.reactive.awaitFirst
 import kotlinx.coroutines.experimental.reactor.mono
 import kotlinx.coroutines.experimental.time.delay
-import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
-import org.springframework.validation.BindingResult
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.thymeleaf.spring5.context.webflux.ReactiveDataDriverContextVariable
 import reactor.core.publisher.Mono
 import java.lang.Exception
+import java.net.URI
 import java.nio.channels.AsynchronousFileChannel
 import java.nio.file.Paths
 import java.time.Duration
@@ -117,17 +116,17 @@ class HomeController(private val movieService: MovieService,
 
 	@PostMapping("/")
 	@ResponseBody
-	fun createMovie(@RequestBody @Valid movie: Movie, bindingResult: BindingResult) = mono<ServerResponse> {
+	fun createMovie(@RequestBody @Valid movie: Movie) = mono {
 
-		if (!bindingResult.hasErrors()) {
-			println(bindingResult)
-			return@mono ServerResponse.badRequest().syncBody(bindingResult.allErrors).awaitFirst()
-		}
+		// do NOT put bindingResult: BindingResult in the url because WebFlux cannot provide it and exception will be thrown!
+		// the request is refused (400 becomes the reponse's status automatically) if the movie is invalid automatically, no need to manually handle it
+//		if (!bindingResult.hasErrors()) {
+//			println(bindingResult)
+//			return@mono ServerResponse.badRequest().syncBody(bindingResult.allErrors).awaitFirst()
+//		}
 
-		movieService.createMovie(movie).awaitFirst()
-		ServerResponse.ok()
-				.header(HttpHeaders.CONTENT_TYPE, "application/json")
-				.syncBody(movie)
-				.awaitFirst()
+		val entity = movieService.createMovie(movie).awaitFirst()
+		val result = ServerResponse.created(URI.create("${entity.id}")).build().awaitFirst()
+		result
 	}
 }

@@ -4,7 +4,7 @@ import javax.validation.constraints.NotNull
 import javax.validation.constraints.Size
 
 
-data class Movie(@NotNull val id: Int?,
-                 @NotNull @Size(min = 3) val name: String?) {
+data class Movie(@get:NotNull val id: Int?,
+                 @get:NotNull @get:Size(min = 3) val name: String?) {
 	constructor() : this(null, null)
 }
