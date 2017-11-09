@@ -148,10 +148,10 @@ Performance:
 	  return true;
 	}
 	
-	Scnenario:
-		shouldComponentUpdate: tells whether React should rerender the component and call its "render()" function.
+	Scenario:
+		shouldComponentUpdate: tells whether React should rerender the component and call its "render()" function. (whenever we change the state, react will invoke the shouldComponentUpdate function)
 		if shouldComponentUpdate returns false, we are done
-		if shouldComponentUpdate returns true, react call the render() method and checks whether the react element is equivalent to the one stored on the Virtual DOM
+		if shouldComponentUpdate returns true, react calls the render() method and checks whether the react element is equivalent to the one stored on the Virtual DOM
 			- this is just a javascript comparison it should be relatively fast
 		if they aren't equivalent react has to update the DOM, otherwise no DOM operation is performed
 		
