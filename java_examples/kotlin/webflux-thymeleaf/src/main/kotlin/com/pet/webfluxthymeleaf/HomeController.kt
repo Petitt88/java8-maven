@@ -13,7 +13,6 @@ import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.server.body
 import org.thymeleaf.spring5.context.webflux.ReactiveDataDriverContextVariable
 import reactor.core.publisher.Mono
 import java.lang.Exception
@@ -127,15 +126,18 @@ class HomeController(private val movieService: MovieService,
 //		}
 
 		val entity = movieService.createMovie(movie).awaitFirst()
-		val result = ResponseEntity.created(URI.create("${entity.id}")).body("Done!")
-
+		// ServerResponse does not work! response's Content-Type will be text-event-stream and statuscode becomes 300
+		// use the good old ResponseEntity instead
 		//val result = ServerResponse.created(URI.create("${entity.id}")).build().awaitFirst()
+
+		val result = ResponseEntity.created(URI.create("${entity.id}")).body("Done!")
 		result
 	}
 
 	@GetMapping("/movies")
 	@ResponseBody
-	fun getMovies(): Mono<ServerResponse> {
-		return ServerResponse.ok().body(movieService.getMoviesFromDb())
+	fun getMovies(): Mono<ResponseEntity<List<Movie>>> = mono {
+		val movies = movieService.getMoviesFromDb().collectList().awaitFirst()
+		ResponseEntity.ok().body(movies)
 	}
 }
