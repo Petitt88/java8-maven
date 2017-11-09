@@ -13,6 +13,7 @@ import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.server.ServerResponse
+import org.springframework.web.reactive.function.server.body
 import org.thymeleaf.spring5.context.webflux.ReactiveDataDriverContextVariable
 import reactor.core.publisher.Mono
 import java.lang.Exception
@@ -127,6 +128,13 @@ class HomeController(private val movieService: MovieService,
 
 		val entity = movieService.createMovie(movie).awaitFirst()
 		val result = ServerResponse.created(URI.create("${entity.id}")).build().awaitFirst()
+
 		result
+	}
+
+	@GetMapping("/movies")
+	@ResponseBody
+	fun getMovies(): Mono<ServerResponse> {
+		return ServerResponse.ok().body(movieService.getMoviesFromDb())
 	}
 }
