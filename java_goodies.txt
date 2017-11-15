@@ -1016,7 +1016,7 @@ Services:
 	}
 	
 	module com.pet.shop {
-		export com.pet.shop.client;
+		exports com.pet.shop.client;
 		
 		opens com.pet.shop.client to javafx.fxml;	- open up the code inside my package to javafx for reflection
 	}
