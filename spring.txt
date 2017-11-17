@@ -3955,3 +3955,14 @@ Spring 5 - Spring Reactive
 	- Subscriber (Observer)
 	- Subscription
 	- Processor (Subject)
+	
+	
+	
+********************************
+Spring Boot 2
+********************************
+
+Rendering: 
+	- Rendering.view("index").modelAttribute("zones", publisher(Flux)).build();
+	- Controller return value this is
+	- can be either RenderingView or Mono<RenderingView>
