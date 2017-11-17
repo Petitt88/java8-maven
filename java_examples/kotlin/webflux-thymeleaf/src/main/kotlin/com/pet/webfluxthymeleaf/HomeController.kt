@@ -8,11 +8,13 @@ import kotlinx.coroutines.experimental.Unconfined
 import kotlinx.coroutines.experimental.reactive.awaitFirst
 import kotlinx.coroutines.experimental.reactor.mono
 import kotlinx.coroutines.experimental.time.delay
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.result.view.Rendering
 import org.thymeleaf.spring5.context.webflux.ReactiveDataDriverContextVariable
 import reactor.core.publisher.Mono
 import java.lang.Exception
@@ -39,16 +41,38 @@ class HomeController(private val movieService: MovieService,
 //	}
 
 	@GetMapping("/")
-	fun index(model: Model): Mono<String> = mono(Unconfined) {
+	fun index(): Mono<Rendering> = mono(Unconfined) {
 
-		model.addAttribute("firstSourceTitle", "Movies from ReactiveDataDriverContextVariable - Flux must be used")
+		var movies = movieService.getMoviesFromDb()
+				.collectList()
+				.awaitFirst()
+				.sortedBy { it.id }
+
+		Rendering.view("index")
+				// this is a Flux. It just works, WebFlux handles it: subscribes to it and renders the view only if the Publisher is done.
+				// this will take ~3 seconds to complete --> WebFlux renders the view after 3 seconds (right after the Flux gets completed)
+				.modelAttribute("movies", movieService.getMoviesWithGenerate2("WebFlux subscribes to it").take(3))
+				.modelAttribute("superMovies", movies)
+				.modelAttribute("firstSourceTitle", "Movies from Mongo database after with coroutine suspending on a Flux")
+				.modelAttribute("secondSourceTitle", "Movies from Mongo. The Flux itself is passed to the model --> WebFlux subscribes to it and starts rendering the view only after the Flux gets completed.")
+				.build()
+	}
+
+	@GetMapping("/push", produces = arrayOf(MediaType.TEXT_EVENT_STREAM_VALUE))
+	fun push(model: Model): Mono<String> = mono(Unconfined) {
+
+		model.addAttribute("firstSourceTitle", "Movies from ReactiveDataDriverContextVariable - Flux must be used. This enables a server pushing model. In this case Thymeleaf itself subscribes to the Flux and renders a section whenever a new data arrives until the Flux gets completed.")
 				.addAttribute("secondSourceTitle", "Movies from Mongo database after with coroutine suspending on a Flux")
 
-		model.addAttribute("movies", ReactiveDataDriverContextVariable(movieService.getMoviesFromDb(10)))
-
-		var movies = movieService.getMoviesFromDb().collectList().awaitFirst()
-		movies = movies.sortedBy { it.id }
+		var movies = movieService.getMoviesFromDb()
+				.collectList()
+				.awaitFirst()
+				.sortedBy { it.id }
 		model.addAttribute("superMovies", movies);
+
+		// 1: this means to flush every item  (default is 10 - flush data after the Flux has fired 10 times)
+		// this is a push model because of "ReactiveDataDriverContextVariable" --> Thymeleaf itself subscribes to the wrapped Flux - so WebFlux doesn't do anything in case of a ReactiveDataDriverContextVariable
+		model.addAttribute("movies", ReactiveDataDriverContextVariable(movieService.getMoviesWithGenerate().take(5), 1))
 
 		"index";
 	}
@@ -56,7 +80,7 @@ class HomeController(private val movieService: MovieService,
 	@GetMapping("/long")
 	fun longRunningSimulation(model: Model) = mono {
 
-		model.addAttribute("firstSourceTitle", "Fixed movies from already resolved Flux via ReactiveDataDriverContextVariable")
+		model.addAttribute("firstSourceTitle", "Fixed movies from a fix Flux.")
 				.addAttribute("secondSourceTitle", "Movies from an infinite Flux stream. Queried only the first 5, each one took 1 second to get.")
 
 		val view = Mono
@@ -64,7 +88,7 @@ class HomeController(private val movieService: MovieService,
 				.map { "index" }
 				.awaitFirst()
 
-		model.addAttribute("movies", ReactiveDataDriverContextVariable(movieService.getMoviesFix("Super")))
+		model.addAttribute("movies", movieService.getMoviesFix("Super"))
 
 		// getMoviesWithGenerate is an infinite stream
 		val movies = movieService.getMoviesWithGenerate("Super")
@@ -126,7 +150,7 @@ class HomeController(private val movieService: MovieService,
 //		}
 
 		val entity = movieService.createMovie(movie).awaitFirst()
-		// ServerResponse does not work! response's Content-Type will be text-event-stream and statuscode becomes 300
+		// ServerResponse does not work! response's Content-Type will be text/event-stream and statuscode becomes 300
 		// use the good old ResponseEntity instead
 		//val result = ServerResponse.created(URI.create("${entity.id}")).build().awaitFirst()
 
