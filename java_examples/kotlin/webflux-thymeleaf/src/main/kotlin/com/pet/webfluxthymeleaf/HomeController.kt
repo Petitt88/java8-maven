@@ -70,7 +70,7 @@ class HomeController(private val movieService: MovieService,
 				.sortedBy { it.id }
 		model.addAttribute("superMovies", movies);
 
-		// 1: this means to flush every item  (default is 10 - flush data after the Flux has fired 10 times)
+		// dataStreamBufferSizeElements 1: this means to flush every item  (default is 10 - flush data after the Flux has fired 10 times)
 		// this is a push model because of "ReactiveDataDriverContextVariable" --> Thymeleaf itself subscribes to the wrapped Flux - so WebFlux doesn't do anything in case of a ReactiveDataDriverContextVariable
 		model.addAttribute("movies", ReactiveDataDriverContextVariable(movieService.getMoviesWithGenerate().take(5), 1))
 
@@ -150,12 +150,11 @@ class HomeController(private val movieService: MovieService,
 //		}
 
 		val entity = movieService.createMovie(movie).awaitFirst()
-		// ServerResponse does not work! response's Content-Type will be text/event-stream and statuscode becomes 300
+		// ServerResponse does not work! response's Content-Type will be text/event-stream and statuscode becomes 200
 		// use the good old ResponseEntity instead
 		//val result = ServerResponse.created(URI.create("${entity.id}")).build().awaitFirst()
 
-		val result = ResponseEntity.created(URI.create("${entity.id}")).body("Done!")
-		result
+		ResponseEntity.created(URI.create("${entity.id}")).body("Done!")
 	}
 
 	@GetMapping("/movies")

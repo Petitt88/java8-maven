@@ -3959,10 +3959,51 @@ Spring 5 - Spring Reactive
 	
 	
 ********************************
-Spring Boot 2
+Spring Boot 2, Spring Framework 5
 ********************************
 
 Rendering: 
 	- Rendering.view("index").modelAttribute("zones", publisher(Flux)).build();
 	- Controller return value this is
 	- can be either RenderingView or Mono<RenderingView>
+	
+	
+FileSystemResource, FileCopyUtils
+
+Functional bean registration (like in Asp.Net Core):
+	GenericApplicationContext ctx = new GenericApplicationContext();
+	ctx.registerBean(...)
+	
+	or kotlin extenions: 
+		val context = GenericApplicationContext { 
+			registerBean()
+		}
+		
+Mandatory and optional dependencies:
+
+	Java:
+		@Controller
+		public class FooController {
+			// Foo is mandatory from DI, Bar is optional
+			public FooController(Foo foo, Optional<Bar> bar) {
+				...
+			}
+		}
+		
+	Kotlin:
+		@Controller
+		// Spring 5 knows the Kotlin type system and Foo is mandatory, Bar is optional
+		class FooController(val foo: Foo, val bar: Bar?) {
+		
+			@GetMapping("/")
+			// Equvivalent to @RequestParam(required = false) in java
+			fun foo(@RequestParam baz: String?) = ...
+		}
+		
+WebFlux functional APIs:
+	RouterFunction: (ServerRequest) -> Mono<HandlerFunction>	- RequestMapping thing (pure function)
+	HandlerFunction: (ServerRequest) -> Mono<ServerResponse>	- body of the handler method (pure function)
+	
+Kotlin DSLs:
+	- Route DSL
+	- Bean registration DSL
