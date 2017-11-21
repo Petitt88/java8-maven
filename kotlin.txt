@@ -21,3 +21,20 @@ Lambda
 				println(this::test)
 			}
 		}
+
+		
+Spring
+
+	Leveraging Kotlin nullable information in Spring annotations
+
+		Originally based on a community contribution from Raman Gupta, Spring now takes advantage of Kotlin null-safety support to determine if an HTTP parameter is required without having to define explicitly the required 
+		attribute. That means @RequestParam name: String? with be treated as not required and @RequestParam name: String as required. This is also supported on Spring Messaging @Header annotation.
+
+		In a similar fashion, Spring bean injection with @Autowired or @Inject uses this information to know if a bean is required or not. 
+			@Autowired lateinit var foo: Foo 	- implies that a bean of type Foo must be registered in the application context 
+			@Autowired lateinit var foo: Foo?  	- while this won’t raise an error if such bean does not exist.
+		
+		Optional ctor dependencies can also be specified:
+			@RestController
+			@RequestMapping("/")
+			class HomeController(private val superFormula: SuperFormula?) { ... }
