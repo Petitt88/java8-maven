@@ -15,7 +15,12 @@ Lambda
 	
 		class MyClass(lazyInitializer: () -> Int) {
 
+			// passing down the lambda
 			val lazyProp: Int by lazy(lazyInitializer)
+			// passing down a method reference
+			val lazyProp2: Int by lazy(this::createInt)
+
+			fun createInt() = 2
 
 			fun test(message: Int, message2: String) {
 				println(this::test)
