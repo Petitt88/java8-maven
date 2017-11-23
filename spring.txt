@@ -3944,23 +3944,27 @@ class Convert<M, R> {
 }
 
 ********************************
-Spring 5 - Spring Reactive
+Spring Testing
 ********************************
 
-4 players:
-	- Publisher (Observable)
-		2 implementations: 
-			- Mono: produces 0 or 1 value
-			- Flux: produces 0 or N values
-	- Subscriber (Observer)
-	- Subscription
-	- Processor (Subject)
+Mock: by definition is an empty object that proivides default values: true, false, null, 0.
+Stub: it is a mock with preprogrammed behavior: basically I provide what the method does (or rather returns) when invoked on the stub.
 	
 	
 	
 ********************************
 Spring Boot 2, Spring Framework 5
 ********************************
+
+WebFlux:
+	4 players:
+		- Publisher (Observable)
+			2 implementations: 
+				- Mono: produces 0 or 1 value
+				- Flux: produces 0 or N values
+		- Subscriber (Observer)
+		- Subscription
+		- Processor (Subject)
 
 Rendering: 
 	- Rendering.view("index").modelAttribute("zones", publisher(Flux)).build();
