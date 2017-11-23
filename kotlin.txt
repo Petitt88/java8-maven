@@ -26,6 +26,16 @@ Lambda
 				println(this::test)
 			}
 		}
+		
+Iterator
+
+	In C# the IEnumerable (or Enumerable<T>) interface is common between arrays and collections (List, HashSet, Dictionary)
+		foreach: can be used on any array, collection objects that implement the IEnumerable<T> generic interface.
+		
+	In Java there is NO common interface between arrays and collections (List, Set, Map).
+	
+	Kotlin is like Java in this case.	
+		for: can be used on any object that has an "iterator operator": public operator fun iterator(): Iterator<T> - T comes from the enclosing class (Array is a class in kotlin)
 
 		
 Spring
