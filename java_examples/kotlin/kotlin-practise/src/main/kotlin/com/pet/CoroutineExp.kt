@@ -56,7 +56,20 @@ fun classInFunction() {
 
 				yield(2)
 			}
-			for (i in seq.take(10)) {
+
+			val lazySeq = buildSequence {
+				yield(0)
+				print("START ")
+				for (i in 1..5) {
+					yield(i)
+					print("STEP ")
+				}
+				print("ALMOST END")
+				yieldAll(16..10)
+				print("END")
+			}
+
+			for (i in lazySeq.take(10)) {
 
 			}
 

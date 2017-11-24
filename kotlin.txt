@@ -1,3 +1,70 @@
+Arrays, Collections
+
+	val arr = Array(10) { Person(it) }
+	val arr = arrayOf(1, 2, 3)
+	val a = listOf(1, 2, 3)
+	val a = mutableListOf(1, 2, 3)
+	val a = ArrayList<Int>()
+	val a = arrayListOf(1, 2)
+	
+	val a = setOf(1, 2, 3)
+	val a = mutableSetOf(1, 2, 3)
+	val a = HashSet<Int>()
+	val a = hashSetOf(1, 2)
+	
+	val a = mapOf(1 to "1", 2 to "2")
+	val a = mutableMapOf(Pair(1, "1"), Pair(2, "2"))
+	val a = hashMapOf<Int, String>()
+	val a = HashMap<Int, String>()
+	
+	// for lazy collections
+	val a = sequenceOf(1, 2, 3)
+	
+	// for synchronized blocks
+	synchronized(this) {
+		...
+	}
+	
+	// try-with-resources block
+	File("my.txt").inputStream().bufferedReader().use {
+		it.lines().forEach { }
+	}
+	File("my.txt").bufferedReader().use {
+		it.lines().forEach { }
+	}
+	
+Delegated properties
+
+	val lazyValue: String by lazy {
+		println("computed!")
+		"Hello"
+	}
+	
+	var name: String by Delegates.observable("<no name>") {
+        prop, old, new ->
+        println("$old -> $new")
+    }
+	
+	class User(val map: Map<String, Any?>) {
+		val name: String by map
+		val age: Int     by map
+	}
+	
+	
+	class Delegate {
+		operator fun getValue(thisRef: Any?, property: KProperty<*>): String {
+			return "$thisRef, thank you for delegating '${property.name}' to me!"
+		}
+	 
+		operator fun setValue(thisRef: Any?, property: KProperty<*>, value: String) {
+			println("$value has been assigned to '${property.name} in $thisRef.'")
+		}
+	}
+	class Example {
+		var p: String by Delegate()
+	}
+
+
 :: - reflection and method reference at the same time.
 
 	list.forEach(::println) 	- method reference
@@ -284,6 +351,23 @@ Coroutines:
 			
 			publish 		- for reactive streams
 			
+		buildSequence: to implement C# yield return with IEnumerable<T>
+		
+			val lazySeq = buildSequence {
+				yield(0)
+				print("START ")
+				for (i in 1..5) {
+					yield(i)
+					print("STEP ")
+				}
+				print("ALMOST END")
+				yieldAll(16..10)
+				print("END")
+			}
+
+			for (i in lazySeq.take(10)) {
+
+			}
 			
 	Scheduling:
 	
