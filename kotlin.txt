@@ -27,6 +27,287 @@ Lambda
 			}
 		}
 		
+	Passing "toBeSynchronized" as a method reference to the "lock" top-level function:
+		fun toBeSynchronized() = sharedResource.operation()
+		val result = lock(lock, ::toBeSynchronized)
+		
+		Another, often more convenient way is to pass a lambda expression:
+		val result = lock(lock, { sharedResource.operation() })
+		val result = lock (lock) {
+			sharedResource.operation()
+		}
+		
+	We can explicitly return a value from the lambda using the qualified return syntax. Otherwise, the value of the last expression is implicitly returned. Therefore, the two following snippets are equivalent:
+	ints.filter { it > 0 } // this literal is of type '(it: Int) -> Boolean'
+	
+	ints.filter {
+		val shouldFilter = it > 0 
+		// return "shouldFilter" as the value of this lambda
+		shouldFilter
+	}
+
+	ints.filter {
+		val shouldFilter = it > 0 
+		// return "shouldFilter" as the value of this lambda
+		return@filter shouldFilter
+	}
+		
+Anonymous Functions
+
+	One thing missing from the lambda expression syntax presented above is the ability to specify the return type of the function. In most cases, this is unnecessary because the return type can be inferred automatically. However, if you do need to specify it explicitly, you can use an alternative syntax: an anonymous function.
+
+	fun(x: Int, y: Int): Int = x + y
+	fun(x: Int, y: Int): Int {
+		return x + y
+	}
+	ints.filter(fun(item) = item > 0)		
+	
+	The return type inference for anonymous functions works just like for normal functions: the return type is inferred automatically for anonymous functions with an expression body and has to be specified explicitly (or is assumed to be Unit) for anonymous functions with a block body.
+
+	Note that anonymous function parameters are always passed inside the parentheses. The shorthand syntax allowing to leave the function outside the parentheses works only for lambda expressions.
+	
+	One other difference between lambda expressions and anonymous functions is the behavior of non-local returns. A return statement without a label always returns from the function declared with the fun keyword. This means that a return inside a lambda expression will return from the enclosing function, whereas a return inside an anonymous function will return from the anonymous function itself.
+			fun test(message: Int, message2: String) {
+
+				synchronized(this, fun() {
+					// return from this anonymous method
+					return
+				})
+				
+				synchronized(this){
+					// returns from the "test" function itself
+					return
+				}
+			}
+			
+			
+Function Literals with Receiver
+
+	Kotlin provides the ability to call a function literal with a specified receiver object. Inside the body of the function literal, you can call methods on that receiver object without any additional qualifiers. This is similar to extension functions, which allow you to access members of the receiver object inside the body of the function. One of the most important examples of their usage is Type-safe Groovy-style builders.
+
+	The type of such a function literal is a function type with receiver:
+		sum : Int.(other: Int) -> Int			
+		// inside the body of this function "this" is the receiver the "sum" method is invoked on
+		val sum = fun Int.(other: Int): Int = this + other
+		1.sum(2)	// "this" is the 1 on the left handside
+		
+	
+	A non-literal value of a function-with-receiver type can also be assigned or passed as an argument where an ordinary function is expected that has an additional first parameter of the receiver type, and vice versa. For example, the types String.(Int) -> Boolean and (String, Int) -> Boolean are compatible:
+
+		val represents: String.(Int) -> Boolean = { other -> toIntOrNull() == other }
+		println("123".represents(123)) // true
+		
+	Lambda expressions can be used as function literals with receiver when the receiver type can be inferred from context.
+		
+		class HTML {
+			fun body() { ... }
+		}
+
+		fun html(init: HTML.() -> Unit): HTML {
+			val html = HTML()  // create the receiver object
+			html.init()        // pass the receiver object to the lambda
+			return html
+		}
+
+
+		html {       // lambda with receiver begins here
+			body()   // calling a method on the receiver object (a HTML instance)
+		}
+
+		
+Inline functions
+
+	Note that if an inline function has no inlinable function parameters and no reified type parameters, the compiler will issue a warning, since inlining such functions is very unlikely to be beneficial (you can suppress the warning if you are sure the inlining is needed using the annotation @Suppress("NOTHING_TO_INLINE")).
+	
+	noinline: In case you want only some of the lambdas passed to an inline function to be inlined, you can mark some of your function parameters with the noinline modifier:
+		inline fun foo(inlined: () -> Unit, noinline notInlined: () -> Unit) {
+			// ...
+		}
+		
+	Non-local returns
+
+		In Kotlin, we can only use a normal, unqualified return to exit a named function or an anonymous function. This means that to exit a lambda, we have to use a label, and a bare return is forbidden inside a lambda, because a lambda can not make the enclosing function return:
+
+		fun foo() {
+			ordinaryFunction {
+				return // ERROR: can not make `foo` return here
+			}
+		}
+		But if the function the lambda is passed to is inlined, the return can be inlined as well, so it is allowed:
+
+		fun foo() {
+			inlineFunction {
+				return // OK: the lambda is inlined
+			}
+		}
+		Such returns (located in a lambda, but exiting the enclosing function) are called non-local returns. We are used to this sort of construct in loops, which inline functions often enclose:
+
+		fun hasZeros(ints: List<Int>): Boolean {
+			ints.forEach {
+				if (it == 0) return true // returns from hasZeros
+			}
+			return false
+		}
+		
+	crossinline:
+		Note that some inline functions may call the lambdas passed to them as parameters not directly from the function body, but from another execution context, such as a local object or a nested function. In such cases, non-local control flow is also not allowed in the lambdas. To indicate that, the lambda parameter needs to be marked with the crossinline modifier:
+
+		inline fun f(crossinline body: () -> Unit) {
+			val f = object: Runnable {
+				override fun run() = body()
+			}
+			// ...
+		}
+		
+	reified:
+	
+		What we actually want is simply pass a type to this function, i.e. call it like this:
+
+		treeNode.findParentOfType<MyTreeNode>()
+			To enable this, inline functions support reified type parameters, so we can write something like this:
+
+			inline fun <reified T> TreeNode.findParentOfType(): T? {
+				var p = parent
+				while (p != null && p !is T) {
+					p = p.parent
+				}
+				return p as T?
+			}
+	
+		Though reflection may not be needed in many cases, we can still use it with a reified type parameter:
+
+			inline fun <reified T> membersOf() = T::class.members
+
+			fun main(s: Array<String>) {
+				println(membersOf<StringBuilder>().joinToString("\n"))
+			}
+	
+	inline properties (since 1.1)
+
+		The inline modifier can be used on accessors of properties that don't have a backing field. You can annotate individual property accessors:
+
+		val foo: Foo
+			inline get() = Foo()
+
+		var bar: Bar
+			get() = ...
+			inline set(v) { ... }
+		You can also annotate an entire property, which marks both of its accessors as inline:
+
+		inline var bar: Bar
+			get() = ...
+			set(v) { ... }
+			
+
+Coroutines:
+	https://github.com/Kotlin/kotlinx.coroutines
+	Suspending functions can only be invoked from another suspending functions or from coroutine blocks. Coroutine blocks are created by coroutine builders.
+	
+	fun main(args: Array<String>) = runBlocking<Unit> {
+		val jobs = arrayListOf<Job>()
+		jobs += launch(Unconfined) { // not confined -- will work with main thread
+			println("      'Unconfined': I'm working in thread ${Thread.currentThread().name}")
+		}
+		jobs += launch(coroutineContext) { // context of the parent, runBlocking coroutine
+			println("'coroutineContext': I'm working in thread ${Thread.currentThread().name}")
+		}
+		jobs += launch(CommonPool) { // will get dispatched to ForkJoinPool.commonPool (or equivalent)
+			println("      'CommonPool': I'm working in thread ${Thread.currentThread().name}")
+		}
+		jobs += launch(newSingleThreadContext("MyOwnThread")) { // will get its own new thread
+			println("          'newSTC': I'm working in thread ${Thread.currentThread().name}")
+		}
+		jobs.forEach { it.join() }
+	}
+	
+	un main(args: Array<String>) = runBlocking<Unit> {
+		val jobs = arrayListOf<Job>()
+		jobs += launch(Unconfined) { // not confined -- will work with main thread
+			println("      'Unconfined': I'm working in thread ${Thread.currentThread().name}")	-- main thread
+			delay(500)
+			println("      'Unconfined': After delay in thread ${Thread.currentThread().name}")	-- not main thread, ForkJoinPool.commonPool
+		}
+		jobs += launch(coroutineContext) { // context of the parent, runBlocking coroutine
+			println("'coroutineContext': I'm working in thread ${Thread.currentThread().name}")	-- main thread
+			delay(1000)
+			println("'coroutineContext': After delay in thread ${Thread.currentThread().name}")	-- main thread
+		}
+		jobs.forEach { it.join() }
+	}
+	
+	Builders:
+		runBlocking
+			fun <T> runBlocking(
+				context: CoroutineContext = EmptyCoroutineContext, 
+				block: suspend CoroutineScope.() -> T
+			): T (source)
+			Runs new coroutine and blocks current thread interruptibly until its completion. This function should not be used from coroutine. It is designed to bridge regular blocking code to libraries that are written in suspending style, to be used in main functions and in tests.
+			
+		launch
+		
+			fun launch(
+				context: CoroutineContext = DefaultDispatcher, 
+				start: CoroutineStart = CoroutineStart.DEFAULT, 
+				block: suspend CoroutineScope.() -> Unit
+			): Job (source)
+			Launches new coroutine without blocking current thread and returns a reference to the coroutine as a Job. The coroutine is cancelled when the resulting job is cancelled.
+			
+		async
+			fun <T> async(
+				context: CoroutineContext = DefaultDispatcher, 
+				start: CoroutineStart = CoroutineStart.DEFAULT, 
+				block: suspend CoroutineScope.() -> T
+			): Deferred<T> (source)
+			Creates new coroutine and returns its future result as an implementation of Deferred.
+
+			The running coroutine is cancelled when the resulting object is cancelled.
+			
+		future
+			for Java 8 CompletableFuture
+			https://github.com/Kotlin/kotlinx.coroutines/blob/master/integration/kotlinx-coroutines-jdk8/README.md
+			
+			val image: CompletableFuture<Image> = future {
+				val future1 = loadImageAsync(name1) // start loading first image
+				val future2 = loadImageAsync(name2) // start loading second image
+				combineImages(future1.await(), future2.await()) // wait for both, combine, and return result
+			}
+			
+		Reactive stream builders: https://github.com/Kotlin/kotlinx.coroutines/blob/master/reactive/README.md
+			mono			- for Reactor
+			flux
+			
+			rxCompletable	- for RxJava
+			rxMaybe
+			rxSingle
+			rxObservable
+			rxFlowable
+			
+			publish 		- for reactive streams
+			
+			
+	Scheduling:
+	
+		Unconfined
+			A coroutine dispatcher that is not confined to any specific thread. It executes initial continuation of the coroutine right here in the current call-frame and let the coroutine resume in whatever thread that is used by the corresponding suspending function, without mandating any specific threading policy.
+
+			Note, that if you need your coroutine to be confined to a particular thread or a thread-pool after resumption, but still want to execute it in the current call-frame until its first suspension, then you can use an optional CoroutineStart parameter in coroutine builders like launch and async setting it to the the value of CoroutineStart.UNDISPATCHED.
+			
+		CommonPool
+			Represents common pool of shared threads as coroutine dispatcher for compute-intensive tasks. It uses java.util.concurrent.ForkJoinPool when available, which implements efficient work-stealing algorithm for its queues, so every coroutine resumption is dispatched as a separate task even when it already executes inside the pool. When available, it wraps ForkJoinPool.commonPool and provides a similar shared pool where not.
+			
+		newSingleThreadContext
+			Creates new coroutine execution context with the a single thread and built-in yield and delay support. NOTE: The resulting ThreadPoolDispatcher owns native resources (its thread).Resources are reclaimed by ThreadPoolDispatcher.close.
+			
+		kotlinx.coroutines.experimental.javafx.JavaFx as UI -- for JavaFx
+			 launch(UI) { // launch coroutine in UI context
+				for (i in 10 downTo 1) { // countdown from 10 to 1 
+					hello.text = "Countdown $i ..." // update text
+					delay(500) // wait half a second
+				}
+				hello.text = "Done!"
+			}
+			
+		
 Iterator
 
 	In C# the IEnumerable (or Enumerable<T>) interface is common between arrays and collections (List, HashSet, Dictionary)
