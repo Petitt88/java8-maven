@@ -586,7 +586,50 @@ Iterator
 	
 	Kotlin is like Java in this case.	
 		for: can be used on any object that has an "iterator operator": public operator fun iterator(): Iterator<T> - T comes from the enclosing class (Array is a class in kotlin)
+		
+		
+Generics
+	out: can be return parameter or property getter (reading)
+	in: can be in (normal) parameter or property setter (writing)
 
+	In Kotlin, there is a way to explain this sort of thing to the compiler. This is called declaration-site variance: we can annotate the type parameter T of Source to make sure that it is only returned (produced) from members of Source<T>, and never consumed. To do this we provide the out modifier:
+	abstract class Source<out T> {
+		abstract fun nextT(): T
+	}
+	In "clever words" they say that the class C is covariant in the parameter T, or that T is a covariant type parameter. You can think of C as being a producer of T's, and NOT a consumer of T's.
+	The out modifier is called a variance annotation, and since it is provided at the type parameter declaration site, we talk about declaration-site variance. This is in contrast with Java's use-site variance where wildcards in the type usages make the types covariant.
+	
+	In addition to out, Kotlin provides a complementary variance annotation: in. It makes a type parameter contravariant: it can only be consumed and never produced. A good example of a contravariant class is Comparable:
+	abstract class Comparable<in T> {
+		abstract fun compareTo(other: T): Int
+	}
+	
+	Type projections
+	
+		fun copy(from: Array<out Any>, to: Array<Any>) {
+		 // ...
+		}
+		fun fill(dest: Array<in String>, value: String) {
+			// ...
+		}
+
+	Star-projections
+		Kotlin provides so called star-projection syntax for this:
+			For Foo<out T>, where T is a covariant type parameter with the upper bound TUpper, Foo<*> is equivalent to Foo<out TUpper>. It means that when the T is unknown you can safely read values of TUpper from Foo<*>.
+			For Foo<in T>, where T is a contravariant type parameter, Foo<*> is equivalent to Foo<in Nothing>. It means there is nothing you can write to Foo<*> in a safe way when T is unknown.
+			For Foo<T>, where T is an invariant type parameter with the upper bound TUpper, Foo<*> is equivalent to Foo<out TUpper> for reading values and to Foo<in Nothing> for writing values.
+			
+		If a generic type has several type parameters each of them can be projected independently. For example, if the type is 
+		declared as interface Function<in T, out U> we can imagine the following star-projections:
+			Function<*, String> means Function<in Nothing, String>;
+			Function<Int, *> means Function<Int, out Any?>;
+			Function<*, *> means Function<in Nothing, out Any?>.
+			
+	Upper bounds
+		fun <T : Comparable<T>> sort(list: List<T>) {
+			// ...
+		}
+	
 		
 Spring
 
