@@ -52,6 +52,11 @@ stdlib enums
 		AUTUMN,
 		SPRING
 	}
+	
+	
+Tuples
+	Pair, Triple
+	
 
 Arrays, Collections
 
@@ -91,6 +96,89 @@ Arrays, Collections
 		File("my.txt").bufferedReader().use {
 			it.lines().forEach { }
 		}
+		
+	Note that the read-only types are covariant. That means, you can take a List<Rectangle> and assign it to List<Shape> assuming Rectangle inherits from Shape. This wouldn't be allowed with the mutable collection types because it would allow for failures at runtime.
+	
+	val items = listOf(1, 2, 3, 4)
+	items.first() == 1
+	items.last() == 4
+	items.filter { it % 2 == 0 }   // returns [2, 4]
+
+	val rwList = mutableListOf(1, 2, 3)
+	rwList.requireNoNulls()        // returns [1, 2, 3]
+	if (rwList.none { it > 6 }) println("No items above 6")  // prints "No items above 6"
+	val item = rwList.firstOrNull()
+	
+
+Type casts, smart casts
+
+	// x is automatically cast to string on the right-hand side of `&&`
+    if (x is String && x.length > 0) {
+        print(x.length) // x is automatically cast to String
+    }
+	
+	if (x !is String) return
+    print(x.length) // x is automatically cast to String
+	
+	
+	Such smart casts work for when-expressions and while-loops as well:
+		when (x) {
+			is Int -> print(x + 1)
+			is String -> print(x.length + 1)
+			is IntArray -> print(x.sum())
+		}
+	
+	Note that smart casts do not work when the compiler cannot guarantee that the variable cannot change between the check and the usage. More specifically, smart casts are applicable according to the following rules:
+		val local variables - always;
+		val properties - if the property is private or internal or the check is performed in the same module where the property is declared. Smart casts aren't applicable to open properties or properties that have custom getters;
+		var local variables - if the variable is not modified between the check and the usage and is not captured in a lambda that modifies it;
+		var properties - never (because the variable can be modified at any time by other code).
+		
+	"Unsafe" cast operator: "as"
+		Usually, the cast operator throws an exception if the cast is not possible. Thus, we call it unsafe. The unsafe cast in Kotlin is done by the infix operator as (see operator precedence):
+		val x: String = y as String
+		
+		Note that null cannot be cast to String as this type is not nullable, i.e. if y is null, the code above throws an exception. In order to match Java cast semantics we have to have nullable type at cast right hand side, like:
+			val x: String? = y as String?
+			
+	"Safe" (nullable) cast operator: "as?"
+		To avoid an exception being thrown, one can use a safe cast operator as? that returns null on failure:
+		val x: String? = y as? String
+			Note that despite the fact that the right-hand side of as? is a non-null type String the result of the cast is nullable.
+			
+			
+Ranges
+	Range expressions are formed with rangeTo functions that have the operator form .. which is complemented by in and !in. Range is defined for any comparable type, but for integral primitive types it has an optimized implementation. Here are some examples of using ranges:
+	
+	val range = 1.rangeTo(10)	// this is equivalent to using the ".." operator: 1..to
+	if (i in 1..10) { // equivalent of 1 <= i && i <= 1
+		println(i)
+	}
+	
+	outer@ for (i in 1..5) {
+		for (j in 10 downTo 1) {
+			if (j == 4) break@outer	// break out from the outer@ label
+		}
+	}
+	
+	for (i in 1..4) print(i) // prints "1234"
+	for (i in 4..1) print(i) // prints nothing
+		for (i in 4 downTo 1) print(i) // prints "4321"
+	for (i in 1..4 step 2) print(i) // prints "13"
+	for (i in 4 downTo 1 step 2) print(i) // prints "42"
+	
+	To create a range which does not include its end element, you can use the until function:
+		for (i in 1 until 10) { // i in [1, 10), 10 is excluded
+			 println(i)
+		}
+	for(i in (10 downTo 1).reversed()) {
+		...
+	}
+		
+	How it works
+		Ranges implement a common interface in the library: ClosedRange<T>.
+		ClosedRange<T> denotes a closed interval in the mathematical sense, defined for comparable types. It has two endpoints: start and endInclusive, which are included in the range. The main operation is contains, usually used in the form of in/!in operators.
+	
 		
 		
 Class delegation
@@ -514,4 +602,4 @@ Spring
 		Optional ctor dependencies can also be specified:
 			@RestController
 			@RequestMapping("/")
-			class HomeController(private val superFormula: SuperFormula?) { ... }
+			class HomeController(private val superFormula: SuperFormula?) { ... }}
