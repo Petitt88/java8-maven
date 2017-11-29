@@ -249,6 +249,26 @@ Lambda
 			}
 		}
 		
+	Interesting: lambda vs local function
+	
+		class Wrapper {
+			fun test() {
+				val lamb = { s: String ->
+					// this is Wrapper
+				}
+				lamb("par")
+
+				val lamb2: (s: String) -> Unit = { s ->  }
+				lamb2("named_par")
+
+				val func = fun String.(s: String) {
+					// this is the string receiver!
+				}
+				func("receiver", "par")
+				"receiver".func("par")
+			}
+		}
+		
 	Passing "toBeSynchronized" as a method reference to the "lock" top-level function:
 		fun toBeSynchronized() = sharedResource.operation()
 		val result = lock(lock, ::toBeSynchronized)
@@ -629,6 +649,156 @@ Generics
 		fun <T : Comparable<T>> sort(list: List<T>) {
 			// ...
 		}
+	
+Nested classes
+	class Outer {
+		private val bar: Int = 1
+		class Nested {
+			fun foo() = 2
+		}
+	}
+	val demo = Outer.Nested().foo() // == 2
+	
+	A class may be marked as inner to be able to access members of outer class. Inner classes carry a reference to an object of an outer class:
+		class Outer {
+			private val bar: Int = 1
+			inner class Inner {
+				fun foo() = bar
+			}
+		}
+		val demo = Outer().Inner().foo() // == 1
+		
+	Anonymous inner classes
+		window.addMouseListener(object: MouseAdapter() {
+			override fun mouseClicked(e: MouseEvent) {
+				// ...
+			}
+																													
+			override fun mouseEntered(e: MouseEvent) {
+				// ...
+			}
+		})
+
+	If the object is an instance of a functional Java interface (i.e. a Java interface with a single abstract method), you can create it using a lambda expression prefixed with the type of the interface:
+		val listener = ActionListener { println("clicked") }
+		
+	Nested classes can be declared even in funtions!
+		private fun Transaction.couponCategories(compInfos: List<CompanyInfo>) {
+			if (compInfos.isEmpty()) return
+
+			class CategoryMini(val title: String,
+							   val description: String,
+							   val image: ByteArray,
+							   val companyId: Long
+			)
+			...
+		}
+		
+		
+This
+	In a member of a class, this refers to the current object of that class.
+	In an extension function or a function literal with receiver this denotes the receiver parameter that is passed on the left-hand side of a dot.
+	
+	Qualified this
+		To access this from an outer scope (a class, or extension function, or labeled function literal with receiver) we write this@label where @label is a label on the scope this is meant to be from:
+		class A { // implicit label @A
+			inner class B { // implicit label @B
+				fun Int.foo() { // implicit label @foo
+					val a = this@A // A's this
+					val b = this@B // B's this
+
+					val c = this // foo()'s receiver, an Int
+					val c1 = this@foo // foo()'s receiver, an Int
+
+					val funLit = lambda@ fun String.() {
+						val d = this // funLit's receiver
+					}
+
+
+					val funLit2 = { s: String ->
+						// foo()'s receiver, since enclosing lambda expression
+						// doesn't have any receiver
+						val d1 = this
+					}
+				}
+			}
+		}
+		
+		
+Equality
+
+	There are 2 types:
+		Referential equality (two references point to the same object);
+		Structural equality (a check for equals()).
+		
+	Referential equality
+		Referential equality is checked by the === operation (and its negated counterpart !==). a === b evaluates to true if and only if a and b point to the same object.
+	Structural equality
+		Structural equality is checked by the == operation (and its negated counterpart !=). By convention, an expression like a == b is translated to:
+
+		a?.equals(b) ?: (b === null)
+		
+		
+Operator overloading
+
+	To implement an operator, we provide a member function or an extension function with a fixed name, for the corresponding type, i.e. left-hand side type for binary operations and argument type for unary ones. Functions that overload operators need to be marked with the operator modifier.
+	
+	data class Counter(val dayIndex: Int) {
+		operator fun plus(increment: Int): Counter {
+			return Counter(dayIndex + increment)
+		}
+	}
+	
+		Expression							Translated to
+		a == b								a?.equals(b) ?: (b === null)
+		a != b								!(a?.equals(b) ?: (b === null))
+		
+
+Null Safety
+	Kotlin's type system is aimed to eliminate NullPointerException's from our code. The only possible causes of NPE's may be:
+		An explicit call to throw NullPointerException();
+		Usage of the !! operator that is described below;
+		External Java code has caused it;
+		There's some data inconsistency with regard to initialization (an uninitialized this available in a constructor is used somewhere).
+		
+			var a: String = "abc"
+			a = null // compilation error
+			
+			var b: String? = "abc"
+			b = null // ok
+			
+	Checking for null conditions
+		val l = if (b != null) b.length else -1
+	Safe Calls
+		val l = b?.length ?: -1: 
+		If the expression to the left of "?:" is not null, the elvis operator returns it, otherwise it returns the expression to the right. Note that the right-hand side expression is evaluated only if the left-hand side is null.
+		
+	Note that, since throw and return are expressions in Kotlin, they can also be used on the right hand side of the elvis operator. This can be very handy, for example, for checking function arguments:
+		fun foo(node: Node): String? {
+			val parent = node.getParent() ?: return null
+			val name = node.getName() ?: throw IllegalArgumentException("name expected")
+			// ...
+		}		
+		
+		To perform a certain operation only for non-null values, you can use the safe call operator together with let:
+			val listWithNulls: List<String?> = listOf("A", null)
+			for (item in listWithNulls) {
+				 item?.let { println(it) } // prints A and ignores null
+			}
+	
+	The !! Operator
+
+		The third option is for NPE-lovers. We can write b!!, and this will return a non-null value of b (e.g., a String in our example) or throw an NPE if b is null:
+		val l = b!!.length
+		
+	Safe Casts
+		Regular casts may result into a ClassCastException if the object is not of the target type. Another option is to use safe casts that return null if the attempt was not successful:
+		val aInt: Int? = a as? Int
+		Collections of Nullable Type
+
+	If you have a collection of elements of a nullable type and want to filter non-null elements, you can do so by using filterNotNull:
+		val nullableList: List<Int?> = listOf(1, 2, null, 4)
+		val intList: List<Int> = nullableList.filterNotNull()
 	
 		
 Spring
