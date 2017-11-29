@@ -266,6 +266,9 @@ Lambda
 				}
 				func("receiver", "par")
 				"receiver".func("par")
+				
+				val functionalInterface = Function<String, Int> { param -> 3 }
+				functionalInterface.apply("Java functional interface implementation example. Casting needed.")
 			}
 		}
 		
@@ -316,7 +319,7 @@ Anonymous Functions
 					return
 				})
 				
-				synchronized(this){
+				synchronized(this) {
 					// returns from the "test" function itself
 					return
 				}
@@ -693,6 +696,39 @@ Nested classes
 			)
 			...
 		}
+		
+
+Anonymous classes, objects:
+	Objects:
+		val errorObject = object {
+			val message = errorMessage
+		}
+		
+	Classes:
+		val thread = object : Thread() {
+			override fun run() {
+				super.run()
+			}
+		}
+		thread.isDaemon = true
+		thread.run()
+
+		
+		val anon = object : ObjectMapper() {
+			fun myFunc(): Unit {}
+		}
+		anon.myFunc()
+		
+		
+		interface SuperCar {
+			fun startEngine(): Unit;
+		}
+		val mySupi = object : SuperCar {
+			override fun startEngine() {
+				TODO("not implemented")
+			}
+		}
+		mySupi.startEngine()
 		
 		
 This
