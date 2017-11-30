@@ -222,13 +222,13 @@ Delegated properties
 
 :: - reflection and method reference at the same time.
 
-	list.forEach(::println) 	- method reference
-	myClass::fun1				- method reference
-	this::fun1					- method reference
+	list.forEach(::println) 	- method reference: it is bound to its receiver
+	myClass::fun1				- method reference, bound function to its receiver (to the MyClass instance)
+	this::fun1					- method reference, bound function to its receiver
 	
 	IntroAndLang::class.java 	- reflection
 	MyClass::myProp				- reflection
-	MyClass::fun1				- reflection
+	MyClass::fun1				- reflection, but can be an unbound function reference as well, depending on the type of the left handside's variable
 	
 	
 Lambda
@@ -835,6 +835,179 @@ Null Safety
 	If you have a collection of elements of a nullable type and want to filter non-null elements, you can do so by using filterNotNull:
 		val nullableList: List<Int?> = listOf(1, 2, null, 4)
 		val intList: List<Int> = nullableList.filterNotNull()
+		
+		
+Exceptions
+
+	Try is an expression:
+		val a: Int? = try { parseInt(input) } catch (e: NumberFormatException) { null }
+		
+	The Nothing type
+		throw is an expression in Kotlin, so you can use it, for example, as part of an Elvis expression:
+			val s = person.name ?: throw IllegalArgumentException("Name required")
+
+		The type of the throw expression is the special type Nothing. The type has no values and is used to mark code locations that can never be reached. In your own code, you can use Nothing to mark a function that never returns:
+			fun fail(message: String): Nothing {
+				throw IllegalArgumentException(message)
+			}
+			
+			When you call this function, the compiler will know that the execution doesn't continue beyond the call:
+
+			val s = person.name ?: fail("Name required")
+			println(s)     // 's' is known to be initialized at this point
+			
+			
+Annotations
+
+	annotation class Fancy
+	
+	Additional attributes of the annotation can be specified by annotating the annotation class with meta-annotations:
+		@Target specifies the possible kinds of elements which can be annotated with the annotation (classes, functions, properties, expressions etc.);
+		@Retention specifies whether the annotation is stored in the compiled class files and whether it's visible through reflection at runtime (by default, both are true);
+		@Repeatable allows using the same annotation on a single element multiple times;
+		@MustBeDocumented specifies that the annotation is part of the public API and should be included in the class or method signature shown in the generated API documentation.
+		
+	Constructors
+		Annotations may have constructors that take parameters.
+		
+			annotation class Special(val why: String)
+			@Special("example") class Foo {}
+			
+	Lambdas
+
+		Annotations can also be used on lambdas. They will be applied to the invoke() method into which the body of the lambda is generated.
+		
+		annotation class Suspendable
+		val f = @Suspendable { Fiber.sleep(10) }
+		
+	Annotation Use-site Targets
+		class Example(@field:Ann val foo,    // annotate Java field
+              @get:Ann val bar,      // annotate Java getter
+              @param:Ann val quux)   // annotate Java constructor parameter
+			  
+		 The full list of supported use-site targets is:
+
+			file: to annotate the entire file
+			property (annotations with this target are not visible to Java);
+			field;
+			get (property getter);
+			set (property setter);
+			receiver (receiver parameter of an extension function or property);
+			param (constructor parameter);
+			setparam (property setter parameter);
+			delegate (the field storing the delegate instance for a delegated property).
+			
+		Java Annotations
+
+			Java annotations are 100% compatible with Kotlin
+			
+			
+Reflection
+	Class References: val c = MyClass::class
+		The reference is a value of type KClass.
+		Note that a Kotlin class reference is not the same as a Java class reference. To obtain a Java class reference, use the .java property on a KClass instance.
+	
+	Bound Class References (since 1.1)
+		You can get the reference to a class of a specific object with the same ::class syntax by using the object as a receiver:
+		val widget: Widget = ...
+		assert(widget is GoodWidget) { "Bad widget: ${widget::class.qualifiedName}" }
+		
+	Function References
+	
+		fun isOdd(x: Int) = x % 2 != 0
+			We can easily call it directly (isOdd(5)), but we can also pass it as a value, e.g. to another function. To do this, we use the :: operator:
+			val numbers = listOf(1, 2, 3)
+			println(numbers.filter(::isOdd)) // prints [1, 3]
+			Here ::isOdd is a value of function type (Int) -> Boolean.
+			
+			
+		If on a class:
+			Haha::testHaha	 	- returns KFunction, or an unbound method reference depending on the left handside's type
+			Haha()::testHaha	- returns method reference - (() -> Unit)
+		
+			var func: () -> Unit = ::test
+			func = Haha()::testHaha
+				fun testHaha() {
+				}
+				class Haha {
+					fun test() {
+					}
+				}
+
+		Select from overloded functions: declare the type of the function:
+			val predicate: (String) -> Boolean = ::isOdd   // refers to isOdd(x: String)
+				
+	Example: Function Composition
+	
+		fun <A, B, C> compose(f: (B) -> C, g: (A) -> B): (A) -> C {
+			return { x -> f(g(x)) }
+		}
+		
+		It returns a composition of two functions passed to it: compose(f, g) = f(g(*)). Now, you can apply it to callable references:
+		
+		fun length(s: String) = s.length
+		val oddLength = compose(::isOdd, ::length)
+		val strings = listOf("a", "ab", "abc")
+
+		println(strings.filter(oddLength)) // Prints "[a, abc]"
+		
+	Property References
+		To access properties as first-class objects in Kotlin, we can also use the :: operator:
+			val x = 1		// The expression ::x evaluates to a property object of type KProperty<Int>
+
+			fun main(args: Array<String>) {
+				println(::x.get()) // prints "1"
+				println(::x.name)  // prints "x"
+			}
+			
+			var y = 1		// For a mutable property, e.g. var y = 1, ::y returns a value of type KMutableProperty<Int>, which has a set() method
+
+			fun main(args: Array<String>) {
+				::y.set(2)
+				println(y) // prints "2"
+			}
+			
+		To access a property that is a member of a class, we qualify it:
+			class A(val p: Int)
+			fun main(args: Array<String>) {
+				val prop = A::p
+				println(prop.get(A(1))) // prints "1"
+			}
+			
+	Constructor References
+		Constructors are referenced by using the :: operator and adding the class name:
+	
+			class Foo
+			fun function(factory: () -> Foo) {
+				val x: Foo = factory()
+			}
+			function(::Foo)
+			
+	Bound Function and Property References (since 1.1) - method reference
+		You can refer to an instance method of a particular object:
+		
+			val numberRegex = "\\d+".toRegex()
+			println(numberRegex.matches("29")) // prints "true"
+		 
+			val isNumber = numberRegex::matches		// Instead of calling the method matches directly we are storing a reference to it. Such reference is bound to its receiver. 
+			println(isNumber("29")) // prints "true"
+			
+			
+		Compare the types of bound and the corresponding unbound references. Bound callable reference has its receiver "attached" to it, so the type of the receiver is no longer a parameter:
+		
+			var boundFunc: () -> Unit = Wrapper()::test // bound function - to its receiver
+			var unboundFunc: (Wrapper) -> Unit = Wrapper::test  // unbound function - need to pass in a receiver
+			var method: KFunction<*> = Wrapper::test    // method for reflection
+			
+			val isNumber: (CharSequence) -> Boolean = numberRegex::matches
+			val matches: (Regex, CharSequence) -> Boolean = Regex::matches
+			
+		Property reference can be bound as well:
+
+			val prop = "abc"::length
+			println(prop.get())   // prints "3"
+			
+		Since Kotlin 1.2, explicitly specifying this as the receiver is not necessary: this::foo and ::foo are equivalent.
 	
 		
 Spring
