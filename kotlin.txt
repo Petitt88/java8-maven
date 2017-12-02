@@ -839,6 +839,9 @@ Null Safety
 		
 Exceptions
 
+	Checked Exceptions
+		Kotlin does not have checked exceptions. 
+
 	Try is an expression:
 		val a: Int? = try { parseInt(input) } catch (e: NumberFormatException) { null }
 		
@@ -1043,7 +1046,43 @@ Type aliases
 			val p: Predicate<Int> = { it > 0 }
 			println(listOf(1, -2).filter(p)) // prints "[1]"
 		}
+		
+		
+If, try-catch expressions
 
+	If expression
+		In Kotlin, if is an expression, i.e. it returns a value. Therefore there is no ternary operator (condition ? then : else), because ordinary if works fine in this role.
+		// As expression 
+		val max = if (a > b) a else b
+		
+	When expression
+		when replaces the switch operator of C-like languages. In the simplest form it looks like this
+		
+		when (x) {
+			in 1..10 -> print("x is in the range")
+			in validNumbers -> print("x is valid")
+			!in 10..20 -> print("x is outside the range")
+			else -> print("none of the above")
+		}
+		when (x) {
+			0, 1 -> print("x == 0 or x == 1")
+			else -> print("otherwise")
+		}
+		fun hasPrefix(x: Any) = when(x) {
+			is String -> x.startsWith("prefix")
+			else -> false
+		}
+		when {
+			x.isOdd() -> print("x is odd")
+			x.isEven() -> print("x is even")
+			else -> print("x is funny")
+		}
+	
+	Try-catch
+		try is an expression, i.e. it may have a return value:
+		val a: Int? = try { parseInt(input) } catch (e: NumberFormatException) { null }
+		The returned value of a try-expression is either the last expression in the try block or the last expression in the catch block (or blocks). Contents of the finally block do not affect the result of the expression.
+	
 
 Spring
 
