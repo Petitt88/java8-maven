@@ -109,6 +109,34 @@ Arrays, Collections
 	if (rwList.none { it > 6 }) println("No items above 6")  // prints "No items above 6"
 	val item = rwList.firstOrNull()
 	
+	// groupBy example
+	class InfoFromDatabase(val catId: Long, val catName: String, val coupId: Long, val couponName: String)
+	class CoupInfo(val coupId: Long, val coupName: String)
+	class GroupedInfo(val catId: Long, val catName: String, val coupons: Iterable<CoupInfo>)
+
+	val infos = listOf(1L, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
+			.map { InfoFromDatabase(catId = it % 3, catName = "CatName${it % 3}", coupId = it, couponName = "CoupoName$it") }
+
+	val res = infos.groupBy { it.catId }
+			.mapKeys {
+				object {
+					val catId = it.key
+					val catName = it.value[0].catName
+				}
+			}
+			.mapValues { entry ->
+				entry.value.map {
+					object {
+						val coupId = it.coupId
+						val coupName = it.couponName
+					}
+				}
+			}
+			.map { GroupedInfo(it.key.catId, it.key.catName, it.value.map { c -> CoupInfo(c.coupId, c.coupName) }) }
+
+	val resDifferently = infos.groupBy { it.catId }
+			.map { GroupedInfo(it.key, it.value[0].catName, it.value.map { c -> CoupInfo(c.coupId, c.couponName) }) }
+
 
 Type casts, smart casts
 
