@@ -136,6 +136,361 @@ Arrays, Collections
 
 	val resDifferently = infos.groupBy { it.catId }
 			.map { GroupedInfo(it.key, it.value[0].catName, it.value.map { c -> CoupInfo(c.coupId, c.couponName) }) }
+			
+			
+Returns and Jumps
+
+	val s = person.name ?: return
+	
+	Break and Continue Labels	
+		loop@ for (i in 1..100) {
+			for (j in 1..100) {
+				if (...) break@loop
+			}
+		}
+
+	Return at Labels: returning normally from a lambda exists the entire function to the caller. However, returning from an anonymous function returns only from that function!
+		fun foo() {
+			ints.forEach {
+				if (it == 0) return  // nonlocal return from inside lambda directly to the caller of foo()
+				print(it)
+			}
+		}
+		
+		fun foo() {
+			ints.forEach lit@ {
+				if (it == 0) return@lit
+				print(it)
+			}
+		}
+		
+		fun foo() {
+			ints.forEach {
+				if (it == 0) return@forEach
+				print(it)
+			}
+		}
+		
+		fun foo() {
+			ints.forEach(fun(value: Int) {
+				if (value == 0) return  // local return to the caller of the anonymous fun, i.e. the forEach loop
+				print(value)
+			})
+		}
+		
+		
+Control Flow: if, when, for, while
+	If Expression
+		// Traditional usage 
+		var max = a 
+		if (a < b) max = b
+		
+		// As expression 
+		val max = if (a > b) a else b
+		
+	When Expression
+		when (x) {
+			0, 1 -> print("x == 0 or x == 1")
+			else -> print("otherwise")
+		}
+		when (x) {
+			in 1..10 -> print("x is in the range")
+			in validNumbers -> print("x is valid")
+			!in 10..20 -> print("x is outside the range")
+			else -> print("none of the above")
+		}
+		when {
+			x.isOdd() -> print("x is odd")
+			x.isEven() -> print("x is even")
+			else -> print("x is funny")
+		}
+		
+	For Loops
+		for (item in collection) print(item)
+		
+		As mentioned before, for iterates through anything that provides an iterator, i.e.
+			has a member- or extension-function iterator(), whose return type
+				has a member- or extension-function next(), and
+				has a member- or extension-function hasNext() that returns Boolean.
+			All of these three functions need to be marked as operator.
+			
+		for (i in array.indices) {
+			print(array[i])
+		}
+		for ((index, value) in array.withIndex()) {
+			println("the element at $index is $value")
+		}
+		
+	While Loops
+		while (x > 0) {
+			x--
+		}
+		do {
+			val y = retrieveData()
+		} while (y != null) // y is visible here!
+		
+		
+Classes and Inheritance
+	Constructors
+	
+		Primary constructors
+			A class in Kotlin can have a primary constructor and one or more secondary constructors. The primary constructor is part of the class header: it goes after the class name (and optional type parameters).
+			class Person internal constructor(firstName: String) {
+			}
+			class Person(firstName: String) {
+			}
+			
+			The primary constructor cannot contain any code. Initialization code can be placed in initializer blocks, which are prefixed with the init keyword:
+
+				class Customer(name: String) {
+					init {
+						logger.info("Customer initialized with value ${name}")
+					}
+				}
+				
+			Note that parameters of the primary constructor can be used in the initializer blocks. They can also be used in property initializers declared in the class body:
+
+				class Customer(name: String) {
+					val customerKey = name.toUpperCase()
+				}
+				
+			In fact, for declaring properties and initializing them from the primary constructor, Kotlin has a concise syntax:
+				class Person(val firstName: String, val lastName: String, var age: Int) {
+					// ...
+				}
+			
+			If the constructor has annotations or visibility modifiers, the constructor keyword is required, and the modifiers go before it:
+				class Customer public @Inject constructor(name: String) { ... }
+				
+		Secondary Constructors
+		
+			The class can also declare secondary constructors, which are prefixed with constructor:
+			class Person {
+				constructor(parent: Person) {
+					parent.children.add(this)
+				}
+			}
+			
+			If the class has a primary constructor, each secondary constructor needs to delegate to the primary constructor, either directly or indirectly through another secondary constructor(s). Delegation to another constructor of the same class is done using the this keyword:
+				class Person(val name: String) {
+					constructor(name: String, parent: Person) : this(name) {
+						parent.children.add(this)
+					}
+				}
+				
+	Inheritance
+		All classes in Kotlin have a common superclass Any, that is a default super for a class with no supertypes declared
+		
+		open class Base(p: Int)
+		class Derived(p: Int) : Base(p)
+		
+		If the class has no primary constructor, then each secondary constructor has to initialize the base type using the super keyword, or to delegate to another constructor which does that. 
+			class MyView : View {
+				constructor(ctx: Context) : super(ctx)
+				constructor(ctx: Context, attrs: AttributeSet) : super(ctx, attrs)
+			}
+			
+		Overriding methods:
+			open class Base {
+				open fun v() {}
+				fun nv() {}
+			}
+			class Derived() : Base() {
+				override fun v() {}
+			}
+			
+			A member marked override is itself open, i.e. it may be overridden in subclasses. If you want to prohibit re-overriding, use final:
+				open class AnotherDerived() : Base() {
+					final override fun v() {}
+				}
+				
+		Overriding Properties
+			open class Foo {
+				open val x: Int get() { ... }
+			}
+			class Bar1 : Foo() {
+				override val x: Int = ...
+			}
+			You can also override a val property with a var property, but not vice versa. This is allowed because a val property essentially declares a getter method, and overriding it as a var additionally declares a setter method in the derived class.
+			
+			interface Foo {
+				val count: Int
+			}
+			class Bar1(override val count: Int) : Foo
+			class Bar2 : Foo {
+				override var count: Int = 0
+			}
+			
+		Abstract Classes
+			We can override a non-abstract open member with an abstract one
+			open class Base {
+				open fun f() {}
+			}
+			abstract class Derived : Base() {
+				override abstract fun f()
+			}
+
+Object Expressions and Declarations
+
+	Object expressions
+		To create an object of an anonymous class that inherits from some type (or types), we write:
+		
+		window.addMouseListener(object : MouseAdapter() {
+			override fun mouseClicked(e: MouseEvent) {
+				// ...
+			}
+
+			override fun mouseEntered(e: MouseEvent) {
+				// ...
+			}
+		})
+		
+		open class A(x: Int) {
+			public open val y: Int = x
+		}
+
+		interface B {...}
+
+		val ab: A = object : A(1), B {
+			override val y = 15
+		}
+		
+	Object declarations
+		Singleton is a very useful pattern, and Kotlin (after Scala) makes it easy to declare singletons:
+		object DataProviderManager {
+			fun registerDataProvider(provider: DataProvider) {
+				// ...
+			}
+
+			val allDataProviders: Collection<DataProvider>
+				get() = // ...
+		}
+		DataProviderManager.registerDataProvider(...)
+		object DefaultListener : MouseAdapter() {
+			override fun mouseClicked(e: MouseEvent) {
+				// ...
+			}
+
+			override fun mouseEntered(e: MouseEvent) {
+				// ...
+			}
+		}
+		
+	Semantic difference between object expressions and declarations
+		There is one important semantic difference between object expressions and object declarations:
+
+		- object expressions are executed (and initialized) immediately, where they are used;
+		- object declarations are initialized lazily, when accessed for the first time;
+		- a companion object is initialized when the corresponding class is loaded (resolved), matching the semantics of a Java static initializer.
+
+
+Interfaces
+
+	Interfaces in Kotlin are very similar to Java 8. They can contain declarations of abstract methods, as well as method implementations. 
+	What makes them different from abstract classes is that interfaces cannot store state. They can have properties but these need to be abstract or to provide accessor implementations.
+
+		interface MyInterface {
+			fun bar()
+			fun foo() {
+			  // optional body
+			}
+		}
+		class Child : MyInterface {
+			override fun bar() {
+				// body
+			}
+		}
+	
+	Properties in Interfaces
+		interface MyInterface {
+			val prop: Int // abstract
+
+			val propertyWithImplementation: String
+				get() = "foo"
+
+			fun foo() {
+				print(prop)
+			}
+		}
+
+		class Child : MyInterface {
+			override val prop: Int = 29
+		}
+
+
+Properties and Fields
+
+	The initializer, getter and setter are optional. Property type is optional if it can be inferred from the initializer (or from the getter return type, as shown below).
+		var allByDefault: Int? // error: explicit initializer required, default getter and setter implied
+		var initialized = 1 // has type Int, default getter and setter
+		
+	The full syntax of a read-only property declaration differs from a mutable one in two ways: it starts with val instead of var and does not allow a setter:
+		val simple: Int? // has type Int, default getter, must be initialized in constructor
+		val inferredType = 1 // has type Int and a default getter
+		
+	We can write custom accessors, very much like ordinary functions, right inside a property declaration. Here's an example of a custom getter:
+		val isEmpty: Boolean
+			get() = this.size == 0
+			
+		var stringRepresentation: String
+			get() = this.toString()
+			set(value) {
+				setDataFromString(value) // parses the string and assigns values to other properties
+			}
+			
+		If you need to change the visibility of an accessor or to annotate it, but don't need to change the default implementation, you can define the accessor without defining its body:
+
+			var setterVisibility: String = "abc"
+				private set // the setter is private and has the default implementation
+
+			var setterWithAnnotation: Any? = null
+				@Inject set // annotate the setter with Inject
+				
+	Backing Fields
+		Classes in Kotlin cannot have fields. However, sometimes it is necessary to have a backing field when using custom accessors.
+		For these purposes, Kotlin provides an automatic backing field which can be accessed using the field identifier.
+		
+		var identityProp: Int = 0
+			get() = field
+			set(value) {
+				field = value
+			}
+			
+	Compile-Time Constants
+
+		Properties the value of which is known at compile time can be marked as compile time constants using the const modifier. Such properties need to fulfil the following requirements:
+			- Top-level or member of an object
+			- Initialized with a value of type String or a primitive type
+			- No custom getter
+			
+		Such properties can be used in annotations:
+			const val SUBSYSTEM_DEPRECATED: String = "This subsystem is deprecated"
+			@Deprecated(SUBSYSTEM_DEPRECATED) fun foo() { ... }
+		
+	Backing Properties
+
+		If you want to do something that does not fit into this "implicit backing field" scheme, you can always fall back to having a backing property:
+		private var _table: Map<String, Int>? = null
+		public val table: Map<String, Int>
+			get() {
+				if (_table == null) {
+					_table = HashMap() // Type parameters are inferred
+				}
+				return _table ?: throw AssertionError("Set to null by another thread")
+			}
+			
+	Late-Initialized Properties and Variables
+		Normally, properties declared as having a non-null type must be initialized in the constructor. 
+		However, fairly often this is not convenient. For example, properties can be initialized through dependency injection, or in the setup method of a unit test. 
+		In this case, you cannot supply a non-null initializer in the constructor, but you still want to avoid null checks when referencing the property inside the body of a class.
+
+		To handle this case, you can mark the property with the lateinit modifier:
+			lateinit var subject: TestSubject
+			
+		Checking whether a lateinit var is initialized (since 1.2)
+			if (foo::bar.isInitialized) {
+				println(foo.bar)
+			}
 
 
 Type casts, smart casts
