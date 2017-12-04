@@ -1073,15 +1073,16 @@ Type aliases
 
 			val p: Predicate<Int> = { it > 0 }
 			println(listOf(1, -2).filter(p)) // prints "[1]"
-		}
-		
-		
-If, try-catch expressions
+		}		
 
-	If expression
-		In Kotlin, if is an expression, i.e. it returns a value. Therefore there is no ternary operator (condition ? then : else), because ordinary if works fine in this role.
-		// As expression 
-		val max = if (a > b) a else b
+Java interop
+
+	Platform types:
+		T! - this means it can be either T or T?
+		Types of Java declarations are treated specially in Kotlin and called platform types. Null-checks are relaxed for such types, so that safety guarantees for them are the same as in Java
+
+
+If, try-catch expressions
 		
 	When expression
 		when replaces the switch operator of C-like languages. In the simplest form it looks like this
