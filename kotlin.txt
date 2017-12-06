@@ -329,6 +329,14 @@ Classes and Inheritance
 			abstract class Derived : Base() {
 				override abstract fun f()
 			}
+			
+	Class delegation: works only on interfaces
+
+		The Delegation pattern has proven to be a good alternative to implementation inheritance, and Kotlin supports it natively requiring zero boilerplate code. 
+		A class Derived can inherit from an interface Base and delegate all of its public methods to a specified object.
+	
+		More importantly, overrides work: the compiler will use your override implementations instead of those in the delegate object.
+			The default functions of the interface can also be overridden!
 
 Object Expressions and Declarations
 
@@ -561,14 +569,6 @@ Ranges
 	How it works
 		Ranges implement a common interface in the library: ClosedRange<T>.
 		ClosedRange<T> denotes a closed interval in the mathematical sense, defined for comparable types. It has two endpoints: start and endInclusive, which are included in the range. The main operation is contains, usually used in the form of in/!in operators.
-	
-		
-		
-Class delegation
-
-	The Delegation pattern has proven to be a good alternative to implementation inheritance, and Kotlin supports it natively requiring zero boilerplate code. A class Derived can inherit from an interface Base and delegate all of its public methods to a specified object.
-	
-	More importantly, overrides work: the compiler will use your override implementations instead of those in the delegate object.
 
 	
 Delegated properties
