@@ -1392,6 +1392,13 @@ Reflection
 			var unboundFunc: (Wrapper) -> Unit = Wrapper::test  // unbound function - need to pass in a receiver
 			var method: KFunction<*> = Wrapper::test    // method for reflection
 			
+				// surprisingly the "method" can be invoked just like a method
+				method(Wrapper())
+				method.invoke(Wrapper())
+				
+				boundFunc.invoke()
+				unboundFunc.invoke(Wrapper())
+			
 			val isNumber: (CharSequence) -> Boolean = numberRegex::matches
 			val matches: (Regex, CharSequence) -> Boolean = Regex::matches
 			
