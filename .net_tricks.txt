@@ -256,6 +256,9 @@ Reference assmeblies:
 			- IHostingEnvironment
 			- IHostedService:
 				- If you register (with the DI container) an IHostedService then ASP.NET Core will call the Start() and Stop() methods of your type during application start and stop respectively.
+			- IHost: since .NET Core 2.1
+				- to register background tasks in any process/host (not just in ASP.NET Core Web Applications)
+				- The IHostedService interface provides a convenient way to start background tasks in an ASP.NET Core web application (in .NET Core 2.0) or in any process/host (starting in .NET Core 2.1 with IHost).
 			-IHostingStartup
 				- The IHostingStartup interface defines a single method: void Configure(IWebHostBuilder builder);. This method is called while the WebHost is being built in the Program.cs of your ASP.NET Core application and allows code to setup anything that can be configured on a WebHostBuidler, including default services and loggers which is how Application Insights works.
 				- ASP.NET Core will execute any IHostingStartup implementations in the applications assembly as well as any that are listed in an Environment Variable called ASPNETCORE_HOSTINGSTARTUPASSEMBLIES.
