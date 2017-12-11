@@ -1154,8 +1154,8 @@ This
 Equality
 
 	There are 2 types:
-		Referential equality (two references point to the same object);
-		Structural equality (a check for equals()).
+		Referential equality (two references point to the same object); - identity
+		Structural equality (a check for equals()).						- equality
 		
 	Referential equality
 		Referential equality is checked by the === operation (and its negated counterpart !==). a === b evaluates to true if and only if a and b point to the same object.
