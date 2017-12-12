@@ -499,6 +499,88 @@ Properties and Fields
 			if (foo::bar.isInitialized) {
 				println(foo.bar)
 			}
+			
+
+Data Classes
+	We frequently create classes whose main purpose is to hold data. In such a class some standard functionality and utility functions are often mechanically derivable from the data. In Kotlin, this is called a data class and is marked as data:
+
+		data class User(val name: String, val age: Int)
+		
+	The compiler automatically derives the following members from all properties declared in the primary constructor:
+		- equals()/hashCode() pair;
+		- toString() of the form "User(name=John, age=42)";
+		- componentN() functions corresponding to the properties in their order of declaration;
+		- copy() function (see below)
+		
+	Data Classes and Destructuring Declarations
+
+		Component functions generated for data classes enable their use in destructuring declarations:
+			val jane = User("Jane", 35) 
+			val (name, age) = jane
+			println("$name, $age years of age") // prints "Jane, 35 years of age"
+			
+			
+Sealed Classes
+	To declare a sealed class, you put the sealed modifier before the name of the class. A sealed class can have subclasses, but all of them must be declared in the same file as the sealed class itself. (Before Kotlin 1.1, the rules were even more strict: classes had to be nested inside the declaration of the sealed class).
+	
+		sealed class Expr
+		data class Const(val number: Double) : Expr()
+		data class Sum(val e1: Expr, val e2: Expr) : Expr()
+		object NotANumber : Expr()
+
+
+Enum Classes
+	The most basic usage of enum classes is implementing type-safe enums:
+
+		enum class Direction {
+			NORTH, SOUTH, WEST, EAST
+		}
+		
+	Initialization
+
+		Since each enum is an instance of the enum class, they can be initialized as:
+			enum class Color(val rgb: Int) {
+					RED(0xFF0000),
+					GREEN(0x00FF00),
+					BLUE(0x0000FF)
+			}
+			
+	Anonymous Classes
+
+		Enum constants can also declare their own anonymous classes:
+			enum class ProtocolState {
+				WAITING {
+					override fun signal() = TALKING
+				},
+
+				TALKING {
+					override fun signal() = WAITING
+				};
+
+				abstract fun signal(): ProtocolState
+			}
+		
+	Working with Enum Constants
+	
+		Just like in Java, enum classes in Kotlin have synthetic methods allowing to list the defined enum constants and to get an enum constant by its name. The signatures of these methods are as follows (assuming the name of the enum class is EnumClass):
+
+			EnumClass.valueOf(value: String): EnumClass
+			EnumClass.values(): Array<EnumClass>
+	
+		Since Kotlin 1.1, it's possible to access the constants in an enum class in a generic way, using the enumValues<T>() and enumValueOf<T>() functions:
+			enum class RGB { RED, GREEN, BLUE }
+
+			inline fun <reified T : Enum<T>> printAllValues() {
+				print(enumValues<T>().joinToString { it.name })
+			}
+
+			printAllValues<RGB>() // prints RED, GREEN, BLUE
+			
+		Every enum constant has properties to obtain its name and position in the enum class declaration:
+
+			val name: String
+			val ordinal: Int
+			The enum constants also implement the Comparable interface, with the natural order being the order in which they are defined in the enum class.
 
 
 Type casts, smart casts
@@ -800,7 +882,7 @@ Inline functions
 			// ...
 		}
 		
-	reified:
+	reified: marks a type parameter of an inline function as accessible at runtime
 	
 		What we actually want is simply pass a type to this function, i.e. call it like this:
 
@@ -814,7 +896,9 @@ Inline functions
 				}
 				return p as T?
 			}
-	
+		
+		We qualified the type parameter with the reified modifier, now it’s accessible inside the function, almost as if it were a normal class. Since the function is inlined, no reflection is needed, normal operators like !is and as are working now. Also, we can call it as mentioned above: myTree.findParentOfType<MyTreeNodeType>().
+		
 		Though reflection may not be needed in many cases, we can still use it with a reified type parameter:
 
 			inline fun <reified T> membersOf() = T::class.members
