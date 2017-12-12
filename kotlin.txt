@@ -537,6 +537,19 @@ Type casts, smart casts
 		val x: String? = y as? String
 			Note that despite the fact that the right-hand side of as? is a non-null type String the result of the cast is nullable.
 			
+Variable number of arguments (Varargs)
+	fun foo(vararg strings: String) { /* ... */ }
+	foo(strings = *arrayOf("a", "b", "c"))
+	
+	
+	fun <T> asList(vararg ts: T): List<T> {
+		val result = ArrayList<T>()
+		for (t in ts) // ts is an Array
+			result.add(t)
+		return result
+	}
+	val list = asList(1, 2, 3)
+			
 			
 Ranges
 	Range expressions are formed with rangeTo functions that have the operator form .. which is complemented by in and !in. Range is defined for any comparable type, but for integral primitive types it has an optimized implementation. Here are some examples of using ranges:
@@ -876,7 +889,7 @@ Coroutines:
 		jobs.forEach { it.join() }
 	}
 	
-	un main(args: Array<String>) = runBlocking<Unit> {
+	fun main(args: Array<String>) = runBlocking<Unit> {
 		val jobs = arrayListOf<Job>()
 		jobs += launch(Unconfined) { // not confined -- will work with main thread
 			println("      'Unconfined': I'm working in thread ${Thread.currentThread().name}")	-- main thread
@@ -900,7 +913,6 @@ Coroutines:
 			Runs new coroutine and blocks current thread interruptibly until its completion. This function should not be used from coroutine. It is designed to bridge regular blocking code to libraries that are written in suspending style, to be used in main functions and in tests.
 			
 		launch
-		
 			fun launch(
 				context: CoroutineContext = DefaultDispatcher, 
 				start: CoroutineStart = CoroutineStart.DEFAULT, 
@@ -1446,12 +1458,171 @@ Type aliases
 
 Java interop
 
-	Platform types:
-		T! - this means it can be either T or T?
-		Types of Java declarations are treated specially in Kotlin and called platform types. Null-checks are relaxed for such types, so that safety guarantees for them are the same as in Java
+	Calling Java from Kotlin
+
+		Platform types:
+			T! - this means it can be either T or T?
+			Types of Java declarations are treated specially in Kotlin and called platform types. Null-checks are relaxed for such types, so that safety guarantees for them are the same as in Java
+			
+			a java "Integer" becomes a platform type in kotlin: Int! (because Integer in java can be either int or a null)
+			however a java "int" becomes a kotlin type: Int (because "int" in java cannot be null)
+			
+			
+			Notion for platform types:
+				- T! means "T or T?",
+				- (Mutable)Collection<T>! means "Java collection of T may be mutable or not, may be nullable or not",
+				- Array<(out) T>! means "Java array of T (or a subtype of T), nullable or not"
+				
+		Mapped types
+			Kotlin treats some Java types specially. Such types are not loaded from Java "as is", but are mapped to corresponding Kotlin types.
+			The mapping only matters at compile time, the runtime representation remains unchanged. Java's primitive types are mapped to corresponding Kotlin types (keeping platform types in mind):
+				Java type	Kotlin type
+				byte		kotlin.Byte
+				short		kotlin.Short
+				int			kotlin.Int
+				long		kotlin.Long
+				char		kotlin.Char
+				float		kotlin.Float
+				double		kotlin.Double
+				boolean		kotlin.Boolean
+				
+			Some non-primitive built-in classes are also mapped:
+				Java type				Kotlin type
+				java.lang.Object		kotlin.Any!
+				java.lang.Cloneable		kotlin.Cloneable!
+				java.lang.Comparable	kotlin.Comparable!
+				java.lang.Enum			kotlin.Enum!
+				java.lang.Annotation	kotlin.Annotation!
+				java.lang.Deprecated	kotlin.Deprecated!
+				java.lang.CharSequence	kotlin.CharSequence!
+				java.lang.String		kotlin.String!
+				java.lang.Number		kotlin.Number!
+				java.lang.Throwable		kotlin.Throwable!
+				
+			Java's boxed primitive types are mapped to nullable Kotlin types:
+				Java type				Kotlin type
+				java.lang.Byte			kotlin.Byte?
+				java.lang.Short			kotlin.Short?
+				java.lang.Integer		kotlin.Int?
+				java.lang.Long			kotlin.Long?
+				java.lang.Character		kotlin.Char?
+				java.lang.Float			kotlin.Float?
+				java.lang.Double		kotlin.Double?
+				java.lang.Boolean		kotlin.Boolean?
+				
+				Note that a boxed primitive type used as a type parameter is mapped to a platform type: for example, List<java.lang.Integer> becomes a List<Int!> in Kotlin.
+				
+			Collection types may be read-only or mutable in Kotlin, so Java's collections are mapped as follows (all Kotlin types in this table reside in the package kotlin.collections):
+					Java type			Kotlin read-only type			Kotlin mutable type				Loaded platform type
+					Iterator<T>			Iterator<T>						MutableIterator<T>				(Mutable)Iterator<T>!
+					Iterable<T>			Iterable<T>						MutableIterable<T>				(Mutable)Iterable<T>!
+					Collection<T>		Collection<T>					MutableCollection<T>			(Mutable)Collection<T>!
+					Set<T>				Set<T>							MutableSet<T>					(Mutable)Set<T>!
+					List<T>				List<T>							MutableList<T>					(Mutable)List<T>!
+					ListIterator<T>		ListIterator<T>					MutableListIterator<T>			(Mutable)ListIterator<T>!
+					Map<K, V>			Map<K, V>						MutableMap<K, V>				(Mutable)Map<K, V>!
+					Map.Entry<K, V>		Map.Entry<K, V>					MutableMap.MutableEntry<K,V>	(Mutable)Map.(Mutable)Entry<K, V>!
+					
+			Java's arrays are mapped as mentioned below:
+				Java type		Kotlin type
+				int[]			kotlin.IntArray!
+				String[]		kotlin.Array<(out) String>!
+					
+		Java generics in Kotlin		
+			Kotlin's generics are a little different from Java's (see Generics). When importing Java types to Kotlin we perform some conversions:
+			Java's wildcards are converted into type projections,
+				Foo<? extends Bar> becomes Foo<out Bar!>!,
+				Foo<? super Bar> becomes Foo<in Bar!>!;
+			Java's raw types are converted into star projections,
+				List becomes List<*>!, i.e. List<out Any?>!.
+			
+		Java Arrays
+			Arrays in Kotlin are invariant, unlike Java. This means that Kotlin does not let us assign an Array<String> to an Array<Any>, which prevents a possible runtime failure. 
+			Passing an array of a subclass as an array of superclass to a Kotlin method is also prohibited, but for Java methods this is allowed (through platform types of the form Array<(out) String>!).
+			
+			Arrays are used with primitive datatypes on the Java platform to avoid the cost of boxing/unboxing operations. 
+			As Kotlin hides those implementation details, a workaround is required to interface with Java code. 
+			There are specialized classes for every type of primitive array (IntArray, DoubleArray, CharArray, and so on) to handle this case. 
+			They are not related to the Array class and are compiled down to Java's primitive arrays for maximum performance.
+			
+				val javaObj = JavaArrayExample()
+				val array = intArrayOf(0, 1, 2, 3)
+				javaObj.removeIndices(array)  // passes int[] to method
+				
+			Even when we navigate with an index, it does not introduce any overhead:
+
+				for (i in array.indices) { // no iterator created
+					array[i] += 2
+				}
+				
+			Finally, in-checks have no overhead either:
+
+				if (i in array.indices) { // same as (i >= 0 && i < array.size)
+					print(array[i])
+				}
+				
+		Java Varargs
+			Java classes sometimes use a method declaration for the indices with a variable number of arguments (varargs):
+
+				public class JavaArrayExample {
+
+					public void removeIndicesVarArg(int... indices) {
+						// code here...
+					}
+				}
+				val javaObj = JavaArrayExample()
+				val array = intArrayOf(0, 1, 2, 3)
+				javaObj.removeIndicesVarArg(*array)
+				
+		Checked Exceptions
+			In Kotlin, all exceptions are unchecked, meaning that the compiler does not force you to catch any of them. 
+			So, when you call a Java method that declares a checked exception, Kotlin does not force you to do anything
+
+		Object Methods
+			When Java types are imported into Kotlin, all the references of the type java.lang.Object are turned into Any. 
+			Since Any is not platform-specific, it only declares toString(), hashCode() and equals() as its members, so to make other members of java.lang.Object available, Kotlin uses extension functions.
+			
+			getClass()
+				To retrieve the Java class of an object, use the java extension property on a class reference:
+				val fooClass = foo::class.java
+				val fooClass = foo.javaClass
+			
+			finalize()
+				To override finalize(), all you need to do is simply declare it, without using the override keyword:
+				class C {
+					protected fun finalize() {
+						// finalization logic
+					}
+				}
+				
+		Inheritance from Java classes
+			At most one Java class (and as many Java interfaces as you like) can be a supertype for a class in Kotlin.
+				
+		Accessing static members
+			Static members of Java classes form "companion objects" for these classes. We cannot pass such a "companion object" around as a value, but can access the members explicitly, for example:
+			if (Character.isLetter(a)) {
+				// ...
+			}
+				
+		SAM Conversions
+			Just like Java 8, Kotlin supports SAM conversions. This means that Kotlin function literals can be automatically converted into implementations of Java interfaces with a single non-default method,
+			as long as the parameter types of the interface method match the parameter types of the Kotlin function.
+			
+			You can use this for creating instances of SAM interfaces:
+			val runnable = Runnable { println("This runs in a runnable") }
+			
+			val executor = ThreadPoolExecutor()
+			// Java signature: void execute(Runnable command)
+			executor.execute { println("This runs in a thread pool") }
+			executor.execute(Runnable { println("This runs in a thread pool") })
+				
+		Using JNI with Kotlin
+			To declare a function that is implemented in native (C or C++) code, you need to mark it with the external modifier:
+			external fun foo(x: Int): Double
+			
+	Calling Kotlin from Java
+	
 		
-		a java "Integer" becomes a platform type in kotlin: Int! (because Integer in java can be either int or a null)
-		however a java "int" becomes a kotlin type: Int (because "int" in java cannot be null)
 
 
 If, try-catch expressions
