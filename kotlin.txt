@@ -1671,3 +1671,19 @@ Spring
 			@RestController
 			@RequestMapping("/")
 			class HomeController(private val superFormula: SuperFormula?) { ... }}
+			
+	WebFlux WebFilter kotlin possible implementations:
+	
+		1.
+		val aFilter = object : WebFilter {
+			override fun filter(exchange: ServerWebExchange, chain: WebFilterChain): Mono<Void> {
+				return chain.filter(exchange);
+			}
+		}
+	
+		2.
+		val bFilter = WebFilter { exchange, chain -> chain.filter(exchange) }
+		
+		3.
+		val func: (exchange: ServerWebExchange, chain: WebFilterChain) -> Mono<Void> = { exchange, chain -> chain.filter(exchange) }
+		val cFilter = WebFilter(func)

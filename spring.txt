@@ -4011,3 +4011,42 @@ WebFlux functional APIs:
 Kotlin DSLs:
 	- Route DSL
 	- Bean registration DSL
+	
+WebFlux filters:
+
+	WebFilter: applied to every request
+		@Bean
+		fun sampleWebFilter(): WebFilter {
+			return WebFilter { e: ServerWebExchange, c: WebFilterChain ->
+				val l: MutableList<String> = e.getAttributeOrDefault(KEY, mutableListOf())
+				l.add("From WebFilter")
+				e.attributes.put(KEY, l)
+				c.filter(e)
+			}
+		}
+	
+	HandlerFilterFunction: applied only on certain routes
+	
+		@Bean
+		fun route(): RouterFunction<*> = router {
+			GET("/react/hello", { r ->
+				ok().body(fromObject(
+						Greeting("${r.attribute(KEY).orElse("[Fallback]: ")}: Hello")
+				))
+			})
+			
+			POST("/another/endpoint", TODO())
+			
+			PUT("/another/endpoint", TODO())
+			
+		}.filter({ r: ServerRequest, n: HandlerFunction<ServerResponse> ->
+			val greetings: MutableList<String> = r.attribute(KEY)
+					.map { v ->
+						v as MutableList<String>
+					}.orElse(mutableListOf())
+
+			greetings.add("From HandlerFilterFunction")
+
+			r.attributes().put(KEY, greetings)
+			n.handle(r)
+		})
