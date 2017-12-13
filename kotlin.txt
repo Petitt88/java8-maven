@@ -335,8 +335,14 @@ Classes and Inheritance
 		The Delegation pattern has proven to be a good alternative to implementation inheritance, and Kotlin supports it natively requiring zero boilerplate code. 
 		A class Derived can inherit from an interface Base and delegate all of its public methods to a specified object.
 	
-		More importantly, overrides work: the compiler will use your override implementations instead of those in the delegate object.
-			The default functions of the interface can also be overridden!
+		More importantly, overrides work: the compiler will use your override implementations instead of those in the delegate object, but the delegate object's implementation can still be invoked with the
+			good old "super" keyword.
+			
+		The default functions of the interface can also be overridden!
+			
+		!IMPORTANT: when the delegate object in its code invokes a method that the delegator overrides, still the delegate's method gets invoked! 
+					This is because "this" points to the delegate object, not to the delegator!
+					The overridden method only gets invoked if "this" points to the delegator, so the code execution is basically in the interface or in the delegator.
 
 Object Expressions and Declarations
 
@@ -705,8 +711,8 @@ Delegated properties
 	this::fun1					- method reference, bound function to its receiver
 	
 	IntroAndLang::class.java 	- reflection
-	MyClass::myProp				- reflection
-	MyClass::fun1				- reflection, but can be an unbound function reference as well, depending on the type of the left handside's variable
+	MyClass::myProp				- reflection, unbound property
+	MyClass::fun1				- reflection, unbound function
 	
 	
 Lambda
@@ -1411,8 +1417,17 @@ Reflection
 			
 			
 		If on a class:
-			Haha::testHaha	 	- returns KFunction, or an unbound method reference ((Haha) -> Unit) depending on the left handside's type
-			Haha()::testHaha	- returns method reference - (() -> Unit)
+			Haha::testHaha	 	- returns KFunction, can be used as an unbound method reference: (Haha) -> Unit
+			
+				left handside's type can be either KFunction or a function
+					var kprop: KProperty<Column<String>> = Haha::name
+					var kfunc: KFunction<Any> = Haha::testHaha
+					var func: (Haha) -> Unit = Haha::testHaha
+					
+			Haha()::testHaha	- returns KFunction, can be used as a bound method reference as well: () -> Unit
+				var kprop: KProperty<Column<String>> = Haha()::name
+				var kfunc: KFunction<Any> = Haha()::testHaha
+				var func: () -> Unit = Haha()::testHaha
 		
 			var func: () -> Unit = ::test
 			func = Haha()::testHaha
