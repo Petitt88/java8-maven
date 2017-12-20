@@ -1,0 +1,35 @@
+Type intersection with union types:
+
+	interface Person {
+		name: string;
+		age: number;
+	}
+	interface Cool {
+		starts: number;
+	}
+	type CoolPerson = (Person & Cool) | null;
+	
+	
+Object, array destructuring
+	function test(): void {
+		const person: CoolPerson = {
+			age: 23,
+			name: 'Mic',
+			starts: 2
+		};
+		testDestructuring(['sdsadsd', 2], person);
+	}
+
+	function testDestructuring([apple, banana, ...restArr]: [string, number], { age, name, ...restObj }: { age: number, name: string }): void {
+		console.log(apple, banana, restArr);
+		console.log(age, name, restObj);
+
+		const arr = [apple, banana, ...restArr];
+		const obj = {
+			age,
+			name,
+			...restObj
+		};
+		// obj.age
+		// arr[0]
+	}
