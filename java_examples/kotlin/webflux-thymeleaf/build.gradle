@@ -1,11 +1,12 @@
 buildscript {
 	ext {
-		kotlinVersion = '1.2.0'
+		kotlinVersion = '1.2.10'
 		springBootVersion = '2.0.0.M7'
 		kotlinCorouteVersion = '0.19.3'
 		swaggerVersion = '2.7.0'
-		exposedVersion = '0.8.7'
+		//exposedVersion = '0.9.1'
 	}
+	ext['kotlin.version'] = kotlinVersion
 	repositories {
 		mavenCentral()
 		maven { url "https://repo.spring.io/snapshot" }
