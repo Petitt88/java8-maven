@@ -7,7 +7,7 @@ Type intersection with union types:
 	interface Cool {
 		starts: number;
 	}
-	type CoolPerson = (Person & Cool) | null;
+	type CoolPerson = (Person & Cool) | null;		// CoolPerson is either null or has the properties/methods declared in both Person and Cool
 	
 	
 Object, array destructuring
