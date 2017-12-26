@@ -61,20 +61,20 @@ class HomeController(private val movieService: MovieService,
 	@GetMapping("/push", produces = arrayOf(MediaType.TEXT_EVENT_STREAM_VALUE))
 	fun push(model: Model): Mono<String> = mono(Unconfined) {
 
-		model.addAttribute("firstSourceTitle", "Movies from ReactiveDataDriverContextVariable - Flux must be used. This enables a server pushing model. In this case Thymeleaf itself subscribes to the Flux and renders a section whenever a new data arrives until the Flux gets completed.")
-				.addAttribute("secondSourceTitle", "Movies from Mongo database after with coroutine suspending on a Flux")
+		model["firstSourceTitle"] = "Movies from ReactiveDataDriverContextVariable - Flux must be used. This enables a server pushing model. In this case Thymeleaf itself subscribes to the Flux and renders a section whenever a new data arrives until the Flux gets completed."
+		model["secondSourceTitle"] = "Movies from Mongo database after with coroutine suspending on a Flux"
 
-		var movies = movieService.getMoviesFromDb()
+		val movies = movieService.getMoviesFromDb()
 				.collectList()
 				.awaitFirst()
 				.sortedBy { it.id }
-		model.addAttribute("superMovies", movies);
+		model["superMovies"] = movies
 
 		// dataStreamBufferSizeElements 1: this means to flush every item  (default is 10 - flush data after the Flux has fired 10 times)
 		// this is a push model because of "ReactiveDataDriverContextVariable" --> Thymeleaf itself subscribes to the wrapped Flux - so WebFlux doesn't do anything in case of a ReactiveDataDriverContextVariable
-		model.addAttribute("movies", ReactiveDataDriverContextVariable(movieService.getMoviesWithGenerate().take(5), 1))
+		model["movies"] = ReactiveDataDriverContextVariable(movieService.getMoviesWithGenerate().take(5), 1)
 
-		"index";
+		"index"
 	}
 
 	@GetMapping("/long")
@@ -88,7 +88,7 @@ class HomeController(private val movieService: MovieService,
 				.map { "index" }
 				.awaitFirst()
 
-		model.addAttribute("movies", movieService.getMoviesFix("Super"))
+		model["movies"] = movieService.getMoviesFix("Super")
 
 		// getMoviesWithGenerate is an infinite stream
 		val movies = movieService.getMoviesWithGenerate("Super")
@@ -97,7 +97,7 @@ class HomeController(private val movieService: MovieService,
 				// without this "awaitFirst" sends the 1st Movie back as soon as it is read from the db
 				.collectList()
 				.awaitFirst()
-		model.addAttribute("superMovies", movies);
+		model["superMovies"] = movies
 
 		delay(Duration.ofSeconds(1))
 
@@ -119,18 +119,18 @@ class HomeController(private val movieService: MovieService,
 					.bodyToFlux(Movie::class.java)
 					.collectList()
 					.awaitFirst()
-			model.addAttribute("movies", moviesFromExternalSystem)
+			model["movies"] = moviesFromExternalSystem
 		} catch (e: Exception) {
 			println(e.message)
 		}
 
 
-		var channel: AsynchronousFileChannel? = null;
+		var channel: AsynchronousFileChannel? = null
 		try {
 			channel = AsynchronousFileChannel.open(Paths.get(ClassLoader.getSystemResource("movies.json").toURI()))
 			val moviesFromFile = channel.parseJson<Array<Movie>>(mapper)
 
-			model.addAttribute("superMovies", moviesFromFile);
+			model["superMovies"] = moviesFromFile
 		} finally {
 			channel?.close()
 		}
@@ -164,3 +164,5 @@ class HomeController(private val movieService: MovieService,
 		ResponseEntity.ok().body(movies)
 	}
 }
+
+private operator fun Model.set(key: String, value: Any) = this.addAttribute(key, value)

@@ -15,7 +15,7 @@ inline suspend fun <reified T> AsynchronousFileChannel.parseJson(mapper: ObjectM
 	while (true) {
 		val bytesRead = this.aRead(buffer, pos)
 		if (bytesRead == -1)
-			break;
+			break
 
 		buffer.array()
 				.take(bytesRead)
