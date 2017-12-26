@@ -4050,3 +4050,5 @@ WebFlux filters:
 			r.attributes().put(KEY, greetings)
 			n.handle(r)
 		})
+		
+In Spring Security the source of truth for reactive applications is Reactor's context.
