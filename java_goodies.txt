@@ -968,7 +968,7 @@ Tools:
 	
 Module Types:
 	- Platform modules
-		- the JDK is diveded into platform modules
+		- the JDK is divided into platform modules
 		- exports packages: explicitly
 	- Application Modules
 		- any JAR containing module-info.class on the module path
@@ -1018,7 +1018,7 @@ Services:
 	module com.pet.shop {
 		exports com.pet.shop.client;
 		
-		opens com.pet.shop.client to javafx.fxml;	- open up the code inside my package to javafx for reflection
+		opens com.pet.shop.client to javafx.fxml;					- open up the code inside my package to javafx for reflection
 	}
 	
 	
@@ -1028,6 +1028,10 @@ Services:
 	with:	  concrete implementation class goes here
 	uses: 	  concrete class/interface goes here
 	opens:	  opens packages to the specified modules up for reflection
+	
+	exports vs opens: 
+		- exports is for public API only. Other modules can only access the public types, fields, constructors, methods, etc. But cannot access internal implementations.
+		- opens is for reflection: it allows other modules to use reflection to access the internal, private fields, methods etc and even to invoke them.
 	
 	ServiceLoader.load(EventService.class): 
 		- the call to ServiceLoader.load(Class<T>) returns an Iterable<T>, containing all service implementations of a given interface 
