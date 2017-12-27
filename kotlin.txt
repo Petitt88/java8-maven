@@ -1278,10 +1278,96 @@ Operator overloading
 		}
 	}
 	
-		Expression							Translated to
-		a == b								a?.equals(b) ?: (b === null)
-		a != b								!(a?.equals(b) ?: (b === null))
+	Unary operations
+	
+		Unary prefix operators
+			Expression				Translated to
+			+a						a.unaryPlus()
+			-a						a.unaryMinus()
+			!a						a.not()
+			
+		Increments and decrements
+			Expression				Translated to
+			a++						a.inc()
+			a--						a.dec()
 		
+	Binary operations
+		
+		Arithmetic operators
+			Expression				Translated to
+			a + b					a.plus(b)
+			a - b					a.minus(b)
+			a * b					a.times(b)
+			a / b					a.div(b)
+			a % b					a.rem(b), a.mod(b) (deprecated)
+			a..b					a.rangeTo(b)
+			
+		'In' operator
+			Expression				Translated to
+			a in b					b.contains(a)
+			a !in b					!b.contains(a)
+			
+		Indexed access operator
+			Expression				Translated to
+			a[i]					a.get(i)
+			a[i, j]					a.get(i, j)
+			a[i_1, ..., i_n]		a.get(i_1, ..., i_n)
+			a[i] = b				a.set(i, b)
+			a[i, j] = b				a.set(i, j, b)
+			a[i_1, ..., i_n] = b	a.set(i_1, ..., i_n, b)
+
+
+		Invoke operator
+			Expression				Translated to
+			a()						a.invoke()
+			a(i)					a.invoke(i)
+			a(i, j)					a.invoke(i, j)
+			a(i_1, ..., i_n)		a.invoke(i_1, ..., i_n)
+	
+		Augmented assignments
+			Expression				Translated to
+			a += b					a.plusAssign(b)
+			a -= b					a.minusAssign(b)
+			a *= b					a.timesAssign(b)
+			a /= b					a.divAssign(b)
+			a %= b					a.remAssign(b), a.modAssign(b) (deprecated)	
+
+		Equality and inequality operators
+			Expression				Translated to
+			a == b					a?.equals(b) ?: (b === null)
+			a != b					!(a?.equals(b) ?: (b === null))
+
+		Comparison operators
+			Expression				Translated to
+			a > b					a.compareTo(b) > 0
+			a < b					a.compareTo(b) < 0
+			a >= b					a.compareTo(b) >= 0
+			a <= b					a.compareTo(b) <= 0
+
+		Property delegation operators
+			provideDelegate, getValue and setValue operator functions are described in Delegated properties.
+
+
+Implement lambdas
+
+	fun testIntMakers(): Unit {
+
+		class IntMakerOldSchool : BiFunction<String, Boolean, Int> {
+			override fun apply(name: String, addOne: Boolean): Int {
+				return if (!addOne) name.toInt()
+				else name.toInt() + 1
+			}
+		}
+
+		/**More Kotlin-ish way*/
+		class IntMaker : (String, Boolean) -> Int {
+			override fun invoke(name: String, addOne: Boolean): Int = if (!addOne) name.toInt() else name.toInt() + 1
+		}
+
+		IntMakerOldSchool().apply("23232", true)
+		IntMaker().invoke("23232", false)
+	}
+
 
 Null Safety
 	Kotlin's type system is aimed to eliminate NullPointerException's from our code. The only possible causes of NPE's may be:
@@ -1557,25 +1643,6 @@ Type aliases
 		}		
 
 Java interop
-
-	Nice to know:
-		fun testIntMakers(): Unit {
-
-			class IntMakerOldSchool : BiFunction<String, Boolean, Int> {
-				override fun apply(name: String, addOne: Boolean): Int {
-					return if (!addOne) name.toInt()
-					else name.toInt() + 1
-				}
-			}
-
-			/**More Kotlin-ish way*/
-			class IntMaker : (String, Boolean) -> Int {
-				override fun invoke(name: String, addOne: Boolean): Int = if (!addOne) name.toInt() else name.toInt() + 1
-			}
-
-			IntMakerOldSchool().apply("23232", true)
-			IntMaker().invoke("23232", false)
-		}
 
 	Calling Java from Kotlin
 
