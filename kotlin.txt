@@ -553,6 +553,53 @@ Sealed Classes
 		data class Const(val number: Double) : Expr()
 		data class Sum(val e1: Expr, val e2: Expr) : Expr()
 		object NotANumber : Expr()
+		
+	Example 1
+		fun eval(expr: Expr): Double = when(expr) {
+			is Const -> expr.number
+			is Sum -> eval(expr.e1) + eval(expr.e2)
+			NotANumber -> Double.NaN
+			// the `else` clause is not required because we've covered all the cases
+		}
+		
+	Example 2
+		fun test() {
+			val hTry = Try.create()
+			// invoke operator on the Try instance
+			val res = hTry { 3 }
+			// invoke operator in Try's companion object
+			val res2 = Try { "result" }
+			when (res) {
+				is Try.Success<*> -> println(res.value)
+				is Try.Fail -> println(res.error)
+			}
+		}
+
+		sealed class Try {
+
+			operator fun <T> invoke(body: () -> T): Try =
+					try {
+						Success(body())
+					} catch (e: Exception) {
+						Fail(e)
+					}
+
+			companion object {
+
+				fun create(): Try = Success(0)
+
+				operator fun <T> invoke(body: () -> T): Try =
+						try {
+							Success(body())
+						} catch (e: Exception) {
+							Fail(e)
+						}
+			}
+
+
+			class Success<T>(val value: T) : Try()
+			class Fail(val error: Exception) : Try()
+		}
 
 
 Enum Classes
