@@ -33,3 +33,24 @@ Object, array destructuring
 		// obj.age
 		// arr[0]
 	}
+	
+	
+Observables:
+	FlatMap vs SwitchMap: https://stackoverflow.com/questions/28175702/what-is-the-difference-between-flatmap-and-switchmap-in-rxjava
+		- the switchMap is like the flatMap BUT it will only emit items from the new observable until a new event is emitted from the source observable
+		- switchMap unsubscribes from the previous source of inner observables as soon as the outer (source) emits a new value
+			if the innser observable is making an http request, then the ongoing request gets canceled
+		- In switchMap the second original emission (green marble) does not emit its second mapped emission (green square), since the third original emission (blue marble) has begun and already emitted its first mapped emission (blue diamond). In other words, only the first of two mapped green emissions happens; no green square is emitted because the blue diamond beat it.
+		- In flatMap, all mapped results will be emitted, even if they're "stale". In other words, both first and second of the mapped green emissions happen -- a green square would've been emitted (if they used consistent map function; since they did not, you see the second green diamond, even though it is emitted after the first blue diamond)
+		
+		
+	On any error the observable gets canceled.
+		- we can subscribe with an error callback to show some feedback to the user but either way the observable is canceled --> stops emitting values
+		- we can use the "catchError" method (before subscribing ofc) to make the observable still work
+			searchField$
+				.pipe(
+					switchMap(userSearch$),
+					catchError(err => Observable.of(defaultUser)))
+				.subscribe(
+					user => this.user = user,
+					err => console.log(err));
