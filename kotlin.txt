@@ -1356,6 +1356,12 @@ Operator overloading
 			a(i)					a.invoke(i)
 			a(i, j)					a.invoke(i, j)
 			a(i_1, ..., i_n)		a.invoke(i_1, ..., i_n)
+			
+			Example:
+				3()
+				""()
+				private operator fun String.invoke(): Int = this.toInt()
+				private operator fun Int.invoke(): String = toString()
 	
 		Augmented assignments
 			Expression				Translated to
