@@ -4012,6 +4012,23 @@ Kotlin DSLs:
 	- Route DSL
 	- Bean registration DSL
 	
+	
+	Route DSL:
+	
+		fun appRouter(): RouterFunction<ServerResponse> = router {
+			"/foo" { request: ServerRequest ->
+				ok().syncBody("response")
+			}
+			"/foo2" { request: Int ->
+				ok().syncBody("response")
+			}
+		}		
+		operator fun String.invoke(f: (ServerRequest) -> Mono<ServerResponse>) {
+			routes += RouterFunctions.route(RequestPredicates.path(this),  HandlerFunction { f(it) })
+		}
+		operator fun String.invoke(f: (par: Int) -> Mono<ServerResponse>): Mono<ServerResponse> = f(32)
+
+	
 WebFlux filters:
 
 	WebFilter: applied to every request
