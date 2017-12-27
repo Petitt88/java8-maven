@@ -983,10 +983,13 @@ Coroutines:
 			fun <T> async(block: suspend () -> T)
 			
 			Here, async() is a regular function (not a suspending function), but the block parameter has a function type with the suspend modifier: suspend () -> T. So, when we pass a lambda to async(), it is a suspending lambda, and we can call a suspending function from it:
-				async {
+				val deferred = async {
 					doSomething(foo)
 					...
+					5
 				}
+				val result: Int = deferred.await()
+				deferred.cancel()
 				
 			- Note that suspending functions await() and doSomething() can not be called from a regular function like 
 			- Also note that suspending functions can be virtual, and when overriding them, the suspend modifier has to be specified.
@@ -1026,6 +1029,7 @@ Coroutines:
 			println("'coroutineContext': After delay in thread ${Thread.currentThread().name}")	-- main thread
 		}
 		jobs.forEach { it.join() }
+		jobs.forEach { it.cancel() }
 	}
 	
 	Builders:
@@ -1050,7 +1054,7 @@ Coroutines:
 				start: CoroutineStart = CoroutineStart.DEFAULT, 
 				block: suspend CoroutineScope.() -> T
 			): Deferred<T> (source)
-			Creates new coroutine and returns its future result as an implementation of Deferred.
+			Creates new coroutine and returns its future result as an implementation of Deferred. Deferred inherits from Job.
 
 			The running coroutine is cancelled when the resulting object is cancelled.
 			
