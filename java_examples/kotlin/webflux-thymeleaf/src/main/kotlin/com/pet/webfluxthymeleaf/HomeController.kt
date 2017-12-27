@@ -12,6 +12,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
+import org.springframework.ui.set
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.result.view.Rendering
@@ -164,5 +165,3 @@ class HomeController(private val movieService: MovieService,
 		ResponseEntity.ok().body(movies)
 	}
 }
-
-private operator fun Model.set(key: String, value: Any) = this.addAttribute(key, value)
