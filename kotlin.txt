@@ -334,15 +334,34 @@ Classes and Inheritance
 
 		The Delegation pattern has proven to be a good alternative to implementation inheritance, and Kotlin supports it natively requiring zero boilerplate code. 
 		A class Derived can inherit from an interface Base and delegate all of its public methods to a specified object.
+		
+		Example
+			interface Base {
+				fun print()
+			}
+
+			class BaseImpl(val x: Int) : Base {
+				override fun print() {
+					print(x)
+				}
+			}
+
+			class Derived(x: Int) : Base by BaseImpl(x)
+			class Derived2(b: Base) : Base by b
+
+			fun main(args: Array<String>) {
+				Derived(10).print()
+				Derived2(BaseImpl(10)).print() // prints 10
+			}
 	
 		More importantly, overrides work: the compiler will use your override implementations instead of those in the delegate object, but the delegate object's implementation can still be invoked with the
 			good old "super" keyword.
 			
 		The default functions of the interface can also be overridden!
 			
-		!IMPORTANT: when the delegate object in its code invokes a method that the delegator overrides, still the delegate's method gets invoked! 
+		!IMPORTANT: when the delegate object in its code invokes a method that the delegator overrides, still the delegate's method gets invoked!  (BaseImpl in the example above is the delegate object)
 					This is because "this" points to the delegate object, not to the delegator!
-					The overridden method in the delegator gets invoked only and only if "this" points to the delegator: which happens only if the code execution STARTS at the delegator itself.
+					The overridden method in the delegator gets invoked only and only if "this" points to the delegator: which happens only if the code execution STARTS at the delegator itself. (delegator is the Derived and Derived2 in the example above)
 					- If the interface is the starting point (or the delegate object itself but this is obvious) then "this" is the delegate object and there is no way to get into the delegator.
 
 Object Expressions and Declarations
@@ -691,17 +710,31 @@ Delegated properties
 	}
 	
 	Custom property delegate
-		class Delegate {
-			operator fun getValue(thisRef: Any?, property: KProperty<*>): String {
-				return "$thisRef, thank you for delegating '${property.name}' to me!"
-			}
-		 
-			operator fun setValue(thisRef: Any?, property: KProperty<*>, value: String) {
-				println("$value has been assigned to '${property.name} in $thisRef.'")
-			}
-		}
-		class Example {
+	
+		/** Property delegates examples: to override getters and setters. */
+		class ExampleCustomDelegates {
 			var p: String by Delegate()
+			var p2: LocalDateTime by TypedDelegate()
+
+			class Delegate {
+				operator fun getValue(thisRef: Any?, property: KProperty<*>): String {
+					return "$thisRef, thank you for delegating '${property.name}' to me!"
+				}
+
+				operator fun setValue(thisRef: Any?, property: KProperty<*>, value: String) {
+					println("$value has been assigned to '${property.name} in $thisRef.'")
+				}
+			}
+
+			class TypedDelegate : ReadWriteProperty<ExampleCustomDelegates, LocalDateTime> {
+				override fun getValue(thisRef: ExampleCustomDelegates, property: KProperty<*>): LocalDateTime {
+					TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+				}
+
+				override fun setValue(thisRef: ExampleCustomDelegates, property: KProperty<*>, value: LocalDateTime) {
+					TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+				}
+			}
 		}
 
 
