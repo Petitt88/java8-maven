@@ -1558,6 +1558,25 @@ Type aliases
 
 Java interop
 
+	Nice to know:
+		fun testIntMakers(): Unit {
+
+			class IntMakerOldSchool : BiFunction<String, Boolean, Int> {
+				override fun apply(name: String, addOne: Boolean): Int {
+					return if (!addOne) name.toInt()
+					else name.toInt() + 1
+				}
+			}
+
+			/**More Kotlin-ish way*/
+			class IntMaker : (String, Boolean) -> Int {
+				override fun invoke(name: String, addOne: Boolean): Int = if (!addOne) name.toInt() else name.toInt() + 1
+			}
+
+			IntMakerOldSchool().apply("23232", true)
+			IntMaker().invoke("23232", false)
+		}
+
 	Calling Java from Kotlin
 
 		Platform types:
