@@ -293,7 +293,7 @@ Reference assmeblies:
 					[BindProperty]
 					public Customer Customer { get; set; }
 					
-					but this old machanism (approach) from Controllers also works:
+					but this old mechanism (approach) from Controllers also works:
 					public void OnPost(Customer customer) {...}
 					
 					In case of a successful Post, the pattern that should be used is Post-Redirect-Get:
@@ -316,7 +316,7 @@ Reference assmeblies:
 			- TempData: instead of doing this.TempData in the PageModel we can do this instead:
 				- [TempData]	- the cookie gets generated specially for the current user, so we do not have to worry about another user reads it first.
 				  public string Message { get; set; }
-				- this approuch stays in the TempData for not just one request, but until it is read. Then the framework automatically deletes it.
+				- this approach stays in the TempData for not just one request, but until it is read. Then the framework automatically deletes it.
 				- works in Controllers as well
 				- before TempData was stored in the Session, but now the default TempData provider is Cookies! So a cookie is created and deleted right after the stored TempData gets read.
 				
