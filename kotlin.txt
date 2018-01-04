@@ -359,10 +359,56 @@ Classes and Inheritance
 			
 		The default functions of the interface can also be overridden!
 			
-		!IMPORTANT: when the delegate object in its code invokes a method that the delegator overrides, still the delegate's method gets invoked!  (BaseImpl in the example above is the delegate object)
-					This is because "this" points to the delegate object, not to the delegator!
-					The overridden method in the delegator gets invoked only and only if "this" points to the delegator: which happens only if the code execution STARTS at the delegator itself. (delegator is the Derived and Derived2 in the example above)
-					- If the interface is the starting point (or the delegate object itself but this is obvious) then "this" is the delegate object and there is no way to get into the delegator.
+		!IMPORTANT: 1. when the delegate object in its code invokes a method that the delegator overrides, still the delegate's method gets invoked!  (BaseImpl in the example above is the delegate object)
+						This is because "this" points to the delegate object, not to the delegator!
+						The overridden method in the delegator gets invoked only and only if "this" points to the delegator: which happens only if the code execution STARTS at the delegator itself. (delegator are Derived and Derived2 in the example above)
+							- If the interface is the starting point (or the delegate object itself but this is obvious) then "this" is the delegate object and there is no way to get into the delegator.
+			Example
+			
+				fun main(args: Array<String>) {
+					val der = Derived(666)
+
+					// prints out Derived\nBase
+					// in spite of BaseImpl overrides the "notAbstractPrint" method, the super.notAbstractPrint() call in Derived invokes the Base interface
+					der.notAbstractPrint()
+					println()
+
+					// prints BaseImpl666 as expected
+					der.print()
+					println()
+
+					// prints "BaseImpl" because BaseImpl overrides printWithInvoke() and "this" points to the BaseImpl object - because Derived does not override the method
+					// even if it didn't override it, the result would still be "BaseImpl" because BaseImpl overrides the "notAbstractPrint()" method as well
+					der.printWithInvoke()
+				}
+
+
+				interface Base {
+					fun print()
+
+					fun notAbstractPrint() {
+						println("Base")
+					}
+
+					fun printWithInvoke() = notAbstractPrint()
+				}
+
+				class BaseImpl(val x: Int) : Base {
+					override fun print() {
+						println("BaseImpl$x")
+					}
+
+					override fun notAbstractPrint() {
+						println("BaseImpl")
+					}
+				}
+
+				class Derived(x: Int) : Base by BaseImpl(x) {
+					override fun notAbstractPrint() {
+						println("Derived")
+						super.notAbstractPrint()
+					}
+				}
 
 Object Expressions and Declarations
 
