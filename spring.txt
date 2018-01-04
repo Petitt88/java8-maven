@@ -3960,8 +3960,8 @@ WebFlux:
 	4 players:
 		- Publisher (Observable)
 			2 implementations: 
-				- Mono: produces 0 or 1 value
-				- Flux: produces 0 or N values
+				- Mono<T>: produces 0 or 1 value 	--> this is like a CompletableFuture<T>
+				- Flux<T>: produces 0 or N values	--> this is like a Stream<T>
 		- Subscriber (Observer)
 		- Subscription
 		- Processor (Subject)
