@@ -4,8 +4,78 @@ Components:
 		  return <h1>Hello, {props.name}</h1>;
 		}
 		
+	- Remember that components may accept arbitrary props, including primitive values, React elements, or functions.
+	
+	- If you want to reuse non-UI functionality between components, we suggest extracting it into a separate JavaScript module. The components may import it and use that function, object, or a class, without extending it.
+	
+	- For building a static prototype, don’t use state at all to build this static version. State is reserved only for interactivity, that is, data that changes over time. 
+	
+	- Render function can return string, React element or a list of these things:
+		- either a single React element or string
+		- or an array of React elements or strings
+			render() {
+				return [
+					<div key={1} />,
+					(
+						<div key={2}>
+							Hallo!
+					</ div>)
+				];
+			}
+	
+Functional components: a function with "props" parameter and a render method. State is unique to class components.
+	You’ll need to change this.props to props both times it appears. Many components in your apps will be able to be written as functional components: these components tend to be easier to write and React will optimize them more in the future.
+	
+	function Square(props) {
+	  return (
+		<button className="square" onClick={props.onClick}>
+		  {props.value}
+		</button>
+	  );
+	}
+	
+Props vs state:
+	1. Is it passed in from a parent via props? If so, it probably isn’t state.
+	2. Does it remain unchanged over time? If so, it probably isn’t state.
+	3. Can you compute it based on any other state or props in your component? If so, it isn’t state.
+	
+State's place:
+	- Identify every component that renders something based on that state.
+	- Find a common owner component (a single component above all the components that need the state in the hierarchy).
+	- Either the common owner or another component higher up in the hierarchy should own the state.
+	- If you can’t find a component where it makes sense to own the state, create a new component simply for holding the state and add it somewhere in the hierarchy above the common owner component.
+		
+		
+Event handling:
+	1. <button onClick={(e) => this.handleClick(e)}>
+        Click me
+      </button>
+		The problem with this syntax is that a different callback is created each time the LoggingButton renders. In most cases, this is fine. However, if this callback is passed as a prop to lower components, those components might do an extra re-rendering. 
+		
+	2. <button onClick={this.deleteRow.bind(this, id)}>Delete Row</button>
+	
+	3.	<button onClick={this.handleClick}>
+			Click me
+		</button>
+		  
+		and in ctor: 
+			// This binding is necessary to make `this` work in the callback
+			this.handleClick = this.handleClick.bind(this);
+			
+	Passing parameters:
+		<button onClick={(e) => this.deleteRow(id, e)}>Delete Row</button>
+		<button onClick={this.deleteRow.bind(this, id)}>Delete Row</button>
+		
+	It is, however, conventional in React apps to use on* names for the attributes and handle* for the handler methods.
+		 <Square value={this.state.squares[i]} onClick={() => this.handleClick(i)}/>
+
+
+
 Props:
 	- input parameters, readonly
+	
+	- to pass all props without having to explicitly type each parameter we can use the spread operator:
+		 <Greeting {...props} /> = <Greeting firstName="Ben" lastName="Hector" />
 
 State:
 	- State is similar to props, but it is private and fully controlled by the component.
@@ -29,7 +99,7 @@ Thinking in React
 	
 Lifecycle events: works only on class components (not on functional components)
 	componentDidMount		- hook runs after the component output has been rendered to the DOM
-	componentWillUnmount	- runs before the component is about to be removed from the DOM
+	componentWillUnmount	- runs before the component is about to be removed from the DOM. Remounting a component causes the state of that component and all of its children to be lost.
 	
 JSX:
 	- Fundamentally, JSX just provides syntactic sugar for the React.createElement(component, props, ...children) function. The JSX code:
@@ -66,6 +136,8 @@ Ref attribute: works only on DOM elements and custom elements that are classes
 		Managing focus, text selection, or media playback.
 		Triggering imperative animations.
 		Integrating with third-party DOM libraries.
+		
+	React will call the ref callback with the DOM element when the component mounts, and call it with null when it unmounts. ref callbacks are invoked before componentDidMount or componentDidUpdate lifecycle hooks.
 		
 	- Exposing DOM Refs to Parent Components: this works both for classes and for functional components.
 	
@@ -110,6 +182,34 @@ Ref attribute: works only on DOM elements and custom elements that are classes
 			);
 		  }
 		}
+		
+Conditional rendering:
+	This works because in JavaScript, true && expression always evaluates to expression, and false && expression always evaluates to false.
+		return (
+			<div>
+			  <h1>Hello!</h1>
+			  {unreadMessages.length > 0 &&
+				<h2>
+				  You have {unreadMessages.length} unread messages.
+				</h2>
+			  }
+			</div>
+		);
+		
+State:
+	
+	1. Do Not Modify State Directly: use .setState
+	
+	2. State Updates May Be Asynchronous - use a second form of setState() that accepts a function rather than an object. That function will receive the previous state as the first argument, and the props at the time the update is applied as the second argument:
+		// Correct
+		this.setState((prevState, props) => ({
+		  counter: prevState.counter + props.increment
+		}));
+		
+	3. State Updates are Merged
+	
+	While this.props is set up by React itself and this.state has a special meaning, you are free to add additional fields to the class manually if you need to store something that is not used for the visual output.
+	If you don’t use something in render(), it shouldn’t be in the state.
 	
 	
 Controlled Components
@@ -130,7 +230,7 @@ Uncontrolled Components
 	- Controlled components are the recommended approach
 	- In this case form data is handled by the DOM, not by React
 	- To write an uncontrolled component, instead of writing an event handler for every state update, you can use a ref to get form values from the DOM.
-	- you have to ‘pull’ the value from the field when you need it
+	- you have to "pull" the value from the field when you need it
 	
 	<input
           defaultValue="Bob"
@@ -164,7 +264,568 @@ Performance:
 		}
 		
 		
+	The biggest benefit of immutability in React comes when you build simple pure components. Since immutable data can more easily determine if changes have been made, it also helps to determine when a component requires being re-rendered.
 		
+		
+Functional vs class components:
+	- function components are simpler
+	- class components can have state and lifecycle hooks
+	
+	
+Context:
+	In some cases, you want to pass data through the component tree without having to pass the props down manually at every level. You can do this directly in React with the powerful “context” API.
+	
+	Why Not To Use Context:
+		- most applications do not need it
+		- If you want your application to be stable, don’t use context. It is an experimental API and it is likely to break in future releases of React.
+		- If you aren’t familiar with state management libraries like Redux or MobX, don’t use context.
+			- For many practical applications, these libraries and their React bindings are a good choice for managing state that is relevant to many components. 
+			
+	Example:
+		class Button extends React.Component {
+		  render() {
+			return (
+			  <button style={{background: this.context.color}}>
+				{this.props.children}
+			  </button>
+			);
+		  }
+		}
+		Button.contextTypes = {
+		  color: PropTypes.string
+		};
+		
+		class Message extends React.Component {
+		  render() {
+			return (
+			  <div>
+				{this.props.text} <Button>Delete</Button>
+			  </div>
+			);
+		  }
+		}
+
+		class MessageList extends React.Component {
+		  getChildContext() {
+			return {color: "purple"};
+		  }
+
+		  render() {
+			const children = this.props.messages.map((message) =>
+			  <Message text={message.text} />
+			);
+			return <div>{children}</div>;
+		  }
+		}
+		MessageList.childContextTypes = {
+		  color: PropTypes.string
+		};
+		
+			By adding childContextTypes and getChildContext to MessageList (the context provider), React passes the information down automatically and any component in the subtree (in this case, Button) can access it by defining contextTypes.
+
+			If contextTypes is not defined, then context will be an empty object.
+			
+	Parent-Child Coupling: React Router V4 uses this context API
+	
+	Referencing Context in Lifecycle Methods:
+		If contextTypes is defined within a component, the following lifecycle methods will receive an additional parameter, the context object:
+			- constructor(props, context)
+			- componentWillReceiveProps(nextProps, nextContext)
+			- shouldComponentUpdate(nextProps, nextState, nextContext)
+			- componentWillUpdate(nextProps, nextState, nextContext)
+
+			
+Fragments: it's like <ng-container> in Angular: React does not render the fragment which is <React.Fragment>:
+
+	class Columns extends React.Component {
+	  render() {
+		return (
+		  <React.Fragment> 		or <>
+			<td>Hello</td>
+			<td>World</td>
+		  </React.Fragment>		or </>
+		);
+	  }
+	}
+	
+	class Table extends React.Component {
+	  render() {
+		return (
+		  <table>
+			<tr>
+			  <Columns />
+			</tr>
+		  </table>
+		);
+	  }
+	}
+	
+	Use <Fragment> when a key prop is required:
+
+		import React, { Fragment } from 'react';
+
+		function Glossary(props) {
+		  return (
+			<dl>
+			  {props.items.map(item => (
+				// Without the `key`, React will fire a key warning
+				<Fragment key={item.id}>
+				  <dt>{item.term}</dt>
+				  <dd>{item.description}</dd>
+				</Fragment>
+			  ))}
+			</dl>
+		  );
+		}
+	Use <></> syntax everywhere else:
+
+		function ListItem({ item }) {
+		  return ( 
+			<>
+			  <dt>{item.term}</dt>
+			  <dd>{item.description}</dd>>
+			</>
+		  );    
+		}
+	
+	
+Portals: Portals provide a first-class way to render children into a DOM node that exists outside the DOM hierarchy of the parent component.
+
+	ReactDOM.createPortal(child, container)
+	
+	render() {
+	  // React mounts a new div and renders the children into it
+	  return (
+		<div>
+		  {this.props.children}
+		</div>
+	  );
+	}
+	render() {
+	  // React does *not* create a new div. It renders the children into `domNode`.
+	  // `domNode` is any valid DOM node, regardless of its location in the DOM.
+	  return ReactDOM.createPortal(
+		this.props.children,
+		domNode,
+	  );
+	}
+	
+	Event Bubbinlg Through Portals:
+		Even though a portal can be anywhere in the DOM tree, it behaves like a normal React child in every other way. Features like context work exactly the same regardless of whether the child is a portal, as the portal still exists in the React tree regardless of position in the DOM tree.
+
+		This includes event bubbling. An event fired from inside a portal will propagate to ancestors in the containing React tree, even if those elements are not ancestors in the DOM tree. Assuming the following HTML structure:
+		
+
+Error Boundaries
+	A JavaScript error in a part of the UI shouldn’t break the whole app. To solve this problem for React users, React 16 introduces a new concept of an “error boundary”.
+
+	Error boundaries are React components that catch JavaScript errors anywhere in their child component tree, log those errors, and display a fallback UI instead of the component tree that crashed.
+	Error boundaries catch errors during rendering, in lifecycle methods, and in constructors of the whole tree below them.
+	
+	Error boundaries do not catch errors for:
+		- Event handlers (learn more)
+		- Asynchronous code (e.g. setTimeout or requestAnimationFrame callbacks)
+		- Server side rendering
+		- Errors thrown in the error boundary itself (rather than its children)
+		
+	A class component becomes an error boundary if it defines a new lifecycle method called "componentDidCatch(error, info)"
+	
+		componentDidCatch(error, info) {
+			// Display fallback UI
+			this.setState({ hasError: true });
+			// You can also log the error to an error reporting service
+			logErrorToMyService(error, info);
+		}
+		
+	The componentDidCatch() method works like a JavaScript catch {} block, but for components. Only class components can be error boundaries. In practice, most of the time you’ll want to declare an error boundary component once and use it throughout your application.
+	
+	Where to Place Error Boundaries
+		The granularity of error boundaries is up to you. 
+		You may wrap top-level route components to display a “Something went wrong” message to the user, just like server-side frameworks often handle crashes. 
+		You may also wrap individual widgets in an error boundary to protect them from crashing the rest of the application.
+		
+	New Behavior for Uncaught Errors
+		This change has an important implication. As of React 16, errors that were not caught by any error boundary will result in unmounting of the whole React component tree.
+		
+	How About try/catch?
+		try / catch is great but it only works for imperative code:
+			try {
+			  showButton();
+			} catch (error) {
+			  // ...
+			}
+		However, React components are declarative and specify what should be rendered:
+			<Button />
+			Error boundaries preserve the declarative nature of React, and behave as you would expect. For example, even if an error occurs in a componentDidUpdate hook caused by a setState somewhere deep in the tree, it will still correctly propagate to the closest error boundary.
+		
+	How About Event Handlers?
+		Error boundaries do not catch errors inside event handlers.
+
+		React doesn’t need error boundaries to recover from errors in event handlers. Unlike the render method and lifecycle hooks, the event handlers don’t happen during rendering. So if they throw, React still knows what to display on the screen.
+
+		If you need to catch an error inside event handler, use the regular JavaScript try / catch statement:
+			class MyComponent extends React.Component {
+			  constructor(props) {
+				super(props);
+				this.state = { error: null };
+			  }
+			  
+			  handleClick = () => {
+				try {
+				  // Do something that could throw
+				} catch (error) {
+				  this.setState({ error });
+				}
+			  }
+
+			  render() {
+				if (this.state.error) {
+				  return <h1>Caught an error.</h1>
+				}
+				return <div onClick={this.handleClick}>Click Me</div>
+			  }
+			}
+			
+Higher-Order Components	(HOC)
+	A higher-order component (HOC) is an advanced technique in React for reusing component logic. HOCs are not part of the React API, per se. They are a pattern that emerges from React’s compositional nature.
+	Concretely, a higher-order component is a function that takes a component and returns a new component.
+		const EnhancedComponent = higherOrderComponent(WrappedComponent);
+		
+		The function receives a Component as its 1st parameter and that component becomes the child of the returned new, enhanced Component.
+		
+	Whereas a component transforms props into UI, a higher-order component transforms a component into another component.
+	HOCs are common in third-party React libraries, such as Redux’s connect and Relay’s createFragmentContainer.
+	
+	Note that a HOC doesn’t modify the input component, nor does it use inheritance to copy its behavior. Rather, a HOC composes the original component by wrapping it in a container component. 
+	A HOC is a pure function with zero side-effects.
+	
+		const CommentListWithSubscription = withSubscription(
+		  CommentList,
+		  (DataSource) => DataSource.getComments()
+		);
+
+		const BlogPostWithSubscription = withSubscription(
+		  BlogPost,
+		  (DataSource, props) => DataSource.getBlogPost(props.id)
+		);
+	
+		// This function takes a component...
+		function withSubscription(WrappedComponent, selectData) {
+		  // ...and returns another component...
+		  return class extends React.Component {
+			constructor(props) {
+			  super(props);
+			  this.handleChange = this.handleChange.bind(this);
+			  this.state = {
+				data: selectData(DataSource, props)
+			  };
+			}
+
+			componentDidMount() {
+			  // ... that takes care of the subscription...
+			  DataSource.addChangeListener(this.handleChange);
+			}
+
+			componentWillUnmount() {
+			  DataSource.removeChangeListener(this.handleChange);
+			}
+
+			handleChange() {
+			  this.setState({
+				data: selectData(DataSource, this.props)
+			  });
+			}
+
+			render() {
+			  // ... and renders the wrapped component with the fresh data!
+			  // Notice that we pass through any additional props
+			  return <WrappedComponent data={this.state.data} {...this.props} />;
+			}
+		  };
+		}
+		
+	Don’t Mutate the Original Component. Use Composition.
+			function logProps(InputComponent) {
+			  InputComponent.prototype.componentWillReceiveProps = function(nextProps) {
+				console.log('Current props: ', this.props);
+				console.log('Next props: ', nextProps);
+			  };
+			  // The fact that we're returning the original input is a hint that it has
+			  // been mutated.
+			  return InputComponent;
+			}
+
+			// EnhancedComponent will log whenever props are received
+			const EnhancedComponent = logProps(InputComponent);
+		
+		Instead of mutation, HOCs should use composition, by wrapping the input component in a container component:
+
+			function logProps(WrappedComponent) {
+			  return class extends React.Component {
+				componentWillReceiveProps(nextProps) {
+				  console.log('Current props: ', this.props);
+				  console.log('Next props: ', nextProps);
+				}
+				render() {
+				  // Wraps the input component in a container, without mutating it. Good!
+				  return <WrappedComponent {...this.props} />;
+				}
+			  }
+			}
+			
+			This HOC has the same functionality as the mutating version while avoiding the potential for clashes. It works equally well with class and functional components. And because it’s a pure function, it’s composable with other HOCs, or even with itself.
+			
+	Convention: Pass Unrelated Props Through to the Wrapped Component
+		render() {
+		  // Filter out extra props that are specific to this HOC and shouldn't be
+		  // passed through
+		  const { extraProp, ...passThroughProps } = this.props;
+
+		  // Inject props into the wrapped component. These are usually state values or
+		  // instance methods.
+		  const injectedProp = someStateOrInstanceMethod;
+
+		  // Pass props to wrapped component
+		  return (
+			<WrappedComponent
+			  injectedProp={injectedProp}
+			  {...passThroughProps}
+			/>
+		  );
+		}
+		
+	Convention: Maximizing Composability
+		// React Redux's `connect`
+		const ConnectedComment = connect(commentSelector, commentActions)(CommentList);
+		
+		What?! If you break it apart, it’s easier to see what’s going on.
+			// connect is a function that returns another function
+			const enhance = connect(commentListSelector, commentListActions);
+			// The returned function is a HOC, which returns a component that is connected
+			// to the Redux store
+			const ConnectedComment = enhance(CommentList);
+			
+		// Instead of doing this...
+		const EnhancedComponent = withRouter(connect(commentSelector)(WrappedComponent))
+
+		// ... you can use a function composition utility
+		// compose(f, g, h) is the same as (...args) => f(g(h(...args)))
+		const enhance = compose(
+		  // These are both single-argument HOCs
+		  withRouter,
+		  connect(commentSelector)
+		)
+		const EnhancedComponent = enhance(WrappedComponent)
+		
+	Convention: Wrap the Display Name for Easy Debugging
+		The most common technique is to wrap the display name of the wrapped component. So if your higher-order component is named withSubscription, and the wrapped component’s display name is CommentList, use the display name WithSubscription(CommentList):
+
+		function withSubscription(WrappedComponent) {
+		  class WithSubscription extends React.Component {/* ... */}
+		  WithSubscription.displayName = `WithSubscription(${getDisplayName(WrappedComponent)})`;
+		  return WithSubscription;
+		}
+
+		function getDisplayName(WrappedComponent) {
+		  return WrappedComponent.displayName || WrappedComponent.name || 'Component';
+		}
+		
+	Caveats
+		Don’t Use HOCs Inside the render Method
+			-Instead, apply HOCs outside the component definition so that the resulting component is created only once. Then, its identity will be consistent across renders. This is usually what you want, anyway.
+			- In those rare cases where you need to apply a HOC dynamically, you can also do it inside a component’s lifecycle methods or its constructor.
+		
+			render() {
+			  // A new version of EnhancedComponent is created on every render
+			  // EnhancedComponent1 !== EnhancedComponent2
+			  const EnhancedComponent = enhance(MyComponent);
+			  // That causes the entire subtree to unmount/remount each time!
+			  return <EnhancedComponent />;
+			}
+			The problem here isn’t just about performance — remounting a component causes the state of that component and all of its children to be lost.
+			
+		Static Methods Must Be Copied Over
+			function enhance(WrappedComponent) {
+			  class Enhance extends React.Component {/*...*/}
+			  // Must know exactly which method(s) to copy :(
+			  Enhance.staticMethod = WrappedComponent.staticMethod;
+			  return Enhance;
+			}
+			
+			However, this requires you to know exactly which methods need to be copied. You can use hoist-non-react-statics to automatically copy all non-React static methods.
+			
+				import hoistNonReactStatic from 'hoist-non-react-statics';
+				function enhance(WrappedComponent) {
+				  class Enhance extends React.Component {/*...*/}
+				  hoistNonReactStatic(Enhance, WrappedComponent);
+				  return Enhance;
+				}
+				
+		Refs Aren’t Passed Through
+
+
+Render props: More concretely, a render prop is a function prop that a component uses to know what to render.
+
+	- In fact, any prop that is a function that a component uses to know what to render is technically a “render prop”.
+	- One interesting thing to note about render props is that you can implement most higher-order components (HOC) using a regular component with a render prop. 
+
+	Example:
+		class MouseTracker extends React.Component {
+		  render() {
+			return (
+			  <div>
+				<h1>Move the mouse around!</h1>
+				<Mouse render={mouse => (
+				  <Cat mouse={mouse} />
+				)}/>
+			  </div>
+			);
+		  }
+		}
+		class Mouse extends React.Component {
+		  constructor(props) {
+			super(props);
+			this.handleMouseMove = this.handleMouseMove.bind(this);
+			this.state = { x: 0, y: 0 };
+		  }
+
+		  handleMouseMove(event) {
+			this.setState({
+			  x: event.clientX,
+			  y: event.clientY
+			});
+		  }
+
+		  render() {
+			return (
+			  <div style={{ height: '100%' }} onMouseMove={this.handleMouseMove}>
+
+				{/*
+				  Instead of providing a static representation of what <Mouse> renders,
+				  use the `render` prop to dynamically determine what to render.
+				*/}
+				{this.props.render(this.state)}
+			  </div>
+			);
+		  }
+		}
+	
+	HOC example:
+		// If you really want a HOC for some reason, you can easily
+		// create one using a regular component with a render prop!
+		function withMouse(Component) {
+		  return class extends React.Component {
+			render() {
+			  return (
+				<Mouse render={mouse => (
+				  <Component {...this.props} mouse={mouse} />
+				)}/>
+			  );
+			}
+		  }
+		}
+		
+	children as render prop:
+		Although the examples above use render, we could just as easily use the children prop!
+			<Mouse children={mouse => (
+			  <p>The mouse position is {mouse.x}, {mouse.y}</p>
+			)}/>
+			
+		And remember, the children prop doesn’t actually need to be named in the list of “attributes” in your JSX element. Instead, you can put it directly inside the element!
+			<Mouse>
+			  {mouse => (
+				<p>The mouse position is {mouse.x}, {mouse.y}</p>
+			  )}
+			</Mouse>
+			
+	Caveats! Be careful when using Render Props with React.PureComponent
+		class Mouse extends React.PureComponent {
+		  // Same implementation as above...
+		}
+		class MouseTracker extends React.Component {
+		  render() {
+			return (
+			  <div>
+				<h1>Move the mouse around!</h1>
+
+				{/*
+				  This is bad! The value of the `render` prop will
+				  be different on each render.
+				*/}
+				<Mouse render={mouse => (
+				  <Cat mouse={mouse} />
+				)}/>
+			  </div>
+			);
+		  }
+		}
+		
+		To get around this problem, you can sometimes define the prop as an instance method, like so:
+
+			class MouseTracker extends React.Component {
+			  constructor(props) {
+				super(props);
+
+				// This binding ensures that `this.renderTheCat` always refers
+				// to the *same* function when we use it in render.
+				this.renderTheCat = this.renderTheCat.bind(this);
+			  }
+
+			  renderTheCat(mouse) {
+				return <Cat mouse={mouse} />;
+			  }
+
+			  render() {
+				return (
+				  <div>
+					<h1>Move the mouse around!</h1>
+					<Mouse render={this.renderTheCat} />
+				  </div>
+				);
+			  }
+			}
+			In cases where you cannot bind the instance method ahead of time in the constructor (e.g. because you need to close over the component’s props and/or state) <Mouse> should extend React.Component instead.
+		
+
+Code splitting: to produce smaller bundles:
+	Before:
+		import { add } from './math';
+		console.log(add(16, 26));
+	After:
+		import("./math").then(math => {
+		  console.log(math.add(16, 26));
+		});
+		
+	Create React App has this configured automatically with webpack (because this syntax in not yet in the ECMAScript standard)
+		
+	Libraries: 
+		React Loadable: React Loadable wraps dynamic imports in a nice, React-friendly API for introducing code splitting into your app at a given component.
+	
+	Route-based code splitting: Here’s an example of how to setup route-based code splitting into your app using libraries like React Router and React Loadable.
+		import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+		import Loadable from 'react-loadable';
+
+		const Loading = () => <div>Loading...</div>;
+
+		const Home = Loadable({
+		  loader: () => import('./routes/Home'),
+		  loading: Loading,
+		});
+
+		const About = Loadable({
+		  loader: () => import('./routes/About'),
+		  loading: Loading,
+		});
+
+		const App = () => (
+		  <Router>
+			<Switch>
+			  <Route exact path="/" component={Home}/>
+			  <Route path="/about" component={About}/>
+			</Switch>
+		  </Router>
+		);
+
 		
 ES6:
 	computed property name: 
@@ -175,3 +836,425 @@ ES6:
 		var partialState = {};
 		partialState[name] = value;
 		this.setState(partialState);
+		
+		
+	Data change with mutation
+		var player = {score: 1, name: 'Jeff'};
+		player.score = 2;
+		// Now player is {score: 2, name: 'Jeff'}
+		
+	Data change without mutation
+		var player = {score: 1, name: 'Jeff'};
+
+		var newPlayer = Object.assign({}, player, {score: 2});
+		// Now player is unchanged, but newPlayer is {score: 2, name: 'Jeff'}
+
+		// Or if you are using object spread syntax proposal, you can write:
+		// var newPlayer = {...player, score: 2};
+		
+		
+	Currying: these 2 are equivalent:
+		function logger(store) {
+		  return function wrapDispatchToAddLogging(next) {
+			return function dispatchAndLog(action) {
+			  console.log('dispatching', action)
+			  let result = next(action)
+			  console.log('next state', store.getState())
+			  return result
+			}
+		  }
+		}
+		
+		const logger = store => next => action => {
+		  console.log('dispatching', action)
+		  let result = next(action)
+		  console.log('next state', store.getState())
+		  return result
+		}
+		
+		
+React elements vs HTML elements
+	React JSX				HTML
+	camelCasing				lowercasing
+	className				class
+	htmlForm				for
+	
+	
+	
+Redux
+
+	Redux is a predictable state container for JavaScript apps.
+	
+	- The whole state of your app is stored in an object tree inside a single store.
+	- The only way to change the state tree is to emit an action, an object describing what happened.
+	- To specify how the actions transform the state tree, you write pure reducers.
+	
+	Glossary:
+	
+		State:
+			- State (also called the state tree) is a broad term, but in the Redux API it usually refers to the single state value that is managed by the store and returned by getState(). It represents the entire state of a Redux application, which is often a deeply nested object.
+			
+		Action: 
+			- An action is a plain object that represents an intention to change the state. Actions are the only way to get data into the store. Any data, whether from UI events, network callbacks, or other sources such as WebSockets needs to eventually be dispatched as actions.
+			- Actions must have a type field that indicates the type of action being performed. Types can be defined as constants and imported from another module. It's better to use strings for type than Symbols because strings are serializable.
+			
+		Reducer:
+			type Reducer<S, A> = (state: S, action: A) => S
+			- A reducer (also called a reducing function) is a function that accepts an accumulation and a value and returns a new accumulation. They are used to reduce a collection of values down to a single value.
+			- In Redux, the accumulated value is the state object, and the values being accumulated are actions. Reducers calculate a new state given the previous state and an action. They must be pure functions—functions that return the exact same output for given inputs. They should also be free of side-effects. This is what enables exciting features like hot reloading and time travel.
+			
+		Dispatching function:
+			type BaseDispatch = (a: Action) => Action
+			type Dispatch = (a: Action | AsyncAction) => any
+			A dispatching function (or simply dispatch function) is a function that accepts an action or an async action; it then may or may not dispatch one or more actions to the store.
+
+			We must distinguish between dispatching functions in general and the base dispatch function provided by the store instance without any middleware.
+
+			The base dispatch function always synchronously sends an action to the store's reducer, along with the previous state returned by the store, to calculate a new state. It expects actions to be plain objects ready to be consumed by the reducer.
+
+			Middleware wraps the base dispatch function. It allows the dispatch function to handle async actions in addition to actions. Middleware may transform, delay, ignore, or otherwise interpret actions or async actions before passing them to the next middleware. See below for more information.
+	
+		Action Creator
+			type ActionCreator = (...args: any) => Action | AsyncAction
+			An action creator is, quite simply, a function that creates an action. Do not confuse the two terms—again, an action is a payload of information, and an action creator is a factory that creates an action.
+
+			Calling an action creator only produces an action, but does not dispatch it. You need to call the store's dispatch function to actually cause the mutation. Sometimes we say bound action creators to mean functions that call an action creator and immediately dispatch its result to a specific store instance.
+
+			If an action creator needs to read the current state, perform an API call, or cause a side effect, like a routing transition, it should return an async action instead of an action.
+			
+		Async Action
+			type AsyncAction = any
+			An async action is a value that is sent to a dispatching function, but is not yet ready for consumption by the reducer. It will be transformed by middleware into an action (or a series of actions) before being sent to the base dispatch() function. Async actions may have different types, depending on the middleware you use. They are often asynchronous primitives, like a Promise or a thunk, which are not passed to the reducer immediately, but trigger action dispatches once an operation has completed.
+			
+		Middleware
+			type MiddlewareAPI = { dispatch: Dispatch, getState: () => State }
+			type Middleware = (api: MiddlewareAPI) => (next: Dispatch) => Dispatch
+			A middleware is a higher-order function that composes a dispatch function to return a new dispatch function. It often turns async actions into actions.
+
+			Middleware is composable using function composition. It is useful for logging actions, performing side effects like routing, or turning an asynchronous API call into a series of synchronous actions.
+			
+		Store
+			type Store = {
+			  dispatch: Dispatch
+			  getState: () => State
+			  subscribe: (listener: () => void) => () => void
+			  replaceReducer: (reducer: Reducer) => void
+			}
+			A store is an object that holds the application's state tree.
+			There should only be a single store in a Redux app, as the composition happens on the reducer level.
+
+			dispatch(action) is the base dispatch function described above.
+			getState() returns the current state of the store.
+			subscribe(listener) registers a function to be called on state changes.
+			replaceReducer(nextReducer) can be used to implement hot reloading and code splitting. Most likely you won't use it.
+		
+		Store creator
+			type StoreCreator = (reducer: Reducer, preloadedState: ?State) => Store
+			A store creator is a function that creates a Redux store. Like with dispatching function, we must distinguish the base store creator, createStore(reducer, preloadedState) exported from the Redux package, from store creators that are returned from the store enhancers.
+			
+		Store enhancer
+			type StoreEnhancer = (next: StoreCreator) => StoreCreator
+			A store enhancer is a higher-order function that composes a store creator to return a new, enhanced store creator. This is similar to middleware in that it allows you to alter the store interface in a composable way.
+
+			Store enhancers are much the same concept as higher-order components in React, which are also occasionally called “component enhancers”.
+	
+	
+	Reducer: a pure function with (state, action) => state signature.
+		The shape of the state is up to you: it can be a primitive, an array, an object, or even an Immutable.js data structure. The only important part is that you should not mutate the state object, but return a new object if the state changes.
+
+	Example:		
+		// Create a Redux store holding the state of your app.
+		// Its API is { subscribe, dispatch, getState }.
+		let store = createStore(counter)
+
+		// You can use subscribe() to update the UI in response to state changes.
+		// Normally you'd use a view binding library (e.g. React Redux) rather than subscribe() directly.
+		// However it can also be handy to persist the current state in the localStorage.
+
+		store.subscribe(() =>
+		  console.log(store.getState())
+		)
+
+		// The only way to mutate the internal state is to dispatch an action.
+		// The actions can be serialized, logged or stored and later replayed.
+		store.dispatch({ type: 'INCREMENT' })
+		// 1
+		store.dispatch({ type: 'INCREMENT' })
+		// 2
+		store.dispatch({ type: 'DECREMENT' })
+		
+	Instead of mutating the state directly, you specify the mutations you want to happen with plain objects called actions. Then you write a special function called a reducer to decide how every action transforms the entire application's state.
+	
+	If you're coming from Flux, there is a single important difference you need to understand. Redux doesn't have a Dispatcher or support many stores. Instead, there is just a single store with a single root reducing function. As your app grows, instead of adding stores, you split the root reducer into smaller reducers independently operating on the different parts of the state tree. This is exactly like how there is just one root component in a React app, but it is composed out of many small components.
+	
+	Finally, to tie state and actions together, we write a function called a reducer. It would be hard to write such a function for a big app, so we write smaller functions managing parts of the state:
+		function visibilityFilter(state = 'SHOW_ALL', action) {
+		  if (action.type === 'SET_VISIBILITY_FILTER') {
+			return action.filter
+		  } else {
+			return state
+		  }
+		}
+
+		function todos(state = [], action) {
+		  switch (action.type) {
+			case 'ADD_TODO':
+			  return state.concat([{ text: action.text, completed: false }])
+			case 'TOGGLE_TODO':
+			  return state.map(
+				(todo, index) =>
+				  action.index === index
+					? { text: todo.text, completed: !todo.completed }
+					: todo
+			  )
+			default:
+			  return state
+		  }
+		}
+	And we write another reducer that manages the complete state of our app by calling those two reducers for the corresponding state keys:
+		function todoApp(state = {}, action) {
+		  return {
+			todos: todos(state.todos, action),
+			visibilityFilter: visibilityFilter(state.visibilityFilter, action)
+		  }
+		}
+		
+	Three Principles:
+		1. Single source of truth: The state of your whole application is stored in an object tree within a single store.
+		2. State is read-only: The only way to change the state is to emit an action, an object describing what happened.
+			This ensures that neither the views nor the network callbacks will ever write directly to the state. Instead, they express an intent to transform the state. Because all changes are centralized and happen one by one in a strict order, there are no subtle race conditions to watch out for. As actions are just plain objects, they can be logged, serialized, stored, and later replayed for debugging or testing purposes.
+		3. Changes are made with pure functions: To specify how the state tree is transformed by actions, you write pure reducers.
+			Reducers are just pure functions that take the previous state and an action, and return the next state. Remember to return new state objects, instead of mutating the previous state. You can start with a single reducer, and as your app grows, split it off into smaller reducers that manage specific parts of the state tree. Because reducers are just functions, you can control the order in which they are called, pass additional data, or even make reusable reducers for common tasks such as pagination.
+			
+			import { combineReducers, createStore } from 'redux'
+			const reducer = combineReducers({ visibilityFilter, todos })
+			const store = createStore(reducer)
+
+		
+	API:
+		combineReducers(reducers)
+			- As your app grows more complex, you'll want to split your reducing function into separate functions, each managing independent parts of the state.
+			- The combineReducers helper function turns an object whose values are different reducing functions into a single reducing function you can pass to createStore.
+			- The resulting reducer calls every child reducer, and gathers their results into a single state object. The state produced by combineReducers() namespaces the states of each reducer under their keys as passed to combineReducers()
+			
+			All combineReducers() does is generate a function that calls your reducers with the slices of state selected according to their keys, and combining their results into a single object again.
+			
+		compose(...functions)
+			Composes functions from right to left.
+			
+		Store
+			A store holds the whole state tree of your application.
+			The only way to change the state inside it is to dispatch an action on it.
+
+			A store is not a class. It's just an object with a few methods on it.
+			To create it, pass your root reducing function to createStore.
+			
+			Methods:
+				- getState(): Returns the current state tree of your application.
+				- dispatch(action): Dispatches an action. This is the only way to trigger a state change. The store's reducing function will be called with the current getState() result and the given action synchronously. Its return value will be considered the next state.
+				- subscribe(listener): Adds a change listener. It will be called any time an action is dispatched, and some part of the state tree may potentially have changed.
+				- replaceReducer(nextReducer): Replaces the reducer currently used by the store to calculate the state. It is advanced API, you might need this if your app implements code splitting.
+		
+		createStore(reducer, [preloadedState], [enhancer]):
+			Creates a Redux store that holds the complete state tree of your app.
+			There should only be a single store in your app.
+			
+			reducer (Function): A reducing function that returns the next state tree, given the current state tree and an action to handle.
+
+			[preloadedState] (any): The initial state. You may optionally specify it to hydrate the state from the server in universal apps, or to restore a previously serialized user session. If you produced reducer with combineReducers, this must be a plain object with the same shape as the keys passed to it. Otherwise, you are free to pass anything that your reducer can understand.
+
+			[enhancer] (Function): The store enhancer. You may optionally specify it to enhance the store with third-party capabilities such as middleware, time travel, persistence, etc. The only store enhancer that ships with Redux is applyMiddleware().
+	
+		applyMiddleware
+			Middleware is the suggested way to extend Redux with custom functionality. Middleware lets you wrap the store's dispatch method for fun and profit. The key feature of middleware is that it is composable. Multiple middleware can be combined together, where each middleware requires no knowledge of what comes before or after it in the chain.
+
+			The most common use case for middleware is to support asynchronous actions without much boilerplate code or a dependency on a library like Rx. It does so by letting you dispatch async actions in addition to normal actions.
+			
+		bindActionCreators(actionCreators, dispatch)
+			Turns an object whose values are action creators, into an object with the same keys, but with every action creator wrapped into a dispatch call so they may be invoked directly.
+			Normally you should just call dispatch directly on your Store instance. If you use Redux with React, react-redux will provide you with the dispatch function so you can call it directly, too.
+			The only use case for bindActionCreators is when you want to pass some action creators down to a component that isn't aware of Redux, and you don't want to pass dispatch or the Redux store to it.
+			
+	Data Flow:
+		1. You call store.dispatch(action)
+			An action is a plain object describing what happened.
+			You can call store.dispatch(action) from anywhere in your app, including components and XHR callbacks, or even at scheduled intervals.
+		2. The Redux store calls the reducer function you gave it - the root reducer by default, or enhanced one
+			The store will pass two arguments to the reducer: the current state tree and the action.
+			Note that a reducer is a pure function. It only computes the next state.
+			It shouldn't perform any side effects like API calls or router transitions. These should happen before an action is dispatched.
+		3. The root reducer may combine the output of multiple reducers into a single state tree.
+		4. The Redux store saves the complete state tree returned by the root reducer.
+			This new tree is now the next state of your app! Every listener registered with store.subscribe(listener) will now be invoked; listeners may call store.getState() to get the current state
+			Now, the UI can be updated to reflect the new state. If you use bindings like React Redux, this is the point at which component.setState(newState) is called.
+
+
+React Redux:
+
+	React bindings for Redux embrace the idea of separating presentational and container components. 
+	The current suggested best practice is to categorize your components as “presentational” or “container” components, and extract a connected container component wherever it makes sense:
+	
+	Presentational components:
+		- Are concerned with how things look.
+		- May contain both presentational and container components** inside, and usually have some DOM markup and styles of their own.
+		- Have no dependencies on the rest of the app, such as Flux actions or stores.
+		- Don’t specify how the data is loaded or mutated.
+		- Receive data and callbacks exclusively via props.
+		- Are written as functional components unless they need state, lifecycle hooks, or performance optimizations.
+		- Examples: Page, Sidebar, Story, UserInfo, List.
+		
+	Container components:
+		- Are concerned with how things work.
+		- May contain both presentational and container components** inside but usually don’t have any DOM markup of their own except for some wrapping divs, and never have any styles.
+		- Provide the data and behavior to presentational or other container components.
+		- Call Flux actions and provide these as callbacks to the presentational components.
+		- Are often stateful, as they tend to serve as data sources.
+		- Are usually generated using higher order components such as connect() from React Redux, createContainer() from Relay, or Container.create() from Flux Utils, rather than written by hand.
+		- Examples: UserPage, FollowersSidebar, StoryContainer, FollowedUserList.
+		- Examples: UserPage, FollowersSidebar, StoryContainer, FollowedUserList.
+		
+	When to Introduce Containers?
+		When you notice that some components don’t use the props they receive but merely forward them down and you have to rewire all those intermediate components any time the children need more data, it’s a good time to introduce some container components. 
+		This way you can get the data and the behavior props to the leaf components without burdening the unrelated components in the middle of the tree.
+		
+	Components:
+		- Stateful and Stateless. Some components use React setState() method and some don’t. While container components tend to be stateful and presentational components tend to be stateless, this is not a hard rule. Presentational components can be stateful, and containers can be stateless too.
+		- Classes and Functions. Since React 0.14, components can be declared both as classes and as functions. Functional components are simpler to define but they lack certain features currently available only to class components. Some of these restrictions may go away in the future but they exist today. Because functional components are easier to understand, I suggest you to use them unless you need state, lifecycle hooks, or performance optimizations, which are only available to the class components at this time.
+		- Pure and Impure. People say that a component is pure if it is guaranteed to return the same result given the same props and state. Pure components can be defined both as classes and functions, and can be both stateful and stateless. Another important aspect of pure components is that they don’t rely on deep mutations in props or state, so their rendering performance can be optimized by a shallow comparison in their shouldComponentUpdate() hook. Currently only classes can define shouldComponentUpdate() but that may change in the future.
+		
+		
+							Presentational Components				Container Components
+	Purpose					How things look (markup, styles)		How things work (data fetching, state updates)
+	Aware of Redux			No										Yes
+	To read data			Read data from props					Subscribe to Redux state
+	To change data			Invoke callbacks from props				Dispatch Redux actions
+	Are written				By hand									Usually generated by React Redux
+	
+	Container components: use React Redux's "connect()" function
+		Technically, a container component is just a React component that uses store.subscribe() to read a part of the Redux state tree and supply props to a presentational component it renders.
+	
+		You could write a container component by hand using store.subscribe(), but we suggest instead generating container components with the React Redux library's connect() function, which provides many useful optimizations to prevent unnecessary re-renders.
+		
+		
+	connect([mapStateToProps], [mapDispatchToProps], [mergeProps], [options]):
+		implements shouldComponentUpdate() for performance
+		
+		mapStateToProps(state, [ownProps]): stateProps: that tells how to transform the current Redux store state into the props you want to pass to a presentational component you are wrapping
+			- If your mapStateToProps function is declared as taking two parameters, it will be called with the store state as the first parameter and the props passed to the connected component as the second parameter, and will also be re-invoked whenever the connected component receives new props as determined by shallow equality comparisons
+		
+		mapDispatchToProps(dispatch, [ownProps]): dispatchProps: In addition to reading the state, container components can dispatch actions.
+			- If an object is passed, each function inside it is assumed to be a Redux action creator. An object with the same function names, but with every action creator wrapped into a dispatch call so they may be invoked directly, will be merged into the component’s props.
+			- If a function is passed, it will be given dispatch as the first parameter. It’s up to you to return an object that somehow uses dispatch to bind action creators in your own way. (Tip: you may use the bindActionCreators() helper from Redux.)
+			- If your mapDispatchToProps function is declared as taking two parameters, it will be called with dispatch as the first parameter and the props passed to the connected component as the second parameter, and will be re-invoked whenever the connected component receives new props
+			
+		mergeProps(stateProps, dispatchProps, ownProps): props
+			If specified, it is passed the result of mapStateToProps(), mapDispatchToProps(), and the parent props. 
+			The plain object you return from it will be passed as props to the wrapped component. 
+			You may specify this function to select a slice of the state based on props, or to bind action creators to a particular variable from props. 
+			If you omit it, Object.assign({}, ownProps, stateProps, dispatchProps) is used by default.
+			
+			
+	Passing the Store		
+		The option we recommend is to use a special React Redux component called <Provider> to magically make the store available to all container components in the application without passing it explicitly. You only need to use it once when you render the root component:
+		
+		ReactDOM.render(
+		  <Provider store={store}>
+			<App />
+		  </Provider>,
+		  document.getElementById('root')
+		)
+		
+	Reselect:
+		Reselect is a memoized selector function, composed of selectors, that returns something you want in your component’s props.
+		Memoisation is an optiomization technique and it means storing the results of expensive function calls and returning the cached result when the same inputs occur again.
+		
+		In Redux, whenever an action is called anywhere in the application, all mounted & connected components call their mapStateToProps function. 
+		This means every single (state --> props) mapping would be recalculated.
+		This is why Reselect is awesome. It will just return the memoized result if nothing has changed.
+		
+		1. Selectors can compute derived data, allowing Redux to store the minimal possible state.
+		2. Selectors are efficient. A selector is not recomputed unless one of its arguments change.
+		3. Selectors are composable. They can be used as input to other selectors.
+		
+		
+		API
+			createSelector(...inputSelectors | [inputSelectors], resultFunc)
+				Takes one or more selectors, or an array of selectors, computes their values and passes them as arguments to resultFunc.
+	
+	
+	Async actions:
+	
+		Usually, for any API request you'll want to dispatch at least 3 different kinds of actions:
+			- An action informing the reducers that the request began.
+			- An action informing the reducers that the request finished successfully.
+			- An action informing the reducers that the request failed.
+			
+			{ type: 'FETCH_POSTS_REQUEST' }
+			{ type: 'FETCH_POSTS_FAILURE', error: 'Oops' }
+			{ type: 'FETCH_POSTS_SUCCESS', response: { ... } }
+			
+			Multiple types leave less room for a mistake, but this is not an issue if you generate action creators and reducers with a helper library like redux-actions.
+		
+		Redux Thunk: Thunk Middleware
+		
+			A thunk is a function that wraps an expression to delay its evaluation.
+			By using this specific middleware, an action creator can return a function instead of an action object. This way, the action creator becomes a thunk.
+		
+			Redux Thunk middleware allows you to write action creators that return a function instead of an action. 
+			The thunk can be used to delay the dispatch of an action, or to dispatch only if a certain condition is met. 
+			The inner function receives the store methods dispatch and getState as parameters.
+			
+				let nextNotificationId = 0
+				export function showNotificationWithTimeout(text) {
+				  return function (dispatch, getState) {
+					// Unlike in a regular action creator, we can exit early in a thunk
+					// Redux doesn’t care about its return value (or lack of it)
+					if (!getState().areNotificationsEnabled) {
+					  return
+					}
+
+					const id = nextNotificationId++
+					dispatch(showNotification(id, text))
+
+					setTimeout(() => {
+					  dispatch(hideNotification(id))
+					}, 5000)
+				  }
+				}
+				
+			Finally, how do we use the synchronous action creators we defined earlier together with network requests? The standard way to do it with Redux is to use the Redux Thunk middleware.
+			
+		Thunk middleware isn't the only way to orchestrate asynchronous actions in Redux:
+
+			- You can use redux-promise or redux-promise-middleware to dispatch Promises instead of functions.
+			- You can use redux-observable to dispatch Observables.
+			- You can use the redux-saga middleware to build more complex asynchronous actions.
+			- You can use the redux-pack middleware to dispatch promise-based asynchronous actions.
+			- You can even write a custom middleware to describe calls to your API, like the real world example does.
+			
+		
+		Middleware in general: 
+			Important: if invoking the original store.dispatch(action) function from any middleware instead of the next(action):
+				- it reexecutes the whole middleware pipeline on that action, including the current middleware
+				- this is useful for async middlewares
+		
+			In Express, KOA, Asp.Net Core: middleware is some code you can put between the framework receiving a request, and the framework generating a response.
+			In Redux it provides a third-party extension point between dispatching an action, and the moment it reaches the reducer.
+			
+			Naive apply middleware implementation:
+				function applyMiddleware(store, middlewares) {
+				  middlewares = middlewares.slice()
+				  middlewares.reverse()
+				  let dispatch = store.dispatch
+				  middlewares.forEach(middleware =>
+					dispatch = middleware(store)(dispatch)
+				  )
+				  return Object.assign({}, store, { dispatch })
+				}
+				
+			The implementation of applyMiddleware() that ships with Redux is similar, but different in three important aspects:
+				1. It only exposes a subset of the store API to the middleware: dispatch(action) and getState().
+				2. It does a bit of trickery to make sure that if you call store.dispatch(action) from your middleware instead of next(action):
+					The action will actually travel the whole middleware chain again, including the current middleware. 
+					This is useful for asynchronous middleware, as we have seen previously. There is one caveat when calling dispatch during setup, described below.
+				3. To ensure that you may only apply middleware once, it operates on createStore() rather than on store itself. Instead of (store, middlewares) => store, its signature is (...middlewares) => (createStore) => createStore.
