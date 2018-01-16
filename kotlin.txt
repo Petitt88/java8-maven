@@ -1397,6 +1397,10 @@ Equality
 
 		a?.equals(b) ?: (b === null)
 		
+	Useful methods on only Arrays:
+		- contentEquals
+		- contentDeepEquals
+		
 		
 Operator overloading
 
@@ -1810,7 +1814,7 @@ Java interop
 				
 			Some non-primitive built-in classes are also mapped:
 				Java type				Kotlin type
-				java.lang.Object		kotlin.Any!
+				java.lang.Object		kotlin.Any!			But not all methods! Missing ones are implemented as extension functions.
 				java.lang.Cloneable		kotlin.Cloneable!
 				java.lang.Comparable	kotlin.Comparable!
 				java.lang.Enum			kotlin.Enum!
