@@ -1,885 +1,866 @@
-Components:
-	- Conceptually, components are like JavaScript functions. They accept arbitrary inputs (called “props”) and return React elements describing what should appear on the screen.
-		function Welcome(props) {
-		  return <h1>Hello, {props.name}</h1>;
-		}
-		
-	- Remember that components may accept arbitrary props, including primitive values, React elements, or functions.
-	
-	- If you want to reuse non-UI functionality between components, we suggest extracting it into a separate JavaScript module. The components may import it and use that function, object, or a class, without extending it.
-	
-	- For building a static prototype, don’t use state at all to build this static version. State is reserved only for interactivity, that is, data that changes over time. 
-	
-	- Render function can return string, React element or a list of these things:
-		- either a single React element or string
-		- or an array of React elements or strings
-			render() {
-				return [
-					<div key={1} />,
-					(
-						<div key={2}>
-							Hallo!
-					</ div>)
-				];
-			}
-	
-Functional components: a function with "props" parameter and a render method. State is unique to class components.
-	You’ll need to change this.props to props both times it appears. Many components in your apps will be able to be written as functional components: these components tend to be easier to write and React will optimize them more in the future.
-	
-	function Square(props) {
-	  return (
-		<button className="square" onClick={props.onClick}>
-		  {props.value}
-		</button>
-	  );
-	}
-	
-Props vs state:
-	1. Is it passed in from a parent via props? If so, it probably isn’t state.
-	2. Does it remain unchanged over time? If so, it probably isn’t state.
-	3. Can you compute it based on any other state or props in your component? If so, it isn’t state.
-	
-State's place:
-	- Identify every component that renders something based on that state.
-	- Find a common owner component (a single component above all the components that need the state in the hierarchy).
-	- Either the common owner or another component higher up in the hierarchy should own the state.
-	- If you can’t find a component where it makes sense to own the state, create a new component simply for holding the state and add it somewhere in the hierarchy above the common owner component.
-		
-		
-Event handling:
-	1. <button onClick={(e) => this.handleClick(e)}>
-        Click me
-      </button>
-		The problem with this syntax is that a different callback is created each time the LoggingButton renders. In most cases, this is fine. However, if this callback is passed as a prop to lower components, those components might do an extra re-rendering. 
-		
-	2. <button onClick={this.deleteRow.bind(this, id)}>Delete Row</button>
-	
-	3.	<button onClick={this.handleClick}>
-			Click me
-		</button>
-		  
-		and in ctor: 
-			// This binding is necessary to make `this` work in the callback
-			this.handleClick = this.handleClick.bind(this);
-			
-	Passing parameters:
-		<button onClick={(e) => this.deleteRow(id, e)}>Delete Row</button>
-		<button onClick={this.deleteRow.bind(this, id)}>Delete Row</button>
-		
-	It is, however, conventional in React apps to use on* names for the attributes and handle* for the handler methods.
-		 <Square value={this.state.squares[i]} onClick={() => this.handleClick(i)}/>
+React
 
-
-
-Props:
-	- input parameters, readonly
-	
-	- to pass all props without having to explicitly type each parameter we can use the spread operator:
-		 <Greeting {...props} /> = <Greeting firstName="Ben" lastName="Hector" />
-
-State:
-	- State is similar to props, but it is private and fully controlled by the component.
-	- We mentioned before that components defined as classes have some additional features. Local state is exactly that: a feature available only to classes.
-	- While this.props is set up by React itself and this.state has a special meaning, you are free to add additional fields to the class manually if you need to store something that is not used for the visual output.
-	- If you don’t use something in render(), it shouldn’t be in the state.
-	
-	- In React apps, whether a component is stateful or stateless is considered an implementation detail of the component that may change over time. You can use stateless components inside stateful components, and vice versa.
-	- this.setState({value: event.target.value}); - MERGES the state - not overrides the state the passed object, but merges it with it.
-	- Also, since setState() automatically merges a partial state into the current state, we only needed to call it with the changed parts
-	
-	- State is reserved only for interactivity, that is, data that changes over time
-
-Prevent component from rendering:
-	- return null from the "render" function
-	- Returning null from a component’s render method does not affect the firing of the component’s lifecycle methods. For instance, componentWillUpdate and componentDidUpdate will still be called.
-	
-	
-Thinking in React
-	The original list of products is passed in as props, so that’s not state. The search text and the checkbox seem to be state since they change over time and can’t be computed from anything. And finally, the filtered list of products isn’t state because it can be computed by combining the original list of products with the search text and value of the checkbox.
-	
-Lifecycle events: works only on class components (not on functional components)
-	componentDidMount		- hook runs after the component output has been rendered to the DOM
-	componentWillUnmount	- runs before the component is about to be removed from the DOM. Remounting a component causes the state of that component and all of its children to be lost.
-	
-JSX:
-	- Fundamentally, JSX just provides syntactic sugar for the React.createElement(component, props, ...children) function. The JSX code:
-		<MyButton color="blue" shadowSize={2}>
-		  Click Me
-		</MyButton>
-		
-		compiles to: React.createElement(MyButton, {color: 'blue', shadowSize: 2}, 'Click Me')
-		
-		- Capitalized types indicate that the JSX tag is referring to a React component. 
-			These tags get compiled into a direct reference to the named variable, so if you use the JSX <Foo /> expression, Foo must be in scope.
-			lowercase types (like div, span) get passed as strings to React.createElement:
-				React.createElement(Foo, props, ...children)
-				React.createElement("div", props, ...children)
-		
-		User-Defined Components Must Be Capitalized
-			When an element type starts with a lowercase letter, it refers to a built-in component like <div> or <span> and results in a string 'div' or 'span' passed to React.createElement. Types that start with a capital letter like <Foo /> compile to React.createElement(Foo) and correspond to a component defined or imported in your JavaScript file.		
-		
-		- React Must Be in Scope since JSX compiles into calls to React.createElement, the React library must also always be in scope from your JSX code.
-		
-		- Children:
-			- Booleans, Null, and Undefined Are Ignored
-			- can be string or expression
-			
-Ref attribute: works only on DOM elements and custom elements that are classes
-	- the "ref" attribute makes it possible to store the DOM element/React component (only if it is a class, not a function!) in our component
-		<CustomTextInput ref={(input) => { this.textInput = input; }} />	- CustomTextInput extends from React.Component
-	- does not work on functional components because they don’t have instances
-		function MyFunctionalComponent() {
-		  return <input />;
-		}
-	
-	- There are a few good use cases for refs:
-		Managing focus, text selection, or media playback.
-		Triggering imperative animations.
-		Integrating with third-party DOM libraries.
-		
-	React will call the ref callback with the DOM element when the component mounts, and call it with null when it unmounts. ref callbacks are invoked before componentDidMount or componentDidUpdate lifecycle hooks.
-		
-	- Exposing DOM Refs to Parent Components: this works both for classes and for functional components.
-	
-		function CustomTextInput(props) {
-		  return (
-			<div>
-			  <input ref={props.inputRef} />
-			</div>
-		  );
-		}
-		class Parent extends React.Component {
-		  render() {
-			return (
-			  <CustomTextInput
-				inputRef={el => this.inputElement = el}
-			  />
-			);
-		  }
-		}
-		
-		
-		function CustomTextInput(props) {
-		  return (
-			<div>
-			  <input ref={props.inputRef} />
-			</div>
-		  );
-		}
-		function Parent(props) {
-		  return (
-			<div>
-			  My input: <CustomTextInput inputRef={props.inputRef} />
-			</div>
-		  );
-		}
-		class Grandparent extends React.Component {
-		  render() {
-			return (
-			  <Parent
-				inputRef={el => this.inputElement = el}
-			  />
-			);
-		  }
-		}
-		
-Conditional rendering:
-	This works because in JavaScript, true && expression always evaluates to expression, and false && expression always evaluates to false.
-		return (
-			<div>
-			  <h1>Hello!</h1>
-			  {unreadMessages.length > 0 &&
-				<h2>
-				  You have {unreadMessages.length} unread messages.
-				</h2>
-			  }
-			</div>
-		);
-		
-State:
-	
-	1. Do Not Modify State Directly: use .setState
-	
-	2. State Updates May Be Asynchronous - use a second form of setState() that accepts a function rather than an object. That function will receive the previous state as the first argument, and the props at the time the update is applied as the second argument:
-		// Correct
-		this.setState((prevState, props) => ({
-		  counter: prevState.counter + props.increment
-		}));
-		
-	3. State Updates are Merged
-	
-	While this.props is set up by React itself and this.state has a special meaning, you are free to add additional fields to the class manually if you need to store something that is not used for the visual output.
-	If you don’t use something in render(), it shouldn’t be in the state.
-	
-	
-Controlled Components
-	- In HTML, form elements such as <input>, <textarea>, and <select> typically maintain their own state and update it based on user input. In React, mutable state is typically kept in the state property of components, and only updated with setState().
-	We can combine the two by making the React state be the “single source of truth”. Then the React component that renders a form also controls what happens in that form on subsequent user input. An input form element whose value is controlled by React in this way is called a “controlled component”.
-	- A controlled input accepts its current value as a prop, as well as a callback to change that value. You could say it’s a more “React way” of approaching this (which doesn’t mean you should always use it).
-	- This flow kind of ‘pushes’ the value changes to the form component
-	- This means your data (state) and UI (inputs) are always in sync. The state gives the value to the input, and the input asks the Form to change the current value.
-	- A form element becomes “controlled” if you set its value via a prop. That’s all.
-	
-	<input type="text" value={this.state.value} onChange={this.handleChange} />
-	handleChange(event) {
-		this.setState({value: event.target.value});
-
-	}
-	
-Uncontrolled Components
-	- Controlled components are the recommended approach
-	- In this case form data is handled by the DOM, not by React
-	- To write an uncontrolled component, instead of writing an event handler for every state update, you can use a ref to get form values from the DOM.
-	- you have to "pull" the value from the field when you need it
-	
-	<input
-          defaultValue="Bob"
-          type="text"
-          ref={(input) => this.input = input} />
-		  
-Performance:	
-	React builds and maintains an internal representation of the rendered UI. It includes the React elements you return from your components.
-	This representation lets React avoid creating DOM nodes and accessing existing ones beyond necessity, as that can be slower than operations on JavaScript objects.
-	Sometimes it is referred to as a “virtual DOM”, but it works the same way on React Native.
-
-	When a component’s props or state change, React decides whether an actual DOM update is necessary by comparing the newly returned element with the previously rendered one. When they are not equal, React will update the DOM.
-	In some cases, your component can speed all of this up by overriding the lifecycle function shouldComponentUpdate, which is triggered before the re-rendering process starts. The default implementation of this function returns true, leaving React to perform the update:
-	shouldComponentUpdate(nextProps, nextState) {
-	  return true;
-	}
-	
-	Scenario:
-		shouldComponentUpdate: tells whether React should rerender the component and call its "render()" function. (whenever we change the state, react will invoke the shouldComponentUpdate function)
-		if shouldComponentUpdate returns false, we are done
-		if shouldComponentUpdate returns true, react calls the render() method and checks whether the react element is equivalent to the one stored on the Virtual DOM
-			- this is just a javascript comparison it should be relatively fast
-		if they aren't equivalent react has to update the DOM, otherwise no DOM operation is performed
-		
-
-	React.PureComponent: shouldComponentUpdate is just do a “shallow comparison” between all the fields of props and state to determine if the component should update
-	
-	pure function: they do not attempt to change their inputs, and always return the same result for the same inputs.
-		function sum(a, b) {
-		  return a + b;
-		}
-		
-		
-	The biggest benefit of immutability in React comes when you build simple pure components. Since immutable data can more easily determine if changes have been made, it also helps to determine when a component requires being re-rendered.
-		
-		
-Functional vs class components:
-	- function components are simpler
-	- class components can have state and lifecycle hooks
-	
-	
-Context:
-	In some cases, you want to pass data through the component tree without having to pass the props down manually at every level. You can do this directly in React with the powerful “context” API.
-	
-	Why Not To Use Context:
-		- most applications do not need it
-		- If you want your application to be stable, don’t use context. It is an experimental API and it is likely to break in future releases of React.
-		- If you aren’t familiar with state management libraries like Redux or MobX, don’t use context.
-			- For many practical applications, these libraries and their React bindings are a good choice for managing state that is relevant to many components. 
-			
-	Example:
-		class Button extends React.Component {
-		  render() {
-			return (
-			  <button style={{background: this.context.color}}>
-				{this.props.children}
-			  </button>
-			);
-		  }
-		}
-		Button.contextTypes = {
-		  color: PropTypes.string
-		};
-		
-		class Message extends React.Component {
-		  render() {
-			return (
-			  <div>
-				{this.props.text} <Button>Delete</Button>
-			  </div>
-			);
-		  }
-		}
-
-		class MessageList extends React.Component {
-		  getChildContext() {
-			return {color: "purple"};
-		  }
-
-		  render() {
-			const children = this.props.messages.map((message) =>
-			  <Message text={message.text} />
-			);
-			return <div>{children}</div>;
-		  }
-		}
-		MessageList.childContextTypes = {
-		  color: PropTypes.string
-		};
-		
-			By adding childContextTypes and getChildContext to MessageList (the context provider), React passes the information down automatically and any component in the subtree (in this case, Button) can access it by defining contextTypes.
-
-			If contextTypes is not defined, then context will be an empty object.
-			
-	Parent-Child Coupling: React Router V4 uses this context API
-	
-	Referencing Context in Lifecycle Methods:
-		If contextTypes is defined within a component, the following lifecycle methods will receive an additional parameter, the context object:
-			- constructor(props, context)
-			- componentWillReceiveProps(nextProps, nextContext)
-			- shouldComponentUpdate(nextProps, nextState, nextContext)
-			- componentWillUpdate(nextProps, nextState, nextContext)
-
-			
-Fragments: it's like <ng-container> in Angular: React does not render the fragment which is <React.Fragment>:
-
-	class Columns extends React.Component {
-	  render() {
-		return (
-		  <React.Fragment> 		or <>
-			<td>Hello</td>
-			<td>World</td>
-		  </React.Fragment>		or </>
-		);
-	  }
-	}
-	
-	class Table extends React.Component {
-	  render() {
-		return (
-		  <table>
-			<tr>
-			  <Columns />
-			</tr>
-		  </table>
-		);
-	  }
-	}
-	
-	Use <Fragment> when a key prop is required:
-
-		import React, { Fragment } from 'react';
-
-		function Glossary(props) {
-		  return (
-			<dl>
-			  {props.items.map(item => (
-				// Without the `key`, React will fire a key warning
-				<Fragment key={item.id}>
-				  <dt>{item.term}</dt>
-				  <dd>{item.description}</dd>
-				</Fragment>
-			  ))}
-			</dl>
-		  );
-		}
-	Use <></> syntax everywhere else:
-
-		function ListItem({ item }) {
-		  return ( 
-			<>
-			  <dt>{item.term}</dt>
-			  <dd>{item.description}</dd>>
-			</>
-		  );    
-		}
-	
-	
-Portals: Portals provide a first-class way to render children into a DOM node that exists outside the DOM hierarchy of the parent component.
-
-	ReactDOM.createPortal(child, container)
-	
-	render() {
-	  // React mounts a new div and renders the children into it
-	  return (
-		<div>
-		  {this.props.children}
-		</div>
-	  );
-	}
-	render() {
-	  // React does *not* create a new div. It renders the children into `domNode`.
-	  // `domNode` is any valid DOM node, regardless of its location in the DOM.
-	  return ReactDOM.createPortal(
-		this.props.children,
-		domNode,
-	  );
-	}
-	
-	Event Bubbinlg Through Portals:
-		Even though a portal can be anywhere in the DOM tree, it behaves like a normal React child in every other way. Features like context work exactly the same regardless of whether the child is a portal, as the portal still exists in the React tree regardless of position in the DOM tree.
-
-		This includes event bubbling. An event fired from inside a portal will propagate to ancestors in the containing React tree, even if those elements are not ancestors in the DOM tree. Assuming the following HTML structure:
-		
-
-Error Boundaries
-	A JavaScript error in a part of the UI shouldn’t break the whole app. To solve this problem for React users, React 16 introduces a new concept of an “error boundary”.
-
-	Error boundaries are React components that catch JavaScript errors anywhere in their child component tree, log those errors, and display a fallback UI instead of the component tree that crashed.
-	Error boundaries catch errors during rendering, in lifecycle methods, and in constructors of the whole tree below them.
-	
-	Error boundaries do not catch errors for:
-		- Event handlers (learn more)
-		- Asynchronous code (e.g. setTimeout or requestAnimationFrame callbacks)
-		- Server side rendering
-		- Errors thrown in the error boundary itself (rather than its children)
-		
-	A class component becomes an error boundary if it defines a new lifecycle method called "componentDidCatch(error, info)"
-	
-		componentDidCatch(error, info) {
-			// Display fallback UI
-			this.setState({ hasError: true });
-			// You can also log the error to an error reporting service
-			logErrorToMyService(error, info);
-		}
-		
-	The componentDidCatch() method works like a JavaScript catch {} block, but for components. Only class components can be error boundaries. In practice, most of the time you’ll want to declare an error boundary component once and use it throughout your application.
-	
-	Where to Place Error Boundaries
-		The granularity of error boundaries is up to you. 
-		You may wrap top-level route components to display a “Something went wrong” message to the user, just like server-side frameworks often handle crashes. 
-		You may also wrap individual widgets in an error boundary to protect them from crashing the rest of the application.
-		
-	New Behavior for Uncaught Errors
-		This change has an important implication. As of React 16, errors that were not caught by any error boundary will result in unmounting of the whole React component tree.
-		
-	How About try/catch?
-		try / catch is great but it only works for imperative code:
-			try {
-			  showButton();
-			} catch (error) {
-			  // ...
-			}
-		However, React components are declarative and specify what should be rendered:
-			<Button />
-			Error boundaries preserve the declarative nature of React, and behave as you would expect. For example, even if an error occurs in a componentDidUpdate hook caused by a setState somewhere deep in the tree, it will still correctly propagate to the closest error boundary.
-		
-	How About Event Handlers?
-		Error boundaries do not catch errors inside event handlers.
-
-		React doesn’t need error boundaries to recover from errors in event handlers. Unlike the render method and lifecycle hooks, the event handlers don’t happen during rendering. So if they throw, React still knows what to display on the screen.
-
-		If you need to catch an error inside event handler, use the regular JavaScript try / catch statement:
-			class MyComponent extends React.Component {
-			  constructor(props) {
-				super(props);
-				this.state = { error: null };
-			  }
-			  
-			  handleClick = () => {
-				try {
-				  // Do something that could throw
-				} catch (error) {
-				  this.setState({ error });
-				}
-			  }
-
-			  render() {
-				if (this.state.error) {
-				  return <h1>Caught an error.</h1>
-				}
-				return <div onClick={this.handleClick}>Click Me</div>
-			  }
+	Components:
+		- Conceptually, components are like JavaScript functions. They accept arbitrary inputs (called “props”) and return React elements describing what should appear on the screen.
+			function Welcome(props) {
+			  return <h1>Hello, {props.name}</h1>;
 			}
 			
-Higher-Order Components	(HOC)
-	A higher-order component (HOC) is an advanced technique in React for reusing component logic. HOCs are not part of the React API, per se. They are a pattern that emerges from React’s compositional nature.
-	Concretely, a higher-order component is a function that takes a component and returns a new component.
-		const EnhancedComponent = higherOrderComponent(WrappedComponent);
+		- Remember that components may accept arbitrary props, including primitive values, React elements, or functions.
 		
-		The function receives a Component as its 1st parameter and that component becomes the child of the returned new, enhanced Component.
+		- If you want to reuse non-UI functionality between components, we suggest extracting it into a separate JavaScript module. The components may import it and use that function, object, or a class, without extending it.
 		
-	Whereas a component transforms props into UI, a higher-order component transforms a component into another component.
-	HOCs are common in third-party React libraries, such as Redux’s connect and Relay’s createFragmentContainer.
-	
-	Note that a HOC doesn’t modify the input component, nor does it use inheritance to copy its behavior. Rather, a HOC composes the original component by wrapping it in a container component. 
-	A HOC is a pure function with zero side-effects.
-	
-		const CommentListWithSubscription = withSubscription(
-		  CommentList,
-		  (DataSource) => DataSource.getComments()
-		);
-
-		const BlogPostWithSubscription = withSubscription(
-		  BlogPost,
-		  (DataSource, props) => DataSource.getBlogPost(props.id)
-		);
-	
-		// This function takes a component...
-		function withSubscription(WrappedComponent, selectData) {
-		  // ...and returns another component...
-		  return class extends React.Component {
-			constructor(props) {
-			  super(props);
-			  this.handleChange = this.handleChange.bind(this);
-			  this.state = {
-				data: selectData(DataSource, props)
-			  };
-			}
-
-			componentDidMount() {
-			  // ... that takes care of the subscription...
-			  DataSource.addChangeListener(this.handleChange);
-			}
-
-			componentWillUnmount() {
-			  DataSource.removeChangeListener(this.handleChange);
-			}
-
-			handleChange() {
-			  this.setState({
-				data: selectData(DataSource, this.props)
-			  });
-			}
-
-			render() {
-			  // ... and renders the wrapped component with the fresh data!
-			  // Notice that we pass through any additional props
-			  return <WrappedComponent data={this.state.data} {...this.props} />;
-			}
-		  };
-		}
+		- For building a static prototype, don’t use state at all to build this static version. State is reserved only for interactivity, that is, data that changes over time. 
 		
-	Don’t Mutate the Original Component. Use Composition.
-			function logProps(InputComponent) {
-			  InputComponent.prototype.componentWillReceiveProps = function(nextProps) {
-				console.log('Current props: ', this.props);
-				console.log('Next props: ', nextProps);
-			  };
-			  // The fact that we're returning the original input is a hint that it has
-			  // been mutated.
-			  return InputComponent;
-			}
-
-			// EnhancedComponent will log whenever props are received
-			const EnhancedComponent = logProps(InputComponent);
-		
-		Instead of mutation, HOCs should use composition, by wrapping the input component in a container component:
-
-			function logProps(WrappedComponent) {
-			  return class extends React.Component {
-				componentWillReceiveProps(nextProps) {
-				  console.log('Current props: ', this.props);
-				  console.log('Next props: ', nextProps);
-				}
+		- Render function can return string, React element or a list of these things:
+			- either a single React element or string
+			- or an array of React elements or strings
 				render() {
-				  // Wraps the input component in a container, without mutating it. Good!
-				  return <WrappedComponent {...this.props} />;
+					return [
+						<div key={1} />,
+						(
+							<div key={2}>
+								Hallo!
+						</ div>)
+					];
 				}
-			  }
-			}
-			
-			This HOC has the same functionality as the mutating version while avoiding the potential for clashes. It works equally well with class and functional components. And because it’s a pure function, it’s composable with other HOCs, or even with itself.
-			
-	Convention: Pass Unrelated Props Through to the Wrapped Component
-		render() {
-		  // Filter out extra props that are specific to this HOC and shouldn't be
-		  // passed through
-		  const { extraProp, ...passThroughProps } = this.props;
-
-		  // Inject props into the wrapped component. These are usually state values or
-		  // instance methods.
-		  const injectedProp = someStateOrInstanceMethod;
-
-		  // Pass props to wrapped component
+		
+	Functional components: a function with "props" parameter and a render method. State is unique to class components.
+		You’ll need to change this.props to props both times it appears. Many components in your apps will be able to be written as functional components: these components tend to be easier to write and React will optimize them more in the future.
+		
+		function Square(props) {
 		  return (
-			<WrappedComponent
-			  injectedProp={injectedProp}
-			  {...passThroughProps}
-			/>
+			<button className="square" onClick={props.onClick}>
+			  {props.value}
+			</button>
 		  );
 		}
 		
-	Convention: Maximizing Composability
-		// React Redux's `connect`
-		const ConnectedComment = connect(commentSelector, commentActions)(CommentList);
+	Props vs state:
+		1. Is it passed in from a parent via props? If so, it probably isn’t state.
+		2. Does it remain unchanged over time? If so, it probably isn’t state.
+		3. Can you compute it based on any other state or props in your component? If so, it isn’t state.
 		
-		What?! If you break it apart, it’s easier to see what’s going on.
-			// connect is a function that returns another function
-			const enhance = connect(commentListSelector, commentListActions);
-			// The returned function is a HOC, which returns a component that is connected
-			// to the Redux store
-			const ConnectedComment = enhance(CommentList);
+	State's place:
+		- Identify every component that renders something based on that state.
+		- Find a common owner component (a single component above all the components that need the state in the hierarchy).
+		- Either the common owner or another component higher up in the hierarchy should own the state.
+		- If you can’t find a component where it makes sense to own the state, create a new component simply for holding the state and add it somewhere in the hierarchy above the common owner component.
 			
-		// Instead of doing this...
-		const EnhancedComponent = withRouter(connect(commentSelector)(WrappedComponent))
-
-		// ... you can use a function composition utility
-		// compose(f, g, h) is the same as (...args) => f(g(h(...args)))
-		const enhance = compose(
-		  // These are both single-argument HOCs
-		  withRouter,
-		  connect(commentSelector)
-		)
-		const EnhancedComponent = enhance(WrappedComponent)
+			
+	Event handling:
+		1. <button onClick={(e) => this.handleClick(e)}>
+			Click me
+		  </button>
+			The problem with this syntax is that a different callback is created each time the LoggingButton renders. In most cases, this is fine. However, if this callback is passed as a prop to lower components, those components might do an extra re-rendering. 
+			
+		2. <button onClick={this.deleteRow.bind(this, id)}>Delete Row</button>
 		
-	Convention: Wrap the Display Name for Easy Debugging
-		The most common technique is to wrap the display name of the wrapped component. So if your higher-order component is named withSubscription, and the wrapped component’s display name is CommentList, use the display name WithSubscription(CommentList):
-
-		function withSubscription(WrappedComponent) {
-		  class WithSubscription extends React.Component {/* ... */}
-		  WithSubscription.displayName = `WithSubscription(${getDisplayName(WrappedComponent)})`;
-		  return WithSubscription;
-		}
-
-		function getDisplayName(WrappedComponent) {
-		  return WrappedComponent.displayName || WrappedComponent.name || 'Component';
-		}
-		
-	Caveats
-		Don’t Use HOCs Inside the render Method
-			-Instead, apply HOCs outside the component definition so that the resulting component is created only once. Then, its identity will be consistent across renders. This is usually what you want, anyway.
-			- In those rare cases where you need to apply a HOC dynamically, you can also do it inside a component’s lifecycle methods or its constructor.
-		
-			render() {
-			  // A new version of EnhancedComponent is created on every render
-			  // EnhancedComponent1 !== EnhancedComponent2
-			  const EnhancedComponent = enhance(MyComponent);
-			  // That causes the entire subtree to unmount/remount each time!
-			  return <EnhancedComponent />;
-			}
-			The problem here isn’t just about performance — remounting a component causes the state of that component and all of its children to be lost.
-			
-		Static Methods Must Be Copied Over
-			function enhance(WrappedComponent) {
-			  class Enhance extends React.Component {/*...*/}
-			  // Must know exactly which method(s) to copy :(
-			  Enhance.staticMethod = WrappedComponent.staticMethod;
-			  return Enhance;
-			}
-			
-			However, this requires you to know exactly which methods need to be copied. You can use hoist-non-react-statics to automatically copy all non-React static methods.
-			
-				import hoistNonReactStatic from 'hoist-non-react-statics';
-				function enhance(WrappedComponent) {
-				  class Enhance extends React.Component {/*...*/}
-				  hoistNonReactStatic(Enhance, WrappedComponent);
-				  return Enhance;
-				}
+		3.	<button onClick={this.handleClick}>
+				Click me
+			</button>
+			  
+			and in ctor: 
+				// This binding is necessary to make `this` work in the callback
+				this.handleClick = this.handleClick.bind(this);
 				
-		Refs Aren’t Passed Through
+		Passing parameters:
+			<button onClick={(e) => this.deleteRow(id, e)}>Delete Row</button>
+			<button onClick={this.deleteRow.bind(this, id)}>Delete Row</button>
+			
+		It is, however, conventional in React apps to use on* names for the attributes and handle* for the handler methods.
+			 <Square value={this.state.squares[i]} onClick={() => this.handleClick(i)}/>
 
 
-Render props: More concretely, a render prop is a function prop that a component uses to know what to render.
 
-	- In fact, any prop that is a function that a component uses to know what to render is technically a “render prop”.
-	- One interesting thing to note about render props is that you can implement most higher-order components (HOC) using a regular component with a render prop. 
+	Props:
+		- input parameters, readonly
+		
+		- to pass all props without having to explicitly type each parameter we can use the spread operator:
+			 <Greeting {...props} /> = <Greeting firstName="Ben" lastName="Hector" />
 
-	Example:
-		class MouseTracker extends React.Component {
-		  render() {
-			return (
-			  <div>
-				<h1>Move the mouse around!</h1>
-				<Mouse render={mouse => (
-				  <Cat mouse={mouse} />
-				)}/>
-			  </div>
-			);
-		  }
-		}
-		class Mouse extends React.Component {
-		  constructor(props) {
-			super(props);
-			this.handleMouseMove = this.handleMouseMove.bind(this);
-			this.state = { x: 0, y: 0 };
-		  }
+	State:
+		- State is similar to props, but it is private and fully controlled by the component.
+		- We mentioned before that components defined as classes have some additional features. Local state is exactly that: a feature available only to classes.
+		- While this.props is set up by React itself and this.state has a special meaning, you are free to add additional fields to the class manually if you need to store something that is not used for the visual output.
+		- If you don’t use something in render(), it shouldn’t be in the state.
+		
+		- In React apps, whether a component is stateful or stateless is considered an implementation detail of the component that may change over time. You can use stateless components inside stateful components, and vice versa.
+		- this.setState({value: event.target.value}); - MERGES the state - not overrides the state the passed object, but merges it with it.
+		- Also, since setState() automatically merges a partial state into the current state, we only needed to call it with the changed parts
+		
+		- State is reserved only for interactivity, that is, data that changes over time
 
-		  handleMouseMove(event) {
-			this.setState({
-			  x: event.clientX,
-			  y: event.clientY
-			});
-		  }
-
-		  render() {
-			return (
-			  <div style={{ height: '100%' }} onMouseMove={this.handleMouseMove}>
-
-				{/*
-				  Instead of providing a static representation of what <Mouse> renders,
-				  use the `render` prop to dynamically determine what to render.
-				*/}
-				{this.props.render(this.state)}
-			  </div>
-			);
-		  }
-		}
-	
-	HOC example:
-		// If you really want a HOC for some reason, you can easily
-		// create one using a regular component with a render prop!
-		function withMouse(Component) {
-		  return class extends React.Component {
-			render() {
+	Prevent component from rendering:
+		- return null from the "render" function
+		- Returning null from a component’s render method does not affect the firing of the component’s lifecycle methods. For instance, componentWillUpdate and componentDidUpdate will still be called.
+		
+		
+	Thinking in React
+		The original list of products is passed in as props, so that’s not state. The search text and the checkbox seem to be state since they change over time and can’t be computed from anything. And finally, the filtered list of products isn’t state because it can be computed by combining the original list of products with the search text and value of the checkbox.
+		
+	Lifecycle events: works only on class components (not on functional components)
+		componentDidMount		- hook runs after the component output has been rendered to the DOM
+		componentWillUnmount	- runs before the component is about to be removed from the DOM. Remounting a component causes the state of that component and all of its children to be lost.
+		
+	JSX:
+		- Fundamentally, JSX just provides syntactic sugar for the React.createElement(component, props, ...children) function. The JSX code:
+			<MyButton color="blue" shadowSize={2}>
+			  Click Me
+			</MyButton>
+			
+			compiles to: React.createElement(MyButton, {color: 'blue', shadowSize: 2}, 'Click Me')
+			
+			- Capitalized types indicate that the JSX tag is referring to a React component. 
+				These tags get compiled into a direct reference to the named variable, so if you use the JSX <Foo /> expression, Foo must be in scope.
+				lowercase types (like div, span) get passed as strings to React.createElement:
+					React.createElement(Foo, props, ...children)
+					React.createElement("div", props, ...children)
+			
+			User-Defined Components Must Be Capitalized
+				When an element type starts with a lowercase letter, it refers to a built-in component like <div> or <span> and results in a string 'div' or 'span' passed to React.createElement. Types that start with a capital letter like <Foo /> compile to React.createElement(Foo) and correspond to a component defined or imported in your JavaScript file.		
+			
+			- React Must Be in Scope since JSX compiles into calls to React.createElement, the React library must also always be in scope from your JSX code.
+			
+			- Children:
+				- Booleans, Null, and Undefined Are Ignored
+				- can be string or expression
+				
+	Ref attribute: works only on DOM elements and custom elements that are classes
+		- the "ref" attribute makes it possible to store the DOM element/React component (only if it is a class, not a function!) in our component
+			<CustomTextInput ref={(input) => { this.textInput = input; }} />	- CustomTextInput extends from React.Component
+		- does not work on functional components because they don’t have instances
+			function MyFunctionalComponent() {
+			  return <input />;
+			}
+		
+		- There are a few good use cases for refs:
+			Managing focus, text selection, or media playback.
+			Triggering imperative animations.
+			Integrating with third-party DOM libraries.
+			
+		React will call the ref callback with the DOM element when the component mounts, and call it with null when it unmounts. ref callbacks are invoked before componentDidMount or componentDidUpdate lifecycle hooks.
+			
+		- Exposing DOM Refs to Parent Components: this works both for classes and for functional components.
+		
+			function CustomTextInput(props) {
 			  return (
-				<Mouse render={mouse => (
-				  <Component {...this.props} mouse={mouse} />
-				)}/>
+				<div>
+				  <input ref={props.inputRef} />
+				</div>
 			  );
 			}
-		  }
-		}
-		
-	children as render prop:
-		Although the examples above use render, we could just as easily use the children prop!
-			<Mouse children={mouse => (
-			  <p>The mouse position is {mouse.x}, {mouse.y}</p>
-			)}/>
+			class Parent extends React.Component {
+			  render() {
+				return (
+				  <CustomTextInput
+					inputRef={el => this.inputElement = el}
+				  />
+				);
+			  }
+			}
 			
-		And remember, the children prop doesn’t actually need to be named in the list of “attributes” in your JSX element. Instead, you can put it directly inside the element!
-			<Mouse>
-			  {mouse => (
-				<p>The mouse position is {mouse.x}, {mouse.y}</p>
-			  )}
-			</Mouse>
 			
-	Caveats! Be careful when using Render Props with React.PureComponent
-		class Mouse extends React.PureComponent {
-		  // Same implementation as above...
-		}
-		class MouseTracker extends React.Component {
-		  render() {
+			function CustomTextInput(props) {
+			  return (
+				<div>
+				  <input ref={props.inputRef} />
+				</div>
+			  );
+			}
+			function Parent(props) {
+			  return (
+				<div>
+				  My input: <CustomTextInput inputRef={props.inputRef} />
+				</div>
+			  );
+			}
+			class Grandparent extends React.Component {
+			  render() {
+				return (
+				  <Parent
+					inputRef={el => this.inputElement = el}
+				  />
+				);
+			  }
+			}
+			
+	Conditional rendering:
+		This works because in JavaScript, true && expression always evaluates to expression, and false && expression always evaluates to false.
 			return (
-			  <div>
-				<h1>Move the mouse around!</h1>
-
-				{/*
-				  This is bad! The value of the `render` prop will
-				  be different on each render.
-				*/}
-				<Mouse render={mouse => (
-				  <Cat mouse={mouse} />
-				)}/>
-			  </div>
+				<div>
+				  <h1>Hello!</h1>
+				  {unreadMessages.length > 0 &&
+					<h2>
+					  You have {unreadMessages.length} unread messages.
+					</h2>
+				  }
+				</div>
 			);
-		  }
+			
+	State:
+		
+		1. Do Not Modify State Directly: use .setState
+		
+		2. State Updates May Be Asynchronous - use a second form of setState() that accepts a function rather than an object. That function will receive the previous state as the first argument, and the props at the time the update is applied as the second argument:
+			// Correct
+			this.setState((prevState, props) => ({
+			  counter: prevState.counter + props.increment
+			}));
+			
+		3. State Updates are Merged
+		
+		While this.props is set up by React itself and this.state has a special meaning, you are free to add additional fields to the class manually if you need to store something that is not used for the visual output.
+		If you don’t use something in render(), it shouldn’t be in the state.
+		
+		
+	Controlled Components
+		- In HTML, form elements such as <input>, <textarea>, and <select> typically maintain their own state and update it based on user input. In React, mutable state is typically kept in the state property of components, and only updated with setState().
+		We can combine the two by making the React state be the “single source of truth”. Then the React component that renders a form also controls what happens in that form on subsequent user input. An input form element whose value is controlled by React in this way is called a “controlled component”.
+		- A controlled input accepts its current value as a prop, as well as a callback to change that value. You could say it’s a more “React way” of approaching this (which doesn’t mean you should always use it).
+		- This flow kind of ‘pushes’ the value changes to the form component
+		- This means your data (state) and UI (inputs) are always in sync. The state gives the value to the input, and the input asks the Form to change the current value.
+		- A form element becomes “controlled” if you set its value via a prop. That’s all.
+		
+		<input type="text" value={this.state.value} onChange={this.handleChange} />
+		handleChange(event) {
+			this.setState({value: event.target.value});
+
 		}
 		
-		To get around this problem, you can sometimes define the prop as an instance method, like so:
+	Uncontrolled Components
+		- Controlled components are the recommended approach
+		- In this case form data is handled by the DOM, not by React
+		- To write an uncontrolled component, instead of writing an event handler for every state update, you can use a ref to get form values from the DOM.
+		- you have to "pull" the value from the field when you need it
+		
+		<input
+			  defaultValue="Bob"
+			  type="text"
+			  ref={(input) => this.input = input} />
+			  
+	Performance:	
+		React builds and maintains an internal representation of the rendered UI. It includes the React elements you return from your components.
+		This representation lets React avoid creating DOM nodes and accessing existing ones beyond necessity, as that can be slower than operations on JavaScript objects.
+		Sometimes it is referred to as a “virtual DOM”, but it works the same way on React Native.
 
-			class MouseTracker extends React.Component {
-			  constructor(props) {
-				super(props);
+		When a component’s props or state change, React decides whether an actual DOM update is necessary by comparing the newly returned element with the previously rendered one. When they are not equal, React will update the DOM.
+		In some cases, your component can speed all of this up by overriding the lifecycle function shouldComponentUpdate, which is triggered before the re-rendering process starts. The default implementation of this function returns true, leaving React to perform the update:
+		shouldComponentUpdate(nextProps, nextState) {
+		  return true;
+		}
+		
+		Scenario:
+			shouldComponentUpdate: tells whether React should rerender the component and call its "render()" function. (whenever we change the state, react will invoke the shouldComponentUpdate function)
+			if shouldComponentUpdate returns false, we are done
+			if shouldComponentUpdate returns true, react calls the render() method and checks whether the react element is equivalent to the one stored on the Virtual DOM
+				- this is just a javascript comparison it should be relatively fast
+			if they aren't equivalent react has to update the DOM, otherwise no DOM operation is performed
+			
 
-				// This binding ensures that `this.renderTheCat` always refers
-				// to the *same* function when we use it in render.
-				this.renderTheCat = this.renderTheCat.bind(this);
+		React.PureComponent: shouldComponentUpdate is just do a “shallow comparison” between all the fields of props and state to determine if the component should update
+		
+		pure function: they do not attempt to change their inputs, and always return the same result for the same inputs.
+			function sum(a, b) {
+			  return a + b;
+			}
+			
+			
+		The biggest benefit of immutability in React comes when you build simple pure components. Since immutable data can more easily determine if changes have been made, it also helps to determine when a component requires being re-rendered.
+			
+			
+	Functional vs class components:
+		- function components are simpler
+		- class components can have state and lifecycle hooks
+		
+		
+	Context:
+		In some cases, you want to pass data through the component tree without having to pass the props down manually at every level. You can do this directly in React with the powerful “context” API.
+		
+		Why Not To Use Context:
+			- most applications do not need it
+			- If you want your application to be stable, don’t use context. It is an experimental API and it is likely to break in future releases of React.
+			- If you aren’t familiar with state management libraries like Redux or MobX, don’t use context.
+				- For many practical applications, these libraries and their React bindings are a good choice for managing state that is relevant to many components. 
+				
+		Example:
+			class Button extends React.Component {
+			  render() {
+				return (
+				  <button style={{background: this.context.color}}>
+					{this.props.children}
+				  </button>
+				);
 			  }
-
-			  renderTheCat(mouse) {
-				return <Cat mouse={mouse} />;
-			  }
-
+			}
+			Button.contextTypes = {
+			  color: PropTypes.string
+			};
+			
+			class Message extends React.Component {
 			  render() {
 				return (
 				  <div>
-					<h1>Move the mouse around!</h1>
-					<Mouse render={this.renderTheCat} />
+					{this.props.text} <Button>Delete</Button>
 				  </div>
 				);
 			  }
 			}
-			In cases where you cannot bind the instance method ahead of time in the constructor (e.g. because you need to close over the component’s props and/or state) <Mouse> should extend React.Component instead.
-		
 
-Code splitting: to produce smaller bundles:
-	Before:
-		import { add } from './math';
-		console.log(add(16, 26));
-	After:
-		import("./math").then(math => {
-		  console.log(math.add(16, 26));
-		});
-		
-	Create React App has this configured automatically with webpack (because this syntax in not yet in the ECMAScript standard)
-		
-	Libraries: 
-		React Loadable: React Loadable wraps dynamic imports in a nice, React-friendly API for introducing code splitting into your app at a given component.
-	
-	Route-based code splitting: Here’s an example of how to setup route-based code splitting into your app using libraries like React Router and React Loadable.
-		import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-		import Loadable from 'react-loadable';
+			class MessageList extends React.Component {
+			  getChildContext() {
+				return {color: "purple"};
+			  }
 
-		const Loading = () => <div>Loading...</div>;
-
-		const Home = Loadable({
-		  loader: () => import('./routes/Home'),
-		  loading: Loading,
-		});
-
-		const About = Loadable({
-		  loader: () => import('./routes/About'),
-		  loading: Loading,
-		});
-
-		const App = () => (
-		  <Router>
-			<Switch>
-			  <Route exact path="/" component={Home}/>
-			  <Route path="/about" component={About}/>
-			</Switch>
-		  </Router>
-		);
-
-		
-ES6:
-	computed property name: 
-		this.setState({
-		  [name]: value
-		});
-		It is equivalent to this ES5 code:
-		var partialState = {};
-		partialState[name] = value;
-		this.setState(partialState);
-		
-		
-	Data change with mutation
-		var player = {score: 1, name: 'Jeff'};
-		player.score = 2;
-		// Now player is {score: 2, name: 'Jeff'}
-		
-	Data change without mutation
-		var player = {score: 1, name: 'Jeff'};
-
-		var newPlayer = Object.assign({}, player, {score: 2});
-		// Now player is unchanged, but newPlayer is {score: 2, name: 'Jeff'}
-
-		// Or if you are using object spread syntax proposal, you can write:
-		// var newPlayer = {...player, score: 2};
-		
-		
-	Currying: these 2 are equivalent:
-		function logger(store) {
-		  return function wrapDispatchToAddLogging(next) {
-			return function dispatchAndLog(action) {
-			  console.log('dispatching', action)
-			  let result = next(action)
-			  console.log('next state', store.getState())
-			  return result
+			  render() {
+				const children = this.props.messages.map((message) =>
+				  <Message text={message.text} />
+				);
+				return <div>{children}</div>;
+			  }
 			}
+			MessageList.childContextTypes = {
+			  color: PropTypes.string
+			};
+			
+				By adding childContextTypes and getChildContext to MessageList (the context provider), React passes the information down automatically and any component in the subtree (in this case, Button) can access it by defining contextTypes.
+
+				If contextTypes is not defined, then context will be an empty object.
+				
+		Parent-Child Coupling: React Router V4 uses this context API
+		
+		Referencing Context in Lifecycle Methods:
+			If contextTypes is defined within a component, the following lifecycle methods will receive an additional parameter, the context object:
+				- constructor(props, context)
+				- componentWillReceiveProps(nextProps, nextContext)
+				- shouldComponentUpdate(nextProps, nextState, nextContext)
+				- componentWillUpdate(nextProps, nextState, nextContext)
+
+				
+	Fragments: it's like <ng-container> in Angular: React does not render the fragment which is <React.Fragment>:
+
+		class Columns extends React.Component {
+		  render() {
+			return (
+			  <React.Fragment> 		or <>
+				<td>Hello</td>
+				<td>World</td>
+			  </React.Fragment>		or </>
+			);
 		  }
 		}
 		
-		const logger = store => next => action => {
-		  console.log('dispatching', action)
-		  let result = next(action)
-		  console.log('next state', store.getState())
-		  return result
+		class Table extends React.Component {
+		  render() {
+			return (
+			  <table>
+				<tr>
+				  <Columns />
+				</tr>
+			  </table>
+			);
+		  }
 		}
 		
+		Use <Fragment> when a key prop is required:
+
+			import React, { Fragment } from 'react';
+
+			function Glossary(props) {
+			  return (
+				<dl>
+				  {props.items.map(item => (
+					// Without the `key`, React will fire a key warning
+					<Fragment key={item.id}>
+					  <dt>{item.term}</dt>
+					  <dd>{item.description}</dd>
+					</Fragment>
+				  ))}
+				</dl>
+			  );
+			}
+		Use <></> syntax everywhere else:
+
+			function ListItem({ item }) {
+			  return ( 
+				<>
+				  <dt>{item.term}</dt>
+				  <dd>{item.description}</dd>>
+				</>
+			  );    
+			}
 		
-React elements vs HTML elements
-	React JSX				HTML
-	camelCasing				lowercasing
-	className				class
-	htmlForm				for
+		
+	Portals: Portals provide a first-class way to render children into a DOM node that exists outside the DOM hierarchy of the parent component.
+
+		ReactDOM.createPortal(child, container)
+		
+		render() {
+		  // React mounts a new div and renders the children into it
+		  return (
+			<div>
+			  {this.props.children}
+			</div>
+		  );
+		}
+		render() {
+		  // React does *not* create a new div. It renders the children into `domNode`.
+		  // `domNode` is any valid DOM node, regardless of its location in the DOM.
+		  return ReactDOM.createPortal(
+			this.props.children,
+			domNode,
+		  );
+		}
+		
+		Event Bubbinlg Through Portals:
+			Even though a portal can be anywhere in the DOM tree, it behaves like a normal React child in every other way. Features like context work exactly the same regardless of whether the child is a portal, as the portal still exists in the React tree regardless of position in the DOM tree.
+
+			This includes event bubbling. An event fired from inside a portal will propagate to ancestors in the containing React tree, even if those elements are not ancestors in the DOM tree. Assuming the following HTML structure:
+			
+
+	Error Boundaries
+		A JavaScript error in a part of the UI shouldn’t break the whole app. To solve this problem for React users, React 16 introduces a new concept of an “error boundary”.
+
+		Error boundaries are React components that catch JavaScript errors anywhere in their child component tree, log those errors, and display a fallback UI instead of the component tree that crashed.
+		Error boundaries catch errors during rendering, in lifecycle methods, and in constructors of the whole tree below them.
+		
+		Error boundaries do not catch errors for:
+			- Event handlers (learn more)
+			- Asynchronous code (e.g. setTimeout or requestAnimationFrame callbacks)
+			- Server side rendering
+			- Errors thrown in the error boundary itself (rather than its children)
+			
+		A class component becomes an error boundary if it defines a new lifecycle method called "componentDidCatch(error, info)"
+		
+			componentDidCatch(error, info) {
+				// Display fallback UI
+				this.setState({ hasError: true });
+				// You can also log the error to an error reporting service
+				logErrorToMyService(error, info);
+			}
+			
+		The componentDidCatch() method works like a JavaScript catch {} block, but for components. Only class components can be error boundaries. In practice, most of the time you’ll want to declare an error boundary component once and use it throughout your application.
+		
+		Where to Place Error Boundaries
+			The granularity of error boundaries is up to you. 
+			You may wrap top-level route components to display a “Something went wrong” message to the user, just like server-side frameworks often handle crashes. 
+			You may also wrap individual widgets in an error boundary to protect them from crashing the rest of the application.
+			
+		New Behavior for Uncaught Errors
+			This change has an important implication. As of React 16, errors that were not caught by any error boundary will result in unmounting of the whole React component tree.
+			
+		How About try/catch?
+			try / catch is great but it only works for imperative code:
+				try {
+				  showButton();
+				} catch (error) {
+				  // ...
+				}
+			However, React components are declarative and specify what should be rendered:
+				<Button />
+				Error boundaries preserve the declarative nature of React, and behave as you would expect. For example, even if an error occurs in a componentDidUpdate hook caused by a setState somewhere deep in the tree, it will still correctly propagate to the closest error boundary.
+			
+		How About Event Handlers?
+			Error boundaries do not catch errors inside event handlers.
+
+			React doesn’t need error boundaries to recover from errors in event handlers. Unlike the render method and lifecycle hooks, the event handlers don’t happen during rendering. So if they throw, React still knows what to display on the screen.
+
+			If you need to catch an error inside event handler, use the regular JavaScript try / catch statement:
+				class MyComponent extends React.Component {
+				  constructor(props) {
+					super(props);
+					this.state = { error: null };
+				  }
+				  
+				  handleClick = () => {
+					try {
+					  // Do something that could throw
+					} catch (error) {
+					  this.setState({ error });
+					}
+				  }
+
+				  render() {
+					if (this.state.error) {
+					  return <h1>Caught an error.</h1>
+					}
+					return <div onClick={this.handleClick}>Click Me</div>
+				  }
+				}
+				
+	Higher-Order Components	(HOC)
+		A higher-order component (HOC) is an advanced technique in React for reusing component logic. HOCs are not part of the React API, per se. They are a pattern that emerges from React’s compositional nature.
+		Concretely, a higher-order component is a function that takes a component and returns a new component.
+			const EnhancedComponent = higherOrderComponent(WrappedComponent);
+			
+			The function receives a Component as its 1st parameter and that component becomes the child of the returned new, enhanced Component.
+			
+		Whereas a component transforms props into UI, a higher-order component transforms a component into another component.
+		HOCs are common in third-party React libraries, such as Redux’s connect and Relay’s createFragmentContainer.
+		
+		Note that a HOC doesn’t modify the input component, nor does it use inheritance to copy its behavior. Rather, a HOC composes the original component by wrapping it in a container component. 
+		A HOC is a pure function with zero side-effects.
+		
+			const CommentListWithSubscription = withSubscription(
+			  CommentList,
+			  (DataSource) => DataSource.getComments()
+			);
+
+			const BlogPostWithSubscription = withSubscription(
+			  BlogPost,
+			  (DataSource, props) => DataSource.getBlogPost(props.id)
+			);
+		
+			// This function takes a component...
+			function withSubscription(WrappedComponent, selectData) {
+			  // ...and returns another component...
+			  return class extends React.Component {
+				constructor(props) {
+				  super(props);
+				  this.handleChange = this.handleChange.bind(this);
+				  this.state = {
+					data: selectData(DataSource, props)
+				  };
+				}
+
+				componentDidMount() {
+				  // ... that takes care of the subscription...
+				  DataSource.addChangeListener(this.handleChange);
+				}
+
+				componentWillUnmount() {
+				  DataSource.removeChangeListener(this.handleChange);
+				}
+
+				handleChange() {
+				  this.setState({
+					data: selectData(DataSource, this.props)
+				  });
+				}
+
+				render() {
+				  // ... and renders the wrapped component with the fresh data!
+				  // Notice that we pass through any additional props
+				  return <WrappedComponent data={this.state.data} {...this.props} />;
+				}
+			  };
+			}
+			
+		Don’t Mutate the Original Component. Use Composition.
+				function logProps(InputComponent) {
+				  InputComponent.prototype.componentWillReceiveProps = function(nextProps) {
+					console.log('Current props: ', this.props);
+					console.log('Next props: ', nextProps);
+				  };
+				  // The fact that we're returning the original input is a hint that it has
+				  // been mutated.
+				  return InputComponent;
+				}
+
+				// EnhancedComponent will log whenever props are received
+				const EnhancedComponent = logProps(InputComponent);
+			
+			Instead of mutation, HOCs should use composition, by wrapping the input component in a container component:
+
+				function logProps(WrappedComponent) {
+				  return class extends React.Component {
+					componentWillReceiveProps(nextProps) {
+					  console.log('Current props: ', this.props);
+					  console.log('Next props: ', nextProps);
+					}
+					render() {
+					  // Wraps the input component in a container, without mutating it. Good!
+					  return <WrappedComponent {...this.props} />;
+					}
+				  }
+				}
+				
+				This HOC has the same functionality as the mutating version while avoiding the potential for clashes. It works equally well with class and functional components. And because it’s a pure function, it’s composable with other HOCs, or even with itself.
+				
+		Convention: Pass Unrelated Props Through to the Wrapped Component
+			render() {
+			  // Filter out extra props that are specific to this HOC and shouldn't be
+			  // passed through
+			  const { extraProp, ...passThroughProps } = this.props;
+
+			  // Inject props into the wrapped component. These are usually state values or
+			  // instance methods.
+			  const injectedProp = someStateOrInstanceMethod;
+
+			  // Pass props to wrapped component
+			  return (
+				<WrappedComponent
+				  injectedProp={injectedProp}
+				  {...passThroughProps}
+				/>
+			  );
+			}
+			
+		Convention: Maximizing Composability
+			// React Redux's `connect`
+			const ConnectedComment = connect(commentSelector, commentActions)(CommentList);
+			
+			What?! If you break it apart, it’s easier to see what’s going on.
+				// connect is a function that returns another function
+				const enhance = connect(commentListSelector, commentListActions);
+				// The returned function is a HOC, which returns a component that is connected
+				// to the Redux store
+				const ConnectedComment = enhance(CommentList);
+				
+			// Instead of doing this...
+			const EnhancedComponent = withRouter(connect(commentSelector)(WrappedComponent))
+
+			// ... you can use a function composition utility
+			// compose(f, g, h) is the same as (...args) => f(g(h(...args)))
+			const enhance = compose(
+			  // These are both single-argument HOCs
+			  withRouter,
+			  connect(commentSelector)
+			)
+			const EnhancedComponent = enhance(WrappedComponent)
+			
+		Convention: Wrap the Display Name for Easy Debugging
+			The most common technique is to wrap the display name of the wrapped component. So if your higher-order component is named withSubscription, and the wrapped component’s display name is CommentList, use the display name WithSubscription(CommentList):
+
+			function withSubscription(WrappedComponent) {
+			  class WithSubscription extends React.Component {/* ... */}
+			  WithSubscription.displayName = `WithSubscription(${getDisplayName(WrappedComponent)})`;
+			  return WithSubscription;
+			}
+
+			function getDisplayName(WrappedComponent) {
+			  return WrappedComponent.displayName || WrappedComponent.name || 'Component';
+			}
+			
+		Caveats
+			Don’t Use HOCs Inside the render Method
+				-Instead, apply HOCs outside the component definition so that the resulting component is created only once. Then, its identity will be consistent across renders. This is usually what you want, anyway.
+				- In those rare cases where you need to apply a HOC dynamically, you can also do it inside a component’s lifecycle methods or its constructor.
+			
+				render() {
+				  // A new version of EnhancedComponent is created on every render
+				  // EnhancedComponent1 !== EnhancedComponent2
+				  const EnhancedComponent = enhance(MyComponent);
+				  // That causes the entire subtree to unmount/remount each time!
+				  return <EnhancedComponent />;
+				}
+				The problem here isn’t just about performance — remounting a component causes the state of that component and all of its children to be lost.
+				
+			Static Methods Must Be Copied Over
+				function enhance(WrappedComponent) {
+				  class Enhance extends React.Component {/*...*/}
+				  // Must know exactly which method(s) to copy :(
+				  Enhance.staticMethod = WrappedComponent.staticMethod;
+				  return Enhance;
+				}
+				
+				However, this requires you to know exactly which methods need to be copied. You can use hoist-non-react-statics to automatically copy all non-React static methods.
+				
+					import hoistNonReactStatic from 'hoist-non-react-statics';
+					function enhance(WrappedComponent) {
+					  class Enhance extends React.Component {/*...*/}
+					  hoistNonReactStatic(Enhance, WrappedComponent);
+					  return Enhance;
+					}
+					
+			Refs Aren’t Passed Through
+
+
+	Render props: More concretely, a render prop is a function prop that a component uses to know what to render.
+
+		- In fact, any prop that is a function that a component uses to know what to render is technically a “render prop”.
+		- One interesting thing to note about render props is that you can implement most higher-order components (HOC) using a regular component with a render prop. 
+
+		Example:
+			class MouseTracker extends React.Component {
+			  render() {
+				return (
+				  <div>
+					<h1>Move the mouse around!</h1>
+					<Mouse render={mouse => (
+					  <Cat mouse={mouse} />
+					)}/>
+				  </div>
+				);
+			  }
+			}
+			class Mouse extends React.Component {
+			  constructor(props) {
+				super(props);
+				this.handleMouseMove = this.handleMouseMove.bind(this);
+				this.state = { x: 0, y: 0 };
+			  }
+
+			  handleMouseMove(event) {
+				this.setState({
+				  x: event.clientX,
+				  y: event.clientY
+				});
+			  }
+
+			  render() {
+				return (
+				  <div style={{ height: '100%' }} onMouseMove={this.handleMouseMove}>
+
+					{/*
+					  Instead of providing a static representation of what <Mouse> renders,
+					  use the `render` prop to dynamically determine what to render.
+					*/}
+					{this.props.render(this.state)}
+				  </div>
+				);
+			  }
+			}
+		
+		HOC example:
+			// If you really want a HOC for some reason, you can easily
+			// create one using a regular component with a render prop!
+			function withMouse(Component) {
+			  return class extends React.Component {
+				render() {
+				  return (
+					<Mouse render={mouse => (
+					  <Component {...this.props} mouse={mouse} />
+					)}/>
+				  );
+				}
+			  }
+			}
+			
+		children as render prop:
+			Although the examples above use render, we could just as easily use the children prop!
+				<Mouse children={mouse => (
+				  <p>The mouse position is {mouse.x}, {mouse.y}</p>
+				)}/>
+				
+			And remember, the children prop doesn’t actually need to be named in the list of “attributes” in your JSX element. Instead, you can put it directly inside the element!
+				<Mouse>
+				  {mouse => (
+					<p>The mouse position is {mouse.x}, {mouse.y}</p>
+				  )}
+				</Mouse>
+				
+		Caveats! Be careful when using Render Props with React.PureComponent
+			class Mouse extends React.PureComponent {
+			  // Same implementation as above...
+			}
+			class MouseTracker extends React.Component {
+			  render() {
+				return (
+				  <div>
+					<h1>Move the mouse around!</h1>
+
+					{/*
+					  This is bad! The value of the `render` prop will
+					  be different on each render.
+					*/}
+					<Mouse render={mouse => (
+					  <Cat mouse={mouse} />
+					)}/>
+				  </div>
+				);
+			  }
+			}
+			
+			To get around this problem, you can sometimes define the prop as an instance method, like so:
+
+				class MouseTracker extends React.Component {
+				  constructor(props) {
+					super(props);
+
+					// This binding ensures that `this.renderTheCat` always refers
+					// to the *same* function when we use it in render.
+					this.renderTheCat = this.renderTheCat.bind(this);
+				  }
+
+				  renderTheCat(mouse) {
+					return <Cat mouse={mouse} />;
+				  }
+
+				  render() {
+					return (
+					  <div>
+						<h1>Move the mouse around!</h1>
+						<Mouse render={this.renderTheCat} />
+					  </div>
+					);
+				  }
+				}
+				In cases where you cannot bind the instance method ahead of time in the constructor (e.g. because you need to close over the component’s props and/or state) <Mouse> should extend React.Component instead.
+			
+
+	Code splitting: to produce smaller bundles:
+		Before:
+			import { add } from './math';
+			console.log(add(16, 26));
+		After:
+			import("./math").then(math => {
+			  console.log(math.add(16, 26));
+			});
+			
+		Create React App has this configured automatically with webpack (because this syntax in not yet in the ECMAScript standard)
+			
+		Libraries: 
+			React Loadable: React Loadable wraps dynamic imports in a nice, React-friendly API for introducing code splitting into your app at a given component.
+		
+		Route-based code splitting: Here’s an example of how to setup route-based code splitting into your app using libraries like React Router and React Loadable.
+			import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+			import Loadable from 'react-loadable';
+
+			const Loading = () => <div>Loading...</div>;
+
+			const Home = Loadable({
+			  loader: () => import('./routes/Home'),
+			  loading: Loading,
+			});
+
+			const About = Loadable({
+			  loader: () => import('./routes/About'),
+			  loading: Loading,
+			});
+
+			const App = () => (
+			  <Router>
+				<Switch>
+				  <Route exact path="/" component={Home}/>
+				  <Route path="/about" component={About}/>
+				</Switch>
+			  </Router>
+			);
+			
+			
+	React elements vs HTML elements
+		React JSX				HTML
+		camelCasing				lowercasing
+		className				class
+		htmlForm				for
+		
+
+React Router
+	Currently, a link's pathname must be absolute
 	
-	
+	Most important components:
+		<BrowserRouter>
+		<Route> - to create placeholders where the router injects the specified component into
+			What does the <Route> render?
+				1. component: a React component. When a route with a component prop matches, the route will return a new element whose type is the provided React component (created using React.createElement).
+				2. render: a function that returns a React element [5]. It will be called when the path matches. This is similar to component, but is useful for inline rendering and passing extra props to the element.
+				3. children: a function that returns a React element. Unlike the prior two props, this will always be rendered, regardless of whether the route’s path matches the current location.
+				
+				<Route path='/page' component={Page} />
+				
+				const extraProps = { color: 'red' }
+				<Route path='/page' render={(props) => (
+				  <Page {...props} data={extraProps}/>
+				)}/>
+				
+				<Route path='/page' children={(props) => (
+				  props.match
+					? <Page {...props}/>
+					: <EmptyPage {...props}/>
+				)}/>
+		<Link> - to create links
+
 	
 Redux
 
@@ -956,7 +937,7 @@ Redux
 			type StoreEnhancer = (next: StoreCreator) => StoreCreator
 			A store enhancer is a higher-order function that composes a store creator to return a new, enhanced store creator. This is similar to middleware in that it allows you to alter the store interface in a composable way.
 
-			Store enhancers are much the same concept as higher-order components in React, which are also occasionally called “component enhancers”.
+			Store enhancers are much the same concept as higher-order components in React, which are also occasionally called "component enhancers".
 	
 	
 	Reducer: a pure function with (state, action) => state signature.
@@ -1069,6 +1050,8 @@ Redux
 			Middleware is the suggested way to extend Redux with custom functionality. Middleware lets you wrap the store's dispatch method for fun and profit. The key feature of middleware is that it is composable. Multiple middleware can be combined together, where each middleware requires no knowledge of what comes before or after it in the chain.
 
 			The most common use case for middleware is to support asynchronous actions without much boilerplate code or a dependency on a library like Rx. It does so by letting you dispatch async actions in addition to normal actions.
+			
+			So basically with middleware the dispatch method (that accepts action objects by default) can be extended via composition.
 			
 		bindActionCreators(actionCreators, dispatch)
 			Turns an object whose values are action creators, into an object with the same keys, but with every action creator wrapped into a dispatch call so they may be invoked directly.
@@ -1235,7 +1218,7 @@ React Redux:
 		
 		Middleware in general: 
 			Important: if invoking the original store.dispatch(action) function from any middleware instead of the next(action):
-				- it reexecutes the whole middleware pipeline on that action, including the current middleware
+				- it re-executes the whole middleware pipeline on that action, including the current middleware
 				- this is useful for async middlewares
 		
 			In Express, KOA, Asp.Net Core: middleware is some code you can put between the framework receiving a request, and the framework generating a response.
@@ -1258,3 +1241,50 @@ React Redux:
 					The action will actually travel the whole middleware chain again, including the current middleware. 
 					This is useful for asynchronous middleware, as we have seen previously. There is one caveat when calling dispatch during setup, described below.
 				3. To ensure that you may only apply middleware once, it operates on createStore() rather than on store itself. Instead of (store, middlewares) => store, its signature is (...middlewares) => (createStore) => createStore.
+				
+				
+
+ES6:
+	computed property name: 
+		this.setState({
+		  [name]: value
+		});
+		It is equivalent to this ES5 code:
+		var partialState = {};
+		partialState[name] = value;
+		this.setState(partialState);
+		
+		
+	Data change with mutation
+		var player = {score: 1, name: 'Jeff'};
+		player.score = 2;
+		// Now player is {score: 2, name: 'Jeff'}
+		
+	Data change without mutation
+		var player = {score: 1, name: 'Jeff'};
+
+		var newPlayer = Object.assign({}, player, {score: 2});
+		// Now player is unchanged, but newPlayer is {score: 2, name: 'Jeff'}
+
+		// Or if you are using object spread syntax proposal, you can write:
+		var newPlayer = {...player, {score: 2}};
+		
+		
+	Currying: these 2 are equivalent:
+		function logger(store) {
+		  return function wrapDispatchToAddLogging(next) {
+			return function dispatchAndLog(action) {
+			  console.log('dispatching', action)
+			  let result = next(action)
+			  console.log('next state', store.getState())
+			  return result
+			}
+		  }
+		}
+		
+		const logger = store => next => action => {
+		  console.log('dispatching', action)
+		  let result = next(action)
+		  console.log('next state', store.getState())
+		  return result
+		}
