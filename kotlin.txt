@@ -1,6 +1,6 @@
 https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/index.html
 
-stdlib interesting mappings
+Scope functions: apply/with/run/also/let
 
 	let - fun <T, R> T.let(block: (T) -> R): R
 		Calls the specified function block with this value as its argument and returns its result.
