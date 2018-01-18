@@ -1248,6 +1248,49 @@ React Redux:
 					This is useful for asynchronous middleware, as we have seen previously. There is one caveat when calling dispatch during setup, described below.
 				3. To ensure that you may only apply middleware once, it operates on createStore() rather than on store itself. Instead of (store, middlewares) => store, its signature is (...middlewares) => (createStore) => createStore.
 				
+			
+			Good explanation about the signature: You may have noticed that middleware functions look a bit confusing. It's a function, that returns a function, that returns a function.
+				const logger = store => dispatch => action => {
+				  return dispatch(action)
+				}
+				
+				Forget about its strange look. Think of it as a single function.
+					function logger (store, dispatch, action) {  
+					
+				Having them as functions-that-return-functions makes for something interesting: it breaks the middleware into 3 steps that are applied separately.
+					const logger = function (store) {
+					  // This function runs on createStore().
+					  // It returns a decorator for dispatch().
+					  // You can get store.getState() here.
+					  return function (dispatch) {
+						// This function runs on createStore() too.
+						// This returns a new dispatch() function to
+						// replace the old one.
+						return function (action) {
+						  // This runs every dispatch().
+						}
+					  }
+					}
+					Most middleware will not need this, but the Redux docs has examples when this can be useful.
+					
+				- Middleware are Redux plugins you can attach to your store.
+					createStore(reducer, {}, applyMiddleware(logger, thunk))
+					
+				- They give dispatch() more powers. (enhance it via higher order functions)
+					store.dispatch({ type: 'SAVE' })     	Normal
+					store.dispatch(fetch('/data.json'))	  	Promises
+					store.dispatch(() => {  })     F		unctions/thunks
+					store.dispatch()               			...and more
+					
+				- You can use middleware to write side effects to actions.
+					const middleware = store => dispatch => action => {
+					  if (action.type === 'FETCH') {
+						doSomethingDifferent()
+					  }
+					  dispatch(action)
+					}
+					
+				
 	Redux Observable
 	
 		Epic: a function that takes a stream of all actions dispatched and returns a stream of new actions to dispatch.
