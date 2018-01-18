@@ -868,6 +868,10 @@ React Router
 	
 Redux
 
+	Overview:
+		Redux manages the state of an app using a single store. To modify the state, an action is dispatched to the store and a reducer updates the store based on the type and other values of the action. 
+		In order to use the new state, the store can be subscribed to. Subscribing requires a callback function which is called whenever the store updates.
+
 	Redux is a predictable state container for JavaScript apps.
 	
 	- The whole state of your app is stored in an object tree inside a single store.
@@ -919,6 +923,14 @@ Redux
 			A middleware is a higher-order function that composes a dispatch function to return a new dispatch function. It often turns async actions into actions.
 
 			Middleware is composable using function composition. It is useful for logging actions, performing side effects like routing, or turning an asynchronous API call into a series of synchronous actions.
+			
+			Middleware enhances the store by enabling you to interact with dispatched actions before they reach the store. 
+			To do this, the store's dispatch function is modified to run the middleware functions before the original dispatch function is called which ultimately sends the action to the reducers.
+			
+			Middleware provides a way to interact with actions that have been dispatched to the store before they reach the store's reducer.
+				Middleware is used by composing the functions together and passing that function to your createStore call. 
+				The composed middleware function is used to replace the store's default dispatch method with one that dispatches the action to each middleware function in a chain, 
+				with the last middleware function dispatching the action to the store.
 			
 		Store
 			type Store = {
@@ -1247,6 +1259,34 @@ React Redux:
 					The action will actually travel the whole middleware chain again, including the current middleware. 
 					This is useful for asynchronous middleware, as we have seen previously. There is one caveat when calling dispatch during setup, described below.
 				3. To ensure that you may only apply middleware once, it operates on createStore() rather than on store itself. Instead of (store, middlewares) => store, its signature is (...middlewares) => (createStore) => createStore.
+				
+			Stopping the Chain
+				Sometimes an action doesn't need to reach the store's reducer because it doesn't update the store based on that action's type. 
+				In those cases, the middleware function does not need to call the nextDispatch for that action. 
+				
+				function middleware(store) {
+				  unsubscribeHistory = history.listen(location => {
+					// a listener is attached to the history. When the
+					// history changes locations, an UPDATE_LOCATION
+					// action is dispatched to the store
+					store.dispatch(updateLocation(location))
+				  })
+
+				  return next => action => {
+					// the middleware only listens for TRANSITION actions
+					// and the next middlewares do not care about this action, not even the reducers (in fact, they do not know about this action because it is React Router v4 specific) --> do not pass TRANSITION actions down the chain
+					if (action.type !== TRANSITION) {
+					  // pass it down the action to the chain to make possible for it to reach the root reducer
+					  return next(action)
+					}
+					// when there is a TRANSITION action the middleware
+					// calls a history function to update the location
+					history[action.payload.method](action.payload.arg)
+					// the middleware doesn't bother passing the TRANSITION
+					// action down the middleware chain, since no reducer
+					// will update the state of the store based on it
+				  }
+				}
 				
 			
 			Good explanation about the signature: You may have noticed that middleware functions look a bit confusing. It's a function, that returns a function, that returns a function.
