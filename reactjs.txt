@@ -861,6 +861,10 @@ React Router
 				)}/>
 		<Link> - to create links
 
+	Connected React Router: 
+		- a Redux binding for React Router v4
+		- the Redux Chrome browser extension will display history related to route changes and we can go back in time
+	
 	
 Redux
 
@@ -883,6 +887,8 @@ Redux
 			type Reducer<S, A> = (state: S, action: A) => S
 			- A reducer (also called a reducing function) is a function that accepts an accumulation and a value and returns a new accumulation. They are used to reduce a collection of values down to a single value.
 			- In Redux, the accumulated value is the state object, and the values being accumulated are actions. Reducers calculate a new state given the previous state and an action. They must be pure functions—functions that return the exact same output for given inputs. They should also be free of side-effects. This is what enables exciting features like hot reloading and time travel.
+			- They must be synchronous
+			- No side effects (no going to the server, debounce, setTimeout, etc.)
 			
 		Dispatching function:
 			type BaseDispatch = (a: Action) => Action
@@ -1242,6 +1248,31 @@ React Redux:
 					This is useful for asynchronous middleware, as we have seen previously. There is one caveat when calling dispatch during setup, described below.
 				3. To ensure that you may only apply middleware once, it operates on createStore() rather than on store itself. Instead of (store, middlewares) => store, its signature is (...middlewares) => (createStore) => createStore.
 				
+	Redux Observable
+	
+		Epic: a function that takes a stream of all actions dispatched and returns a stream of new actions to dispatch.
+			"actions in, actions out" - other actions out
+			
+			When defining the epics I'm just setting up the pipeline, the setup is executed exactly once during the application boot.
+			Whenever an action gets dispatched, AFTER it went through the reducers it will reach my epic pipeline. 
+			If the epic maps it to another action, then it will be dispatched again to the store, calling my reducers then my epics again.
+			So the newly dispatched action 1st reaches the reducers and after that my epics. To escape this the epic pipeline just do not match it (ofType is not true, does not match to any action.type).
+			
+		Workflow:
+			1. calling store.dispatch(action)
+			2. reducers receive the action
+			3. epics receive the action
+				3.a) if the epic does not map it to another action then we are finished
+				3.b) if the epic maps it to another action then the new action (action out) gets dispatched my the epicMiddleware under the hood via store.dispatch(action) --> and we go to 2.
+					--> reducers receive the new action and after handling it (synchronously ofc) the epic gets invoked again
+					
+		action$.ofType(FETCH_USER)
+			.mergeMap(action =>
+			  ajax.getJSON(`/api/users/${action.payload}`)				using an inner observable: so if the ajax request fails it does not bring the whole epic pipeline down if catching the error
+				.map(response => fetchUserFulfilled(response))
+				.takeUntil(action$.ofType(FETCH_USER_CANCELLED))
+				.catch(err => Observable.of(defaultUser))				catch the possible error, do not let them propagate to the outer observable resulting in briging the epic pipeline down
+			);
 				
 
 ES6:
