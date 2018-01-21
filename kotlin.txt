@@ -1140,6 +1140,7 @@ Coroutines:
 				block: suspend CoroutineScope.() -> Unit
 			): Job (source)
 			Launches new coroutine without blocking current thread and returns a reference to the coroutine as a Job. The coroutine is cancelled when the resulting job is cancelled.
+			It's like a fire-and-forget model.
 			
 		async
 			fun <T> async(
@@ -1148,7 +1149,6 @@ Coroutines:
 				block: suspend CoroutineScope.() -> T
 			): Deferred<T> (source)
 			Creates new coroutine and returns its future result as an implementation of Deferred. Deferred inherits from Job.
-
 			The running coroutine is cancelled when the resulting object is cancelled.
 			
 		future
