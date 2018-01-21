@@ -90,6 +90,10 @@ React
 		- Also, since setState() automatically merges a partial state into the current state, we only needed to call it with the changed parts
 		
 		- State is reserved only for interactivity, that is, data that changes over time
+		- If the state changes and we invoke setState React will re-render the entire component 
+			- Only in the virtual DOM, then compares it with the real DOM - if the two do not match, only then updates the DOM and only the relevant parts that really changed (does not re-render the whole component into the DOM)
+			- State changes are asynchronous. If you read from this.state immediately after calling this.setState, it probably won’t reflect the changes yet.
+				- If the current value of the state is needed for calculating the next state, specify a function as the parameter: this.setState((prevState, props) => ({...}), () => {/* state update has just happened*/});
 
 	Prevent component from rendering:
 		- return null from the "render" function
@@ -860,6 +864,11 @@ React Router
 					: <EmptyPage {...props}/>
 				)}/>
 		<Link> - to create links
+		
+		<Route path="/cats/:id" component={CatPage} />
+			The CatPage will have a props called "match" that's "params" property will contain the url parameters:
+				props.match.params.id
+				To access this from the mapStateToProps function: ownProps.match.params.id
 
 	Connected React Router: 
 		- a Redux binding for React Router v4
@@ -871,6 +880,8 @@ Redux
 	Overview:
 		Redux manages the state of an app using a single store. To modify the state, an action is dispatched to the store and a reducer updates the store based on the type and other values of the action. 
 		In order to use the new state, the store can be subscribed to. Subscribing requires a callback function which is called whenever the store updates.
+		
+	Data flow in React: dispatch(action) -> reducer -> new state -> re-render
 
 	Redux is a predictable state container for JavaScript apps.
 	
@@ -1138,10 +1149,21 @@ React Redux:
 		
 		
 	connect([mapStateToProps], [mapDispatchToProps], [mergeProps], [options]):
-		implements shouldComponentUpdate() for performance
+			- implements shouldComponentUpdate() for performance
+			- if mapDispatchToProps is not provided, the "dispatch" function gets mapped to the connected component's props. It can directly be invoked then.
 		
 		mapStateToProps(state, [ownProps]): stateProps: that tells how to transform the current Redux store state into the props you want to pass to a presentational component you are wrapping
 			- If your mapStateToProps function is declared as taking two parameters, it will be called with the store state as the first parameter and the props passed to the connected component as the second parameter, and will also be re-invoked whenever the connected component receives new props as determined by shallow equality comparisons
+			
+			mapStateToProps is a function that will be called when our component mounts, updates, or our store state is changed
+				- Use componentWillReceiveProps if you want to handle the update in the props: for example to set the component's internal state object to make it possible to have some interaction with forms
+				
+					Example:
+						- There's only one problem. Earlier, we set up our mapStateToProps function to contain a default, empty cat object, as well as default, empty catHobbies and checkBoxHobbies collections. These default objects would get passed to props, should the component render before our application's state gets populated with the cat and hobby collections from our API.
+						- When the actions that retrieve that data from the API are finished being handled by the reducers, and the new versions of state are pushed out to the components, the mapStateToProps function runs again, and the component re-renders with new props.
+						- But wait! The constructor function will only be invoked once, not again and again every time application state changes and mapStateToProps get re-invoked. So, how will we insure that our CatPage component's internal state, which gets its cat, catHobbies and checkBoxHobbies properties from the component's props, gets updated when those props change?
+						- For this, we will use the component lifecycle method componentWillReceiveProps.
+						- The componentWillReceiveProps function will be invoked every time a component's props are updated by a re-invocation of the mapStateToProps function. This is the perfect place to update the CatPage's state whenever props get updated.
 		
 		mapDispatchToProps(dispatch, [ownProps]): dispatchProps: In addition to reading the state, container components can dispatch actions.
 			- If an object is passed, each function inside it is assumed to be a Redux action creator. An object with the same function names, but with every action creator wrapped into a dispatch call so they may be invoked directly, will be merged into the component’s props.
@@ -1343,8 +1365,8 @@ React Redux:
 			
 		Workflow:
 			1. calling store.dispatch(action)
-			2. reducers receive the action
-			3. epics receive the action
+			2. reducers receive the action		--> so the pipeline goes to the "handler", the last and original dispatch function gets invoked
+			3. epics receive the action			--> only when "going back" in the pipeline (state has been updated by the reducers) receives the epic the action
 				3.a) if the epic does not map it to another action then we are finished
 				3.b) if the epic maps it to another action then the new action (action out) gets dispatched my the epicMiddleware under the hood via store.dispatch(action) --> and we go to 2.
 					--> reducers receive the new action and after handling it (synchronously ofc) the epic gets invoked again
