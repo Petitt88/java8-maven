@@ -1012,7 +1012,8 @@ Services:
 		requires java.sql;
 		requires org.slf4j;
 		exports com.mysql.jdbc;
-		provides java.sql.Driver with com.mysql.jdbc.Driver;		- this module provides the implementation of the Driver (class and interface)
+		provides java.sql.Driver 
+			with com.mysql.jdbc.Driver;								- this module provides the implementation of the Driver (class and interface)
 	}
 	
 	module com.pet.shop {
@@ -1024,10 +1025,10 @@ Services:
 	
 	requires: module name goes here
 	exports:  package name goes here
-	provides: concrete class/interface goes here
+	provides: concrete interface goes here (with fully qualified name) - what interface the module provides
 	with:	  concrete implementation class goes here
-	uses: 	  concrete class/interface goes here
-	opens:	  opens packages to the specified modules up for reflection
+	uses: 	  concrete interface goes here (which implementation other module provides)
+	opens:	  opens packages to the specified modules up for reflection - by default modules are closed for reflection, we have to be explicit here
 	
 	exports vs opens: 
 		- exports is for public API only. Other modules can only access the public types, fields, constructors, methods, etc. But cannot access internal implementations.
