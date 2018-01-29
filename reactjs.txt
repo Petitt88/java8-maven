@@ -411,7 +411,7 @@ React
 			if they aren't equivalent react has to update the DOM, otherwise no DOM operation is performed
 			
 
-		React.PureComponent: shouldComponentUpdate is just do a “shallow comparison” between all the fields of props and state to determine if the component should update
+		React.PureComponent: shouldComponentUpdate just does a “shallow comparison” between all the fields of props and state to determine if the component should update
 		
 		pure function: they do not attempt to change their inputs, and always return the same result for the same inputs.
 			function sum(a, b) {
@@ -490,7 +490,12 @@ React
 				- componentWillUpdate(nextProps, nextState, nextContext)
 
 				
-	Fragments: it's like <ng-container> in Angular: React does not render the fragment which is <React.Fragment>:
+	Fragments: a common pattern for a component to return multiple elements
+		- the react components (capitalized classes) do not get rendered into the DOM - so for example in case of <Column /> we will never see <Column /> DOM node.
+		- however a component in its render() function can return only 1 element
+			- another component, text, numbers
+			- or an array of one of the above
+		- fragments are good for returning multiple elements	
 
 		class Columns extends React.Component {
 		  render() {
@@ -1013,9 +1018,17 @@ React Router
 					: <EmptyPage {...props}/>
 				)}/>
 		<Link> - to create links
+		<Switch> - renders only the 1st <Route /> that matches the url
+			- by default each <Route /> gets rendered
+				<Route path="/about" component={About}/>
+				<Route path="/:user" component={User}/>
+				<Route component={NoMatch}/>
+				- If the URL is /about, then <About>, <User>, and <NoMatch> will all render because they all match the path. This is by design, allowing us to compose <Route>s into our apps in many ways, like sidebars and breadcrumbs, bootstrap tabs, etc.
+		<Redirect> - to redirect the user to the specified component. This changes the browser history along with the browser url as well.
+		
 		
 		<Route path="/cats/:id" component={CatPage} />
-			The CatPage will have a props called "match" that's "params" property will contain the url parameters:
+			The CatPage will have a props called "match" which "params" property will contain the url parameters:
 				props.match.params.id
 				To access this from the mapStateToProps function: ownProps.match.params.id
 
