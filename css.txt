@@ -26,7 +26,7 @@ Grid layout:
 		
 		width: 95%;
 		max-width: 1000px;
-		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));		// becomes a 3 column layout. On mobile each column stacking on top of eacah other.
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));		// becomes a 3 column layout. On mobile each column stacking on top of each other.
 		
 		grid-template-columns: repeat(auto-fill, 150px);				// auto fill as many 150px wide columns as possible (somewhat responsive design) - a lot of free spaces arise with this when resizing the browser.
 		grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));	// auto fill as many 150px wide columns as possible and always fill the whole row. Puts empty tracks if there are not enough columns to fill the whole window.
