@@ -128,6 +128,8 @@ React
 		Lifecycle methods in more details:
 			render(): can render:
 				- React elements. Typically created via JSX. An element can either be a representation of a native DOM component (<div />), or a user-defined composite component (<MyComponent />).
+					- React components are what composes the entire virtual DOM. For example: <h1>Hello!</h1> - this is a virtual DOM element
+					- ReactDOM.render(<App />, document.getElementById('container')) - renders the <App /> virtual dom element into the real dom element
 				- String and numbers. These are rendered as text nodes in the DOM.
 				- Portals. Created with ReactDOM.createPortal.
 				- null. Renders nothing.
@@ -1586,3 +1588,50 @@ ES6:
 		  console.log('next state', store.getState())
 		  return result
 		}
+		
+		
+TypeScript:
+	import { ComponentClass, ReactChild } from "react";
+		ReactChild: 		e.g.: <Component /> - so this is a component instance (props specified by the caller)
+		ComponentClass: 	e.g.: Component		- so this is a class and the callee for instantiate it (props gets specified by the callee)
+		
+		export interface Button {
+		  component: ComponentClass;
+		  content: string | ReactChild;
+		  key: string | number;
+		  options?: object;
+		}
+		
+		import classnames from "classnames";
+		
+		const button: Button =  {
+			component: Button,
+			content: (
+			  <Icon icon="notification" size={<Medium />} className={classnames("Button", className, { "Button--primary": primary })} {...rest}>
+				<span>Peter</span>
+				{' '}
+				<img src={...} />
+			  </Icon>
+			),
+			key: "notifications",
+			options: {
+			  className: "Button--no_padding",
+			  onClick: () => ({})
+			}
+		}
+		
+		
+		
+		<div className="Header__right Layout__cell Layout__cell--tight Layout__cell--align-middle">
+			{buttons.map(button => (
+			  <button.component key={button.key} {...button.options}>
+				{button.content}
+			  </button.component>
+			))}
+		</div>
+		vs
+		   <div className="Header__right Layout__cell Layout__cell--tight Layout__cell--align-middle">
+            {buttons.map((button: ButtonInterface) => (
+              React.createElement(button.component, { key: button.key, ...button.options }, button.content);
+            ))}
+        </div>
