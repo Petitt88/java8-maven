@@ -1619,9 +1619,12 @@ TypeScript:
 			  onClick: () => ({})
 			}
 		}
-		
-		
-		
+
+
+
+Goode examples:
+
+	1.
 		<div className="Header__right Layout__cell Layout__cell--tight Layout__cell--align-middle">
 			{buttons.map(button => (
 			  <button.component key={button.key} {...button.options}>
@@ -1630,8 +1633,25 @@ TypeScript:
 			))}
 		</div>
 		vs
-		   <div className="Header__right Layout__cell Layout__cell--tight Layout__cell--align-middle">
+		<div className="Header__right Layout__cell Layout__cell--tight Layout__cell--align-middle">
             {buttons.map((button: ButtonInterface) => (
               React.createElement(button.component, { key: button.key, ...button.options }, button.content);
             ))}
         </div>
+
+	2.
+		export default class Button extends React.PureComponent<Props> {
+		  render() {
+			const { className, children, primary, ...rest } = this.props;
+			return (
+			  <button className={classnames("Button", className, { "Button--primary": primary })} {...rest}>		// notice how we pass all other parameters down to the react button representing a DOM button
+				{children}
+			  </button>
+			);
+		  }
+		}
+		
+		usage:
+		<Button key={index} {...button.options} className={"Button--primary"} onClick={this.handleClick}>
+             {button.children}
+		</Button>
