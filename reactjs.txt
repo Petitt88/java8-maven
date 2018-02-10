@@ -1592,8 +1592,8 @@ ES6:
 		
 TypeScript:
 	import { ComponentClass, ReactChild } from "react";
-		ReactChild: 		e.g.: <Component /> - so this is a component instance (props specified by the caller)
 		ComponentClass: 	e.g.: Component		- so this is a class and the callee for instantiate it (props gets specified by the callee)
+		ReactChild: 		e.g.: <Component /> - so this is a component instance (props specified by the caller)
 		
 		export interface Button {
 		  component: ComponentClass;
