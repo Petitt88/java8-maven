@@ -1,9 +1,9 @@
 buildscript {
 	ext {
-		kotlinVersion = '1.2.20'
-		springBootVersion = '2.0.0.M7'
-		kotlinCorouteVersion = '0.19.3'
-		swaggerVersion = '2.7.0'
+		kotlinVersion = '1.2.21'
+		springBootVersion = '2.0.0.RC1'
+		kotlinCorouteVersion = '0.22.2'
+		swaggerVersion = '2.8.0'
 		//exposedVersion = '0.9.1'
 	}
 	ext['kotlin.version'] = kotlinVersion
@@ -28,10 +28,16 @@ group = 'com.pet'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
 compileKotlin {
-	kotlinOptions.jvmTarget = "1.8"
+	kotlinOptions {
+		freeCompilerArgs = ["-Xjsr305=strict"]
+		jvmTarget = "1.8"
+	}
 }
 compileTestKotlin {
-	kotlinOptions.jvmTarget = "1.8"
+	kotlinOptions {
+		freeCompilerArgs = ["-Xjsr305=strict"]
+		jvmTarget = "1.8"
+	}
 }
 
 repositories {
@@ -50,6 +56,7 @@ dependencies {
 	//compile("org.jetbrains.exposed:exposed:${exposedVersion}")
 	//compile("org.jetbrains.exposed:spring-transaction:${exposedVersion}")
 
+	compile("com.fasterxml.jackson.module:jackson-module-kotlin")
 	compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
 	compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
 	compile("org.jetbrains.kotlinx:kotlinx-coroutines-core:${kotlinCorouteVersion}")
