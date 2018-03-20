@@ -2,6 +2,7 @@ React
 
 	v16 new features:
 		- render() can return an array of components or <> (fragment) to cover multiple components
+			- fragments do not need "key" prop to be specified
 		- Error boundaries: use the componentDidCatch method to make a component an error boundary
 			-  Error boundaries are React components that catch JavaScript errors anywhere in their child component tree, log those errors, and display a fallback UI instead of the component tree that crashed.
 		- ReactDOM.createPortal()
