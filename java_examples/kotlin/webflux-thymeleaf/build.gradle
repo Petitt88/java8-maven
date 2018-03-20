@@ -1,10 +1,10 @@
 buildscript {
 	ext {
-		kotlinVersion = '1.2.21'
-		springBootVersion = '2.0.0.RC1'
+		kotlinVersion = '1.2.30'
+		springBootVersion = '2.0.0.RELEASE'
 		kotlinCorouteVersion = '0.22.2'
 		swaggerVersion = '2.8.0'
-		//exposedVersion = '0.9.1'
+		//exposedVersion = '0.10.1'
 	}
 	ext['kotlin.version'] = kotlinVersion
 	repositories {
@@ -48,8 +48,8 @@ repositories {
 
 
 dependencies {
-	compile('org.springframework.boot:spring-boot-starter-thymeleaf')
 	compile('org.springframework.boot:spring-boot-starter-webflux')
+	compile('org.springframework.boot:spring-boot-starter-thymeleaf')
 	compile('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
 	compile("io.springfox:springfox-swagger2:${swaggerVersion}")
 	compile("io.springfox:springfox-swagger-ui:${swaggerVersion}")
@@ -57,8 +57,8 @@ dependencies {
 	//compile("org.jetbrains.exposed:spring-transaction:${exposedVersion}")
 
 	compile("com.fasterxml.jackson.module:jackson-module-kotlin")
-	compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:${kotlinVersion}")
-	compile("org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}")
+	compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+	compile("org.jetbrains.kotlin:kotlin-reflect")
 	compile("org.jetbrains.kotlinx:kotlinx-coroutines-core:${kotlinCorouteVersion}")
 	compile("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:${kotlinCorouteVersion}")
 	compile("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:${kotlinCorouteVersion}")

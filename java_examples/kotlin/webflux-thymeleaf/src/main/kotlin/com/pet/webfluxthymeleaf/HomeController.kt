@@ -44,7 +44,7 @@ class HomeController(private val movieService: MovieService,
 	@GetMapping("/")
 	fun index(): Mono<Rendering> = mono(Unconfined) {
 
-		var movies = movieService.getMoviesFromDb()
+		val movies = movieService.getMoviesFromDb()
 				.collectList()
 				.awaitFirst()
 				.sortedBy { it.id }
