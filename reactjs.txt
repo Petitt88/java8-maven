@@ -33,10 +33,16 @@ React
 					];
 				}
 		
-	Functional components: a function with "props" parameter and a render method. State is unique to class components.
+	Functional components: 
+		- a function with "props" parameter and a render method. 
+		- State is unique to class components. 
+		- 2nd parameter is the context if specified (context is an anti-pattern, use a state-management library like redux instead). 
+			- Moreover context is an opt-in feature, meaning Component.contextTypes must be specified otherwise it won't get passed as an argument.
+			- So it is important to declare them anytime you use the context.
+		
 		You’ll need to change this.props to props both times it appears. Many components in your apps will be able to be written as functional components: these components tend to be easier to write and React will optimize them more in the future.
 		
-		function Square(props) {
+		function Square(props, [context]) {
 		  return (
 			<button className="square" onClick={props.onClick}>
 			  {props.value}
@@ -168,7 +174,7 @@ React
 				
 			shouldComponentUpdate(nextProps, nextState)
 				- Use shouldComponentUpdate() to let React know if a component’s output is not affected by the current change in state or props. 
-				- The default behavior is to re-render on every state change, and in the vast majority of cases you should rely on the default behavior.
+				- The default behavior is to re-render on every state change, and in the vast majority of cases you should rely on the default behavior. - the function returns "true" by default
 				- This method is not called for the initial render or when forceUpdate() is used.
 				- Returning false does not prevent child components from re-rendering when their state changes.
 				- Currently, if shouldComponentUpdate() returns false, then componentWillUpdate(), render(), and componentDidUpdate() will not be invoked
@@ -1069,6 +1075,14 @@ Redux
 		Redux manages the state of an app using a single store. To modify the state, an action is dispatched to the store and a reducer updates the store based on the type and other values of the action. 
 		In order to use the new state, the store can be subscribed to. Subscribing requires a callback function which is called whenever the store updates.
 		
+	What makes redux fast:
+		- I have to create a new instance for the state at each dispatch though
+		- I can keep using previous references to arrays, complex objects if they did not change! - this makes it fast
+			- React PureComponents do a shallow comparison on props passed to them
+			- react-redux's connect() function implements shouldComponentUpdate and does a shallow reference comparison
+		- Though on each state change all of the mapStateToProps() functions get executed again, but the reference of the props stay the same shouldComponentUpdate() returns false and no render() is invoked
+			- For complex calculations in mapStateToProps reselect can be used which uses caching
+		
 	Data flow in React: dispatch(action) -> reducer -> new state -> re-render
 
 	Redux is a predictable state container for JavaScript apps.
@@ -1080,7 +1094,7 @@ Redux
 	Glossary:
 	
 		State:
-			- State (also called the state tree) is a broad term, but in the Redux API it usually refers to the single state value that is managed by the store and returned by getState(). It represents the entire state of a Redux application, which is often a deeply nested object.
+			- State (also called the state tree) is a broad term, but in the Redux API it usually refers to the single state value that is managed by the store and returned by getState(). It represents the entire state of a Redux application, which is often a deeply nested object. TRhe state is readonly. The only way to change the state tree is to dispatch an action.
 			
 		Action: 
 			- An action is a plain object that represents an intention to change the state. Actions are the only way to get data into the store. Any data, whether from UI events, network callbacks, or other sources such as WebSockets needs to eventually be dispatched as actions.
@@ -1092,6 +1106,8 @@ Redux
 			- In Redux, the accumulated value is the state object, and the values being accumulated are actions. Reducers calculate a new state given the previous state and an action. They must be pure functions—functions that return the exact same output for given inputs. They should also be free of side-effects. This is what enables exciting features like hot reloading and time travel.
 			- They must be synchronous
 			- No side effects (no going to the server, debounce, setTimeout, etc.)
+			- Do not modify the values passed to them - they are immutable
+			- A useful convention is to always name the reducers after the state-key they manage. This way combineReducers will produce a state with the exact same as the reducers have.
 			
 		Dispatching function:
 			type BaseDispatch = (a: Action) => Action
@@ -1233,7 +1249,7 @@ Redux
 		combineReducers(reducers)
 			- As your app grows more complex, you'll want to split your reducing function into separate functions, each managing independent parts of the state.
 			- The combineReducers helper function turns an object whose values are different reducing functions into a single reducing function you can pass to createStore.
-			- The resulting reducer calls every child reducer, and gathers their results into a single state object. The state produced by combineReducers() namespaces the states of each reducer under their keys as passed to combineReducers()
+			- The resulting reducer calls every child reducer delegating them parts of the state tree, and gathers their results into a single state object. The state produced by combineReducers() namespaces the states of each reducer under their keys as passed to combineReducers()
 			
 			All combineReducers() does is generate a function that calls your reducers with the slices of state selected according to their keys, and combining their results into a single object again.
 			
@@ -1292,7 +1308,7 @@ Redux
 React Redux:
 
 	React bindings for Redux embrace the idea of separating presentational and container components. 
-	The current suggested best practice is to categorize your components as “presentational” or “container” components, and extract a connected container component wherever it makes sense:
+	The current suggested best practice is to categorize your components as "presentational" or "container" components, and extract a connected container component wherever it makes sense:
 	
 	Presentational components:
 		- Are concerned with how things look.
@@ -1337,13 +1353,22 @@ React Redux:
 	
 		You could write a container component by hand using store.subscribe(), but we suggest instead generating container components with the React Redux library's connect() function, which provides many useful optimizations to prevent unnecessary re-renders.
 		
+	Separation of container and presentational components are not required by redux but it is recommended because it decouples the rendering from redux so later it is easier to move to different frameworks other then redux
+		while keeping the presentational components exactly the same.
+		
 		
 	connect([mapStateToProps], [mapDispatchToProps], [mergeProps], [options]):
 			- implements shouldComponentUpdate() for performance
-			- if mapDispatchToProps is not provided, the "dispatch" function gets mapped to the connected component's props. It can directly be invoked then.
+			- if mapDispatchToProps is not provided, or it is any falsy value like "null", the "dispatch" function gets mapped to the connected component's props. It can directly be invoked then.
+			- subscribes to store changes in the componentDidMount(), unsubscribes in componentWillUnmount(), and opts-in to context API to be able to access the store provided by <Provider>
+			- mapStateToProps gets invoked anytime the redux state changes (if the 2nd parameter is specified then also gets invoked anytime the ownProps on the connected component changes)
+			- mapDispatchToProps get invoked only after the component gets mounted (or if the 2nd parameter is specified then also gets invoked anytime the ownProps on the connected component changes)
+			- it calculates the props that need to get passed to the presentational component by merging the objects returned from mapStateToProps, mapDispatchToProps and its own props
 		
 		mapStateToProps(state, [ownProps]): stateProps: that tells how to transform the current Redux store state into the props you want to pass to a presentational component you are wrapping
 			- If your mapStateToProps function is declared as taking two parameters, it will be called with the store state as the first parameter and the props passed to the connected component as the second parameter, and will also be re-invoked whenever the connected component receives new props as determined by shallow equality comparisons
+			- If mapStateToProps is null, it tells connect() there is no need to subscribe to the store
+					- connect(null)
 			
 			mapStateToProps is a function that will be called when our component mounts, updates, or our store state is changed
 				- Use componentWillReceiveProps if you want to handle the update in the props: for example to set the component's internal state object to make it possible to have some interaction with forms
@@ -1359,6 +1384,7 @@ React Redux:
 			- If an object is passed, each function inside it is assumed to be a Redux action creator. An object with the same function names, but with every action creator wrapped into a dispatch call so they may be invoked directly, will be merged into the component’s props.
 			- If a function is passed, it will be given dispatch as the first parameter. It’s up to you to return an object that somehow uses dispatch to bind action creators in your own way. (Tip: you may use the bindActionCreators() helper from Redux.)
 			- If your mapDispatchToProps function is declared as taking two parameters, it will be called with dispatch as the first parameter and the props passed to the connected component as the second parameter, and will be re-invoked whenever the connected component receives new props
+			- if connect() receives any falsy value as mapDispatchToProps (undefined, null, false, 0) then the dispatch itself gets passed to the presentational component
 			
 		mergeProps(stateProps, dispatchProps, ownProps): props
 			If specified, it is passed the result of mapStateToProps(), mapDispatchToProps(), and the parent props. 
@@ -1376,6 +1402,12 @@ React Redux:
 		  </Provider>,
 		  document.getElementById('root')
 		)
+		
+		<Provider> uses the Context API but it is best to use the mapStateToProps, mapDispatchToProps functions on connect().
+		
+		connect()(PresentationalComponent) - this is a special case:
+			- connect does not subscribe to store changes, and dispatch itself is passed as a prop to PresentationalComponent
+			- could have been also written as: connect(null), connect(null, null)
 		
 	Reselect:
 		Reselect is a memoized selector function, composed of selectors, that returns something you want in your component’s props.
@@ -1618,7 +1650,7 @@ ES6:
 		
 TypeScript:
 	import { ComponentClass, ReactChild } from "react";
-		ComponentClass: 	e.g.: Component		- so this is a class and the callee for instantiate it (props gets specified by the callee)
+		ComponentClass: 	e.g.: Component		- so this is a class and the callee instantiates it (props gets specified by the callee) - used in HOC patterns
 		ReactChild: 		e.g.: <Component /> - so this is a component instance (props specified by the caller)
 		
 		export interface Button {
@@ -1679,5 +1711,5 @@ Goode examples:
 		
 		usage:
 		<Button key={index} {...button.options} className={"Button--primary"} onClick={this.handleClick}>
-             {button.children}
+			{button.children}
 		</Button>
