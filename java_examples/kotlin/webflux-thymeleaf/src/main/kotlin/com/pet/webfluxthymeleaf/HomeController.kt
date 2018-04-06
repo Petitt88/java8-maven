@@ -59,7 +59,7 @@ class HomeController(private val movieService: MovieService,
 				.build()
 	}
 
-	@GetMapping("/push", produces = arrayOf(MediaType.TEXT_EVENT_STREAM_VALUE))
+	@GetMapping("/push", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
 	fun push(model: Model): Mono<String> = mono(Unconfined) {
 
 		model["firstSourceTitle"] = "Movies from ReactiveDataDriverContextVariable - Flux must be used. This enables a server pushing model. In this case Thymeleaf itself subscribes to the Flux and renders a section whenever a new data arrives until the Flux gets completed."

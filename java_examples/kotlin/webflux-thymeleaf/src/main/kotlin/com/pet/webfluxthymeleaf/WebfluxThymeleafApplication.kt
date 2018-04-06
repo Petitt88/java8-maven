@@ -30,9 +30,9 @@ class WebfluxThymeleafApplication {
 			println("Inserting 1000 elements...")
 
 			mr.saveAll(movies)
-					// without this awaitFirst will fire as soon as the 1st item is inserted. We need all data in the database at the next statement
-					.collectList()
-					.awaitFirst()
+				// without this awaitFirst will fire as soon as the 1st item is inserted. We need all data in the database at the next statement
+				.collectList()
+				.awaitFirst()
 
 			mr.findAll().subscribe(::println)
 		}
@@ -56,4 +56,35 @@ class WebfluxThymeleafApplication {
 
 fun main(args: Array<String>) {
 	runApplication<WebfluxThymeleafApplication>(*args)
+
+	//SpringApplicationBuilder(WebfluxThymeleafApplication::class.java).sources(myBeans).build(*args)
 }
+
+//val myBeans = beans {
+//	bean<UserHandler>()
+//	bean<Routes>()
+//	bean<WebHandler>("webHandler") {
+//		RouterFunctions.toWebHandler(
+//			ref<Routes>().router(),
+//			HandlerStrategies.builder().viewResolver(ref()).build()
+//		)
+//	}
+//	bean("messageSource") {
+//		ReloadableResourceBundleMessageSource().apply {
+//			setBasename("messages")
+//			setDefaultEncoding("UTF-8")
+//		}
+//	}
+//	bean {
+//		val prefix = "classpath:/templates/"
+//		val suffix = ".mustache"
+//		val loader = MustacheResourceTemplateLoader(prefix, suffix)
+//		MustacheViewResolver(Mustache.compiler().withLoader(loader)).apply {
+//			setPrefix(prefix)
+//			setSuffix(suffix)
+//		}
+//	}
+//	profile("foo") {
+//		bean<Foo>()
+//	}
+//}
