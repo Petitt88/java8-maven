@@ -37,7 +37,7 @@ Object, array destructuring
 	
 Observables:
 	FlatMap vs SwitchMap: https://stackoverflow.com/questions/28175702/what-is-the-difference-between-flatmap-and-switchmap-in-rxjava
-		- the switchMap is like the flatMap BUT it will only emit items from the new observable until a new event is emitted from the source observable
+		- the switchMap is like the flatMap BUT it will only emit items from the new (inner) observable until a new event is emitted from the source observable
 		- switchMap unsubscribes from the previous source of inner observables as soon as the outer (source) emits a new value
 			if the innser observable is making an http request, then the ongoing request gets canceled
 		- In switchMap the second original emission (green marble) does not emit its second mapped emission (green square), since the third original emission (blue marble) has begun and already emitted its first mapped emission (blue diamond). In other words, only the first of two mapped green emissions happens; no green square is emitted because the blue diamond beat it.
