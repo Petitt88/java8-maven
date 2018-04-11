@@ -1162,7 +1162,7 @@ Redux
 		- I can keep using previous references to arrays, complex objects if they did not change! - this makes it fast
 			- React PureComponents do a shallow comparison on props passed to them
 			- react-redux's connect() function implements shouldComponentUpdate and does a shallow reference comparison
-		- Though on each state change all of the mapStateToProps() functions get executed again, but the reference of the props stay the same shouldComponentUpdate() returns false and no render() is invoked
+		- Though on each state change all of the mapStateToProps() functions get executed again, but the reference of the props stay the same => shouldComponentUpdate() returns false => and no render() is invoked
 			- For complex calculations in mapStateToProps reselect can be used which uses caching
 		
 	Data flow in React: dispatch(action) -> reducer -> new state -> re-render
@@ -1795,3 +1795,69 @@ Goode examples:
 		<Button key={index} {...button.options} className={"Button--primary"} onClick={this.handleClick}>
 			{button.children}
 		</Button>
+		
+Epics:
+	export const updateLoggingLevelAsync = createEpic<SecurityEpic>(actions$ =>
+	  actions$
+		.ofType(ActionTypes.UpdateLoggingLevel)
+		.switchMap(action => SecurityApi.updateLoggingLevel(action.payload.loggingLevel))
+		.map(() => setUpdateLoggingLevelOpState(OperationState.Default))
+	);
+	
+	
+	
+	type AccountEpic = Epic<Action, AppState, any, ReduxAction>;
+
+	export const whoAmIAsync = createEpic<AccountEpic>(actions$ =>
+	  actions$.ofType(ActionTypes.WhoAmI).switchMap(() =>
+		Observable.concat(
+		  Observable.of(setCurrentUser(loading())),
+		  AccountApi.whoAmI()
+			.mergeMap(response => [
+			  setServerConfig(response.serverConfig),
+			  setCurrentUser(loaded(accountInfoToUser(response.accountInfo)))
+			])
+			.catch(() => Observable.of(setCurrentUser(error())))
+		)
+	  )
+	);
+
+	export const loginAsync = createEpic<AccountEpic>(actions$ =>
+	  actions$.ofType(ActionTypes.Login).switchMap(action => {
+		const { userName, password, mode } = action.payload;
+		return Observable.concat(
+		  Observable.of(setLoginResult(loading())),
+		  AccountApi.login({
+			userName,
+			password,
+			loginMode: mode
+		  })
+			.map(info => setCurrentUser(loaded(accountInfoToUser(info))))
+			.catch((err: AjaxError) =>
+			  Observable.of(setLoginResult(error({ errorCode: err.response.errorCodeCode })))
+			)
+		);
+	  })
+	);
+
+	export const logoutAsync = createEpic<AccountEpic>(actions$ =>
+	  actions$.ofType(ActionTypes.Logout).switchMap(() =>
+		AccountApi.logout()
+		  .map(() => setCurrentUser(loaded({ isLoggedIn: false })))
+		  .catch(() => Observable.of(setCurrentUser(error())))
+	  )
+	);
+
+	export const setCurrentUserAsync = createEpic<AccountEpic>(actions$ =>
+	  actions$.ofType(ActionTypes.SetCurrentUser).map(() => setLoginResult(loaded({})))
+	);
+
+	export const loadBroadcastMessagesAsync = createEpic<AccountEpic>(actions$ =>
+	  actions$.ofType(ActionTypes.LoadActiveBroadcastMessages).switchMap(() => {
+		return BroadcastApi.listActiveBroadcastMessages()
+		  .map(messages => setBroadcastMessages(loaded(messages.map(BroadcastMessage.fromServer))))
+		  .catch((err: AjaxError) =>
+			Observable.of(setBroadcastMessages(error({ errorCode: err.response.errorCodeCode })))
+		  );
+	  })
+	);
