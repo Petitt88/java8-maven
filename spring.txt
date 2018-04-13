@@ -4028,6 +4028,88 @@ Kotlin DSLs:
 		}
 		operator fun String.invoke(f: (par: Int) -> Mono<ServerResponse>): Mono<ServerResponse> = f(32)
 		
+		
+	Bean registration DSL:
+	
+		@SpringBootApplication
+		class FindarAppApplication : SpringBootServletInitializer() {
+
+			@Bean
+			@Prototype
+			fun getLogger(ip: InjectionPoint): Logger = safeInvoke { LoggerFactory.getLogger(ip.member.declaringClass) }
+					?: LoggerFactory.getLogger(ip.declaredType.name)
+
+			@Bean
+			fun jacksonCustomizer() = Jackson2ObjectMapperBuilderCustomizer {
+				it.featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+				it.featuresToEnable(SerializationFeature.WRITE_DATES_WITH_ZONE_ID)
+				it.featuresToEnable(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES)
+				it.featuresToEnable(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES)
+			}
+
+			@Bean
+			fun databaseInitializer(categoryService: CouponCategoryService) = DatabaseInitializer(categoryService)
+
+			/**
+			 * Exceuted only in case of external webserver! War packaging.
+			 */
+			override fun configure(builder: SpringApplicationBuilder): SpringApplicationBuilder {
+				return builder
+						.initializers(
+								beans {
+									bean {
+										ApplicationRunner {
+											val ds = ref<DataSourceProperties>()
+											// need to connect to the database
+											Database.connect(ds.url, ds.driverClassName, ds.username, ds.password)
+											transaction {
+												// it seems this not just creates the missing tables, columns but
+												// also updates the schema. Perfect!
+												SchemaUtils.createMissingTablesAndColumns(
+														Users,
+														Companies,
+														CouponCategories,
+														Coupons
+												)
+											}
+										}
+									}
+								})
+						.sources(FindarAppApplication::class.java)
+			}
+		}
+
+		/**
+		 * Executed only in case of embedded webserver! Jar packaging.
+		 */
+		fun main(args: Array<String>) {
+			//runApplication<FindarAppApplication>(*args)
+			SpringApplicationBuilder()
+					.initializers(
+							beans {
+								bean {
+									ApplicationRunner {
+										val ds = ref<DataSourceProperties>()
+										// need to connect to the database
+										Database.connect(ds.url, ds.driverClassName, ds.username, ds.password)
+										transaction {
+											// it seems this not just creates the missing tables, columns but
+											// also updates the schema. Perfect!
+											SchemaUtils.createMissingTablesAndColumns(
+													Users,
+													Companies,
+													CouponCategories,
+													Coupons
+											)
+										}
+									}
+								}
+							})
+					.sources(FindarAppApplication::class.java)
+					.run(*args);
+		}
+
+		
 	
 	Bean registration DSL:
 		beans {
