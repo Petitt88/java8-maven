@@ -1861,3 +1861,22 @@ Epics:
 		  );
 	  })
 	);
+
+	
+componentWillReceiveProps vs componentWillUpdate:
+
+	componentWillReceiveProps is called before componentWillUpdate in React's update lifecycle. You are right that componentWillReceiveProps allows you to call setState. On the other hand componentWillUpdate is a callback to use when you need to respond to a state change.
+	
+	So the default workflow for the parent-child component relationship would be the following:
+		- Parent passes new props to the child
+		- Child handles new props in 'componentWillReceiveProps', calls setState if necessary
+		- Child handles new state in 'componentWillUpdate' - but if your component is stateful, handling props in 'componentWillReceiveProps' will be enough.
+	
+	
+componentDidUpdate:
+	componentDidUpdate(prevProps) {
+		// only initiate webservice request if the filter in the props has changed!
+		if(this.props.filter !== prevProps.filter) {
+			fetchTodos(this.props.filter).then(todos => this.setState({todos}));
+		}
+	}
