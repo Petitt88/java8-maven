@@ -1198,9 +1198,12 @@ Redux
 
 			We must distinguish between dispatching functions in general and the base dispatch function provided by the store instance without any middleware.
 
-			The base dispatch function always synchronously sends an action to the store's reducer, along with the previous state returned by the store, to calculate a new state. It expects actions to be plain objects ready to be consumed by the reducer.
+			The base dispatch function always synchronously sends an action to the store's reducer, along with the previous state returned by the store, to calculate a new state. 
+			It expects actions to be plain objects ready to be consumed by the reducer.
 
-			Middleware wraps the base dispatch function. It allows the dispatch function to handle async actions in addition to actions. Middleware may transform, delay, ignore, or otherwise interpret actions or async actions before passing them to the next middleware. See below for more information.
+			Middleware wraps the base dispatch function. It allows the dispatch function to handle async actions, or even Observables in addition to actions. 
+			Middleware may transform, delay, ignore, dispatch a new action, or otherwise interpret actions or async actions before passing them to the next middleware. 
+			See below for more information.
 	
 		Action Creator
 			type ActionCreator = (...args: any) => Action | AsyncAction
@@ -1799,87 +1802,93 @@ Goode examples:
 			{button.children}
 		</Button>
 		
-Epics:
-	export const updateLoggingLevelAsync = createEpic<SecurityEpic>(actions$ =>
-	  actions$
-		.ofType(ActionTypes.UpdateLoggingLevel)
-		.switchMap(action => SecurityApi.updateLoggingLevel(action.payload.loggingLevel))
-		.map(() => setUpdateLoggingLevelOpState(OperationState.Default))
-	);
-	
-	
-	
-	type AccountEpic = Epic<Action, AppState, any, ReduxAction>;
-
-	export const whoAmIAsync = createEpic<AccountEpic>(actions$ =>
-	  actions$.ofType(ActionTypes.WhoAmI).switchMap(() =>
-		Observable.concat(
-		  Observable.of(setCurrentUser(loading())),
-		  AccountApi.whoAmI()
-			.mergeMap(response => [
-			  setServerConfig(response.serverConfig),
-			  setCurrentUser(loaded(accountInfoToUser(response.accountInfo)))
-			])
-			.catch(() => Observable.of(setCurrentUser(error())))
-		)
-	  )
-	);
-
-	export const loginAsync = createEpic<AccountEpic>(actions$ =>
-	  actions$.ofType(ActionTypes.Login).switchMap(action => {
-		const { userName, password, mode } = action.payload;
-		return Observable.concat(
-		  Observable.of(setLoginResult(loading())),
-		  AccountApi.login({
-			userName,
-			password,
-			loginMode: mode
-		  })
-			.map(info => setCurrentUser(loaded(accountInfoToUser(info))))
-			.catch((err: AjaxError) =>
-			  Observable.of(setLoginResult(error({ errorCode: err.response.errorCodeCode })))
-			)
+	Epics:
+		export const updateLoggingLevelAsync = createEpic<SecurityEpic>(actions$ =>
+		  actions$
+			.ofType(ActionTypes.UpdateLoggingLevel)
+			.switchMap(action => SecurityApi.updateLoggingLevel(action.payload.loggingLevel))
+			.map(() => setUpdateLoggingLevelOpState(OperationState.Default))
 		);
-	  })
-	);
+		
+		
+		
+		type AccountEpic = Epic<Action, AppState, any, ReduxAction>;
 
-	export const logoutAsync = createEpic<AccountEpic>(actions$ =>
-	  actions$.ofType(ActionTypes.Logout).switchMap(() =>
-		AccountApi.logout()
-		  .map(() => setCurrentUser(loaded({ isLoggedIn: false })))
-		  .catch(() => Observable.of(setCurrentUser(error())))
-	  )
-	);
+		export const whoAmIAsync = createEpic<AccountEpic>(actions$ =>
+		  actions$.ofType(ActionTypes.WhoAmI).switchMap(() =>
+			Observable.concat(
+			  Observable.of(setCurrentUser(loading())),
+			  AccountApi.whoAmI()
+				.mergeMap(response => [
+				  setServerConfig(response.serverConfig),
+				  setCurrentUser(loaded(accountInfoToUser(response.accountInfo)))
+				])
+				.catch(() => Observable.of(setCurrentUser(error())))
+			)
+		  )
+		);
 
-	export const setCurrentUserAsync = createEpic<AccountEpic>(actions$ =>
-	  actions$.ofType(ActionTypes.SetCurrentUser).map(() => setLoginResult(loaded({})))
-	);
+		export const loginAsync = createEpic<AccountEpic>(actions$ =>
+		  actions$.ofType(ActionTypes.Login).switchMap(action => {
+			const { userName, password, mode } = action.payload;
+			return Observable.concat(
+			  Observable.of(setLoginResult(loading())),
+			  AccountApi.login({
+				userName,
+				password,
+				loginMode: mode
+			  })
+				.map(info => setCurrentUser(loaded(accountInfoToUser(info))))
+				.catch((err: AjaxError) =>
+				  Observable.of(setLoginResult(error({ errorCode: err.response.errorCodeCode })))
+				)
+			);
+		  })
+		);
 
-	export const loadBroadcastMessagesAsync = createEpic<AccountEpic>(actions$ =>
-	  actions$.ofType(ActionTypes.LoadActiveBroadcastMessages).switchMap(() => {
-		return BroadcastApi.listActiveBroadcastMessages()
-		  .map(messages => setBroadcastMessages(loaded(messages.map(BroadcastMessage.fromServer))))
-		  .catch((err: AjaxError) =>
-			Observable.of(setBroadcastMessages(error({ errorCode: err.response.errorCodeCode })))
-		  );
-	  })
-	);
+		export const logoutAsync = createEpic<AccountEpic>(actions$ =>
+		  actions$.ofType(ActionTypes.Logout).switchMap(() =>
+			AccountApi.logout()
+			  .map(() => setCurrentUser(loaded({ isLoggedIn: false })))
+			  .catch(() => Observable.of(setCurrentUser(error())))
+		  )
+		);
 
-	
-componentWillReceiveProps vs componentWillUpdate:
+		export const setCurrentUserAsync = createEpic<AccountEpic>(actions$ =>
+		  actions$.ofType(ActionTypes.SetCurrentUser).map(() => setLoginResult(loaded({})))
+		);
 
-	componentWillReceiveProps is called before componentWillUpdate in React's update lifecycle. You are right that componentWillReceiveProps allows you to call setState. On the other hand componentWillUpdate is a callback to use when you need to respond to a state change.
-	
-	So the default workflow for the parent-child component relationship would be the following:
-		- Parent passes new props to the child
-		- Child handles new props in 'componentWillReceiveProps', calls setState if necessary
-		- Child handles new state in 'componentWillUpdate' - but if your component is stateful, handling props in 'componentWillReceiveProps' will be enough.
-	
-	
-componentDidUpdate:
-	componentDidUpdate(prevProps) {
-		// only initiate webservice request if the filter in the props has changed!
-		if(this.props.filter !== prevProps.filter) {
-			fetchTodos(this.props.filter).then(todos => this.setState({todos}));
-		}
-	}
+		export const loadBroadcastMessagesAsync = createEpic<AccountEpic>(actions$ =>
+		  actions$.ofType(ActionTypes.LoadActiveBroadcastMessages).switchMap(() => {
+			return BroadcastApi.listActiveBroadcastMessages()
+			  .map(messages => setBroadcastMessages(loaded(messages.map(BroadcastMessage.fromServer))))
+			  .catch((err: AjaxError) =>
+				Observable.of(setBroadcastMessages(error({ errorCode: err.response.errorCodeCode })))
+			  );
+		  })
+		);
+		
+	Lifecycle hooks:
+
+		componentWillReceiveProps vs componentWillUpdate:
+
+			componentWillReceiveProps is called before componentWillUpdate in React's update lifecycle. You are right that componentWillReceiveProps allows you to call setState. On the other hand componentWillUpdate is a callback to use when you need to respond to a state change.
+			
+			So the default workflow for the parent-child component relationship would be the following:
+				- Parent passes new props to the child
+				- Child handles new props in 'componentWillReceiveProps', calls setState if necessary
+				- Child handles new state in 'componentWillUpdate' - but if your component is stateful, handling props in 'componentWillReceiveProps' will be enough.
+			
+			
+		componentDidUpdate:
+			componentDidUpdate(prevProps) {
+				// only initiate webservice request if the filter in the props has changed!
+				if(this.props.filter !== prevProps.filter) {
+					fetchTodos(this.props.filter).then(todos => this.setState({todos}));
+				}
+			}
+			
+	Redux:
+		useful npm packages:
+			- redux-promise: adds support for dispatching functions that return promises
+			- redux-logger: logging middleware
