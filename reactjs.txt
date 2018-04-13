@@ -1443,9 +1443,12 @@ React Redux:
 			- implements shouldComponentUpdate() for performance
 			- if mapDispatchToProps is not provided, or it is any falsy value like "null", the "dispatch" function gets mapped to the connected component's props. It can directly be invoked then.
 			- subscribes to store changes in the componentDidMount(), unsubscribes in componentWillUnmount(), and opts-in to context API to be able to access the store provided by <Provider>
+				does not subscribe is mapStateToProps is a falsy value
 			- mapStateToProps gets invoked anytime the redux state changes (if the 2nd parameter is specified then also gets invoked anytime the ownProps on the connected component changes)
-			- mapDispatchToProps get invoked only after the component gets mounted (or if the 2nd parameter is specified then also gets invoked anytime the ownProps on the connected component changes)
+			- mapDispatchToProps gets invoked only after the component gets mounted (or if the 2nd parameter is specified then also gets invoked anytime the ownProps on the connected component changes)
 			- it calculates the props that need to get passed to the presentational component by merging the objects returned from mapStateToProps, mapDispatchToProps and its own props
+			- passes all additional props to the enhanced Component, not just the ones mapped in mapStateToProps and mapDispatchToProps
+				- so this works like a charm: withRouter(connect(null, null)(MyComponent)) --> MyComponent will receive the "history" and "match" objects as props
 		
 		mapStateToProps(state, [ownProps]): stateProps: that tells how to transform the current Redux store state into the props you want to pass to a presentational component you are wrapping
 			- If your mapStateToProps function is declared as taking two parameters, it will be called with the store state as the first parameter and the props passed to the connected component as the second parameter, and will also be re-invoked whenever the connected component receives new props as determined by shallow equality comparisons
