@@ -1531,11 +1531,15 @@ React Redux:
 		Redux Thunk: Thunk Middleware
 		
 			A thunk is a function that wraps an expression to delay its evaluation.
+			A thunk is a function returned from other function.
 			By using this specific middleware, an action creator can return a function instead of an action object. This way, the action creator becomes a thunk.
 		
 			Redux Thunk middleware allows you to write action creators that return a function instead of an action. 
 			The thunk can be used to delay the dispatch of an action, or to dispatch only if a certain condition is met. 
 			The inner function receives the store methods dispatch and getState as parameters.
+			The thunk middleware does not use what we return from the thunk --> 
+				- As a convention we can always return a promise that represents the corresponding async operation
+				- The return value of the thunk becomes the return value of dispatching the thunk (mapDispatchToProps is needed to wrap the thunk action creator with dispatching to the store)
 			
 				let nextNotificationId = 0
 				export function showNotificationWithTimeout(text) {
@@ -1890,5 +1894,8 @@ Goode examples:
 			
 	Redux:
 		useful npm packages:
+			- redux-observable: to dispatch Observables
 			- redux-promise: adds support for dispatching functions that return promises
+			- redux-thunk: adds a middleware to support dispatching thunks (functions returned from other functions)
 			- redux-logger: logging middleware
+			- normalizr: normalize deeply nested api objects and returning nested entities with their IDs, gathered in dictionaries
