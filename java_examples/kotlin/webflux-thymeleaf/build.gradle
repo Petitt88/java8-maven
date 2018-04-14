@@ -1,10 +1,10 @@
 buildscript {
 	ext {
 		kotlinVersion = '1.2.31'
-		springBootVersion = '2.0.0.RELEASE'
-		kotlinCorouteVersion = '0.22.2'
+		springBootVersion = '2.0.1.RELEASE'
+		kotlinCorouteVersion = '0.22.5'
 		swaggerVersion = '2.8.0'
-		//exposedVersion = '0.10.1'
+		//exposedVersion = '0.10.2'
 	}
 	ext['kotlin.version'] = kotlinVersion
 	repositories {
