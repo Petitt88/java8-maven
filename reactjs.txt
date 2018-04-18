@@ -1677,12 +1677,15 @@ React Redux:
 			If the epic maps it to another action, then it will be dispatched again to the store, calling my reducers then my epics again.
 			So the newly dispatched action 1st reaches the reducers and after that my epics. To escape this the epic pipeline just do not match it (ofType is not true, does not match to any action.type).
 			
+			An observable can be mapped to either a redux action (use .map() method) or to an array of redux actions (use .mergeMap() method).
+			
 		Workflow:
 			1. calling store.dispatch(action)
 			2. reducers receive the action		--> so the pipeline goes to the "handler", the last and original dispatch function gets invoked
 			3. epics receive the action			--> only when "going back" in the pipeline (state has been updated by the reducers) receives the epic the action
 				3.a) if the epic does not map it to another action then we are finished
-				3.b) if the epic maps it to another action then the new action (action out) gets dispatched my the epicMiddleware under the hood via store.dispatch(action) --> and we go to 2.
+				3.b) if the epic maps it to another action -use .map()- (or to an array of actions -use .mergeMap()-) 
+					then the new action (action out) gets dispatched by the epicMiddleware under the hood via store.dispatch(action) --> and we go to 2.
 					--> reducers receive the new action and after handling it (synchronously ofc) the epic gets invoked again
 					
 		action$.ofType(FETCH_USER)
@@ -1692,6 +1695,33 @@ React Redux:
 				.takeUntil(action$.ofType(FETCH_USER_CANCELLED))
 				.catch(err => Observable.of(defaultUser))				catch the possible error, do not let them propagate to the outer observable resulting in briging the epic pipeline down
 			);
+			
+		export const loginAsync = createEpic<AccountEpic>(actions$ =>
+		  actions$.ofType(ActionTypes.Login).switchMap(action => {
+			const { userName, password, mode } = action.payload;
+			return Observable.concat(
+			
+			  // Observable maps to an action
+			  Observable.of(setLoginResult(loading())),
+			  
+			  // Observable maps to an array of actions --> can be an empty array as well (with an empty array no redux actions gets dispatched after the Observable get completed)
+			  Observable.from([setLoginResult(loading())]),
+			  
+			  // Observable maps to an action, using error handling
+			  AccountApi.login({
+				userName,
+				password,
+				loginMode: mode
+			  })
+				.map(([accountInfo, languageSettings]) =>
+				  setCurrentUser(loaded(serverUserInfoToUser({ ...accountInfo, ...languageSettings })))
+				)
+				.catch((err: AjaxError) =>
+				  Observable.of(setLoginResult(error({ errorCode: err.response.errorCodeCode })))
+				)
+			);
+		  })
+		);
 				
 
 ES6:
