@@ -1574,6 +1574,11 @@ React Redux:
 			Important: if invoking the original store.dispatch(action) function from any middleware instead of the next(action):
 				- it re-executes the whole middleware pipeline on that action, including the current middleware
 				- this is useful for async middlewares
+				- when applying the middlewares, the "applyMiddleware" from Redux reverses the provided middleware array. So the lets one in the arrays gets application 1st.
+					This results in like building a shell from inside to outside:
+					[1st MW]		[2ndMW]			[3rdMW]		[original dispath]
+						|				|				|				|
+					applied 3rd		applied 2nd		applied 1st	 dispatch to store				((1st_MW)((2nd_MW)((3rd_MW)store)))
 		
 			In Express, KOA, Asp.Net Core: middleware is some code you can put between the framework receiving a request, and the framework generating a response.
 			In Redux it provides a third-party extension point between dispatching an action, and the moment it reaches the reducer.
@@ -1671,6 +1676,7 @@ React Redux:
 	
 		Epic: a function that takes a stream of all actions dispatched and returns a stream of new actions to dispatch.
 			"actions in, actions out" - other actions out
+			It is a function which takes a stream of actions and returns a stream of actions.
 			
 			When defining the epics I'm just setting up the pipeline, the setup is executed exactly once during the application boot.
 			Whenever an action gets dispatched, AFTER it went through the reducers it will reach my epic pipeline. 
