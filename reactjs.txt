@@ -1713,6 +1713,9 @@ React Redux:
 			  // Observable maps to an array of actions --> can be an empty array as well (with an empty array no redux actions gets dispatched after the Observable get completed)
 			  Observable.from([setLoginResult(loading())]),
 			  
+			  // Observable maps to an empty array which means no actions need to be performed after completion
+			  .mergeMap(() => []);
+			  
 			  // Observable maps to an action, using error handling
 			  AccountApi.login({
 				userName,
