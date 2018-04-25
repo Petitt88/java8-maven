@@ -1,3 +1,13 @@
+***********How to make a Web App started from VS via IIS Express accessible from a VM's browser***********
+
+1. change the ./vs/config/applicationhost.config file:
+	- from this: <binding protocol="http" bindingInformation="*:44479:localhost" />
+	- to this:   <binding protocol="http" bindingInformation=":44479:" /> - just remove the leading asterix and the localhost host header
+2. run VS in admininstrator mode
+3. start the web app
+
+**********************************************************************************************************
+
 1. The runtime version is determined by the starting project. No matter what the runtime of the other referenced dlls are, they will use the same as the starting project.
 2. Similarly, only the starting app's config is taken into consideration.
 
