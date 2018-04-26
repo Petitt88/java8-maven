@@ -1221,6 +1221,7 @@ Redux
 			type MiddlewareAPI = { dispatch: Dispatch, getState: () => State }
 			type Middleware = (api: MiddlewareAPI) => (next: Dispatch) => Dispatch
 			A middleware is a higher-order function that composes a dispatch function to return a new dispatch function. It often turns async actions into actions.
+				A higher-order function is a function that takes one or more functions as parameters and returns a function as its result.
 
 			Middleware is composable using function composition. It is useful for logging actions, performing side effects like routing, or turning an asynchronous API call into a series of synchronous actions.
 			
@@ -1410,7 +1411,7 @@ React Redux:
 		- Provide the data and behavior to presentational or other container components.
 		- Call Flux actions and provide these as callbacks to the presentational components.
 		- Are often stateful, as they tend to serve as data sources.
-		- Are usually generated using higher order components such as connect() from React Redux, createContainer() from Relay, or Container.create() from Flux Utils, rather than written by hand.
+		- Are usually generated using higher-order components such as connect() from React Redux, createContainer() from Relay, or Container.create() from Flux Utils, rather than written by hand.
 		- Examples: UserPage, FollowersSidebar, StoryContainer, FollowedUserList.
 		
 	When to Introduce Containers?
@@ -1657,7 +1658,7 @@ React Redux:
 				- Middleware are Redux plugins you can attach to your store.
 					createStore(reducer, {}, applyMiddleware(logger, thunk))
 					
-				- They give dispatch() more powers. (enhance it via higher order functions)
+				- They give dispatch() more powers. (enhance it via higher-order functions)
 					store.dispatch({ type: 'SAVE' })     	Normal
 					store.dispatch(fetch('/data.json'))	  	Promises
 					store.dispatch(() => {  })     F		unctions/thunks
