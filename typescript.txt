@@ -54,3 +54,16 @@ Observables:
 				.subscribe(
 					user => this.user = user,
 					err => console.log(err));
+					
+	Of() vs From():
+		It is important to note the difference between of and from when passing an array-like structure (including strings):
+		
+		Observable.of([1, 2, 3]).subscribe(x => console.log(x));
+		would print the whole array at once.
+
+		On the other hand,
+
+		Observable.from([1, 2, 3]).subscribe(x => console.log(x));
+		prints the elements 1 by 1.
+
+		For strings the behaviour is the same, but at character level.
