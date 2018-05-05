@@ -6,7 +6,46 @@ React
 		- Error boundaries: use the componentDidCatch method to make a component an error boundary
 			-  Error boundaries are React components that catch JavaScript errors anywhere in their child component tree, log those errors, and display a fallback UI instead of the component tree that crashed.
 		- ReactDOM.createPortal()
-		- setState() can return null --> this causes React not to invoke the render() function
+		- setState() can get null --> this causes React not to invoke the render() function
+		
+	v16.3 new features: https://reactjs.org/blog/2018/03/29/react-v-16-3.html
+		- deprecating lifecycle hooks: componentWillMount, componentWillReceiveProps, componentWillUnmount
+		- 2 new lifecycle methods: static getDerivedStateFromProps(), and getSnapshotBeforeUpdate()
+			- the recommended way to update state in response to props changes is with the new static getDerivedStateFromProps lifecycle
+			- return null from it to indicate no change to state
+		- official Context API
+		- createRef API
+		- forwardRef API
+			- Ref forwarding is a new opt-in feature that lets some components take a ref they receive, and pass it further down (in other words, “forward” it) to a child. 
+		- StrictMode Component
+			StrictMode is a tool for highlighting potential problems in an application. Like Fragment, StrictMode does not render any visible UI. It activates additional checks and warnings for its descendants.
+			StrictMode checks are run in development mode only; they do not impact the production build.
+		
+	Best practices:
+		- Initializing state: 
+			instead of componentWillMount, the simplest refactor for this type of component is to move state initialization to the constructor or to a property initializer.
+		- Fetching external data: 
+			instead of componentWillMount, the recommended upgrade path for most use cases is to move data-fetching into componentDidMount.
+		- Adding event listeners (or subscriptions):
+			For memory leaking reasons on SSE For, the recommended way to add listeners/subscriptions is to use the componentDidMount lifecycle.
+			People often assume that componentWillMount and componentWillUnmount are always paired, but that is not guaranteed. Only once componentDidMount has been called does React guarantee that componentWillUnmount will later be called for clean up.
+		- Updating state based on props:
+			instead of componentWillReceiveProps (there is nothing wrong doing the state update in this method, only thing it that it will be deprecated), as of version 16.3, the recommended way to update state in response to props changes is with the new static getDerivedStateFromProps lifecycle. (That lifecycle is called when a component is created and each time it receives new props).
+		- Invoking external callbacks:
+			- Sometimes people use componentWillUpdate out of a misplaced fear that by the time componentDidUpdate fires, it is “too late” to update the state of other components. 
+				This is not the case. React ensures that any setState calls that happen during componentDidMount and componentDidUpdate are flushed before the user sees the updated UI (this triggers an extra render() though). 
+				In general, it is better to avoid cascading updates like this, but in some cases they are necessary (for example, if you need to position a tooltip after measuring the rendered DOM element)
+			- it is unsafe to use componentWillUpdate for this purpose in async mode, because the external callback might get called multiple times for a single update. Instead, the componentDidUpdate lifecycle should be used since it is guaranteed to be invoked only once per update.
+		- Side effects on props change
+			- Like componentWillUpdate, componentWillReceiveProps might get called multiple times for a single update. For this reason it is important to avoid putting side effects in this method. Instead, componentDidUpdate should be used since it is guaranteed to be invoked only once per update.
+		- Fetching external data when props change
+			- Instead of using componentWillReceiveProps, the recommended upgrade path for this component is to move data updates into componentDidUpdate. 
+				Not to mention that componentWillReceiveProps may be invoked multiple times during a single update.
+				You can also use the new getDerivedStateFromProps lifecycle to clear stale data before rendering the new props.
+		- Reading DOM properties before an update:
+			- In the above example, componentWillUpdate is used to read the DOM property. However with async rendering, there may be delays between “render” phase lifecycles (like componentWillUpdate and render) and “commit” phase lifecycles (like componentDidUpdate). If the user does something like resize the window during this time, the scrollHeight value read from componentWillUpdate will be stale.
+			- The solution to this problem is to use the new “commit” phase lifecycle, getSnapshotBeforeUpdate. This method gets called immediately before mutations are made (e.g. before the DOM is updated). It can return a value for React to pass as a parameter to componentDidUpdate, which gets called immediately after mutations.
+			
 
 	Components:
 		- Conceptually, components are like JavaScript functions. They accept arbitrary inputs (called “props”) and return React elements describing what should appear on the screen.
@@ -121,15 +160,18 @@ React
 	
 		Mounting: these methods are called when an instance of a component is being created and inserted into the DOM:
 			constructor()
-			componentWillMount()
+			static getDerivedStateFromProps()
+			componentWillMount() / UNSAFE_componentWillMount()
 			render()
 			componentDidMount()
 			
 		Updating: an update can be caused by changes to props or state. These methods are called when a component is being re-rendered:
-			componentWillReceiveProps()
+			componentWillReceiveProps() / UNSAFE_componentWillReceiveProps()
+			static getDerivedStateFromProps()
 			shouldComponentUpdate()
-			componentWillUpdate()
+			componentWillUpdate() / UNSAFE_componentWillUpdate()
 			render()
+			getSnapshotBeforeUpdate()
 			componentDidUpdate()
 			
 		Unmounting: this method is called when a component is being removed from the DOM:
@@ -183,6 +225,7 @@ React
 				- componentWillUpdate() is invoked immediately before rendering when new props or state are being received. Use this as an opportunity to perform preparation before an update occurs. This method is not called for the initial render.
 				- Note that you cannot call this.setState() here; nor should you do anything else (e.g. dispatch a Redux action) that would trigger an update to a React component before componentWillUpdate() returns.
 				- If you need to update state in response to props changes, use componentWillReceiveProps() instead.
+				- In async rendering mode this hook may get called multiple times (by the time when this comes the hook will be called UNSAFE_componentWillUpdate()
 				
 			componentDidUpdate(prevProps, prevState)
 				- componentDidUpdate() is invoked immediately after updating occurs. This method is not called for the initial render.
@@ -199,6 +242,20 @@ React
 				- Error boundaries catch errors during rendering, in lifecycle methods, and in constructors of the whole tree below them.
 				- A class component becomes an error boundary if it defines this lifecycle method. Calling setState() in it lets you capture an unhandled JavaScript error in the below tree and display a fallback UI. 
 				- Only use error boundaries for recovering from unexpected exceptions; don’t try to use them for control flow.
+				
+			static getDerivedStateFromProps(nextProps, prevState)
+				- getDerivedStateFromProps is invoked after a component is instantiated as well as when it receives new props. 
+				- It should return an object to update state, or null to indicate that the new props do not require any state updates.
+				- Together with componentDidUpdate, this new lifecycle should cover all use cases for the legacy componentWillReceiveProps.
+				
+			getSnapshotBeforeUpdatee(prevProps, prevState)
+				- getSnapshotBeforeUpdate() is invoked right before the most recently rendered output is committed to e.g. the DOM. 
+				- It enables your component to capture current values (e.g. scroll position) before they are potentially changed.
+				- Any value returned by this lifecycle will be passed as a parameter to componentDidUpdate().
+				- The new getSnapshotBeforeUpdate lifecycle is called right before mutations are made (e.g. before the DOM is updated). 
+				- The return value for this lifecycle will be passed as the third parameter to componentDidUpdate. 
+				- (This lifecycle isn’t often needed, but can be useful in cases like manually preserving scroll position during rerenders.)
+				- Together with componentDidUpdate, this new lifecycle should cover all use cases for the legacy componentWillUpdate.
 				
 		Class methods:
 		
@@ -302,6 +359,9 @@ React
 			function MyFunctionalComponent() {
 			  return <input />;
 			}
+		- It's like angular's @ViewChild - we make a dom/react component available from the template inside render() on the component class as field
+			- if using the Callback refs variant (using a callback), refs can be lifted up to parent components.
+			<CustomTextInput inputRef={el => this.inputElement = el} />
 		
 		- There are a few good use cases for refs:
 			Managing focus, text selection, or media playback.
@@ -322,9 +382,7 @@ React
 			class Parent extends React.Component {
 			  render() {
 				return (
-				  <CustomTextInput
-					inputRef={el => this.inputElement = el}
-				  />
+				  <CustomTextInput inputRef={el => this.inputElement = el} />
 				);
 			  }
 			}
