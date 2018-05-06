@@ -9,7 +9,7 @@ React
 		- setState() can get null --> this causes React not to invoke the render() function
 		
 	v16.3 new features: https://reactjs.org/blog/2018/03/29/react-v-16-3.html
-		- deprecating lifecycle hooks: componentWillMount, componentWillReceiveProps, componentWillUnmount
+		- deprecating lifecycle hooks: componentWillMount, componentWillReceiveProps, componentWillUpdate
 		- 2 new lifecycle methods: static getDerivedStateFromProps(), and getSnapshotBeforeUpdate()
 			- the recommended way to update state in response to props changes is with the new static getDerivedStateFromProps lifecycle
 			- return null from it to indicate no change to state
@@ -32,7 +32,7 @@ React
 		- Updating state based on props:
 			instead of componentWillReceiveProps (there is nothing wrong doing the state update in this method, only thing it that it will be deprecated), as of version 16.3, the recommended way to update state in response to props changes is with the new static getDerivedStateFromProps lifecycle. (That lifecycle is called when a component is created and each time it receives new props).
 		- Invoking external callbacks:
-			- Sometimes people use componentWillUpdate out of a misplaced fear that by the time componentDidUpdate fires, it is “too late” to update the state of other components. 
+			- Sometimes people use componentWillUpdate out of a misplaced fear that by the time componentDidUpdate fires, it is "too late" to update the state of other components. 
 				This is not the case. React ensures that any setState calls that happen during componentDidMount and componentDidUpdate are flushed before the user sees the updated UI (this triggers an extra render() though). 
 				In general, it is better to avoid cascading updates like this, but in some cases they are necessary (for example, if you need to position a tooltip after measuring the rendered DOM element)
 			- it is unsafe to use componentWillUpdate for this purpose in async mode, because the external callback might get called multiple times for a single update. Instead, the componentDidUpdate lifecycle should be used since it is guaranteed to be invoked only once per update.
