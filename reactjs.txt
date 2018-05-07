@@ -16,7 +16,7 @@ React
 		- official Context API
 		- createRef API
 		- forwardRef API
-			- Ref forwarding is a new opt-in feature that lets some components take a ref they receive, and pass it further down (in other words, “forward” it) to a child. 
+			- Ref forwarding is a new opt-in feature that lets some components take a ref they receive, and pass it further down (in other words, "forward" it) to a child. 
 		- StrictMode Component
 			StrictMode is a tool for highlighting potential problems in an application. Like Fragment, StrictMode does not render any visible UI. It activates additional checks and warnings for its descendants.
 			StrictMode checks are run in development mode only; they do not impact the production build.
@@ -44,7 +44,7 @@ React
 				You can also use the new getDerivedStateFromProps lifecycle to clear stale data before rendering the new props.
 		- Reading DOM properties before an update:
 			- In the above example, componentWillUpdate is used to read the DOM property. However with async rendering, there may be delays between “render” phase lifecycles (like componentWillUpdate and render) and “commit” phase lifecycles (like componentDidUpdate). If the user does something like resize the window during this time, the scrollHeight value read from componentWillUpdate will be stale.
-			- The solution to this problem is to use the new “commit” phase lifecycle, getSnapshotBeforeUpdate. This method gets called immediately before mutations are made (e.g. before the DOM is updated). It can return a value for React to pass as a parameter to componentDidUpdate, which gets called immediately after mutations.
+			- The solution to this problem is to use the new "commit" phase lifecycle, getSnapshotBeforeUpdate. This method gets called immediately before mutations are made (e.g. before the DOM is updated). It can return a value for React to pass as a parameter to componentDidUpdate, which gets called immediately after mutations.
 			
 
 	Components:
@@ -525,7 +525,7 @@ React
 		
 	Controlled Components
 		- In HTML, form elements such as <input>, <textarea>, and <select> typically maintain their own state and update it based on user input. In React, mutable state is typically kept in the state property of components, and only updated with setState().
-		We can combine the two by making the React state be the “single source of truth”. Then the React component that renders a form also controls what happens in that form on subsequent user input. An input form element whose value is controlled by React in this way is called a “controlled component”.
+		We can combine the two by making the React state be the "single source of truth". Then the React component that renders a form also controls what happens in that form on subsequent user input. An input form element whose value is controlled by React in this way is called a “controlled component”.
 		- A controlled input accepts its current value as a prop, as well as a callback to change that value. You could say it’s a more “React way” of approaching this (which doesn’t mean you should always use it).
 		- This flow kind of ‘pushes’ the value changes to the form component
 		- This means your data (state) and UI (inputs) are always in sync. The state gives the value to the input, and the input asks the Form to change the current value.
