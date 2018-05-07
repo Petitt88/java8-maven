@@ -960,7 +960,7 @@ Tools:
 		- runs on bytecode, not on sourcecode
 	- JLink:
 		- A Java command line driven tool which links / brings together all required modules for an application into a run time image.
-		- This image is usually drastically smaller in size, thus helping reduce the footprint of the application as the entire JRE is not normally needed. jlink will also resolve static dependencies between modules thus guaranteeing the integrity of each module at run time. jlink requires that all artifacts are modules with well defined public contracts (exports, requires etc), thus “Automatic” modules will not suffice.
+		- This image is usually drastically smaller in size, thus helping reduce the footprint of the application as the entire JRE is not normally needed. JLink will also resolve static dependencies between modules thus guaranteeing the integrity of each module at run time. JLink requires that all artifacts are modules with well defined public contracts (exports, requires etc), thus “Automatic” modules will not suffice.
 		- jlink --version
 	-JShell:
 		- This command line environment brings a form of Read-Eval-Print-Loop (REPL) to the Java platform. This is intended to facilitate prototyping and exploration of coding options with immediate results and feedback.
