@@ -615,6 +615,10 @@ Sealed Classes
 			val res = hTry { 3 }
 			// invoke operator in Try's companion object
 			val res2 = Try { "result" }
+			
+			fun getData() = 32
+			val res3 = Try(::getData)
+			
 			when (res) {
 				is Try.Success<*> -> println(res.value)
 				is Try.Fail -> println(res.error)
@@ -2267,6 +2271,25 @@ If, try-catch expressions
 		val a: Int? = try { parseInt(input) } catch (e: NumberFormatException) { null }
 		The returned value of a try-expression is either the last expression in the try block or the last expression in the catch block (or blocks). Contents of the finally block do not affect the result of the expression.
 	
+	
+Tuple implementation
+	object Tuple {
+		operator fun <A> invoke(_1: A): Tuple1<A> = Tuple1(_1)
+		operator fun <A, B> invoke(_1: A, _2: B): Tuple2<A, B> = Tuple2(_1, _2)
+		operator fun <A, B, C> invoke(_1: A, _2: B, _3: C): Tuple3<A, B, C> = Tuple3(_1, _2, _3)
+		operator fun <A, B, C, D> invoke(_1: A, _2: B, _3: C, _4: D): Tuple4<A, B, C, D> = Tuple4(_1, _2, _3, _4)
+		operator fun <A, B, C, D, E> invoke(_1: A, _2: B, _3: C, _4: D, _5: E): Tuple5<A, B, C, D, E> = Tuple5(_1, _2, _3, _4, _5)
+	}
+	
+	...
+	data class Tuple2<out A, out B>(val _1: A, val _2: B)
+	...
+	
+	usage:
+		val tup2 = Tuple("elem1", "elem2")
+		val tup3 = Tuple("elem1", "elem2", "elem3")
+		val tup4 = Tuple("elem1", "elem2", "elem3", "elem4")
+
 
 Spring
 
