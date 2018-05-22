@@ -1,8 +1,9 @@
 buildscript {
 	ext {
 		kotlinVersion = '1.2.41'
-		springBootVersion = '2.0.1.RELEASE'
+		springBootVersion = '2.0.2.RELEASE'
 		kotlinCorouteVersion = '0.22.5'
+		gradlewVersion = '4.7.0'
 		swaggerVersion = '2.8.0'
 		//exposedVersion = '0.10.2'
 	}
@@ -76,5 +77,6 @@ kotlin {
 }
 
 task wrapper(type: Wrapper) {
-	gradleVersion = '4.7'
+	gradleVersion = gradlewVersion
+	distributionType = Wrapper.DistributionType.ALL
 }
