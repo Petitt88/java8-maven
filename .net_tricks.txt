@@ -692,15 +692,77 @@ Threading:
 			
 C#:
 	7.2:
-		"in" modifier on parameters, to specify that an argument is passed by reference but not modified by the called method.
-		"ref readonly" modifier on method returns, to indicate that a method returns its value by reference but doesn't allow writes to that object.
-		"readonly struct" declaration, to indicate that a struct is immutable and should be passed as an in parameter to its member methods.
-		"ref struct" declaration, to indicate that a struct type accesses managed memory directly and must always be stack allocated.
+		- "in" modifier on parameters, to specify that an argument is passed by reference but not modified by the called method.
+		- "ref readonly" modifier on method returns, to indicate that a method returns its value by reference but doesn't allow writes to that object.
+		- "readonly struct" declaration, to indicate that a struct is immutable and should be passed as an in parameter to its member methods.
+		- "ref struct" declaration, to indicate that a struct type accesses managed memory directly and must always be stack allocated.
 		
-		Span<T> and Memory<T>
+		- Span<T> and Memory<T>
 		
 			Span<T> is stack-only nature while Memory<T> can use the heap.
 
 			Span<T> is a new type we are adding to the platform to represent contiguous regions of arbitrary memory, with performance characteristics on par with T[]. Its APIs are similar to the array, but unlike arrays, it can point to either managed or native memory, or to memory allocated on the stack.
 
 			Memory <T> is a type complementing Span<T>. As discussed in its design document, Span<T> is a stack-only type. The stack-only nature of  Span<T> makes it unsuitable for many scenarios that require storing references to buffers (represented with Span<T>) on the heap, e.g. for routines doing asynchronous calls.
+			
+			Examples:
+				int[] array = new int[10];
+				Span<int> span = array.AsSpan();
+				ReadonlySpan<int> readonlySpan = array.AsSpan();
+		
+		- stackalloc keyword: to allocate reference types on the stack instead of the heap:
+			Span<int> span = stackalloc int[10];
+			
+	8.0:
+		- Nullable reference types:
+			public string? LastName { get; set; }
+			
+		- Swtich expression (instead of swtich statement):
+			class Person
+			{
+				public string FirstName { get; set; }
+				public string LastName { get; set; }
+			}
+		
+			static string M(Person person)
+			{
+				return person swtich
+				{
+					// use Deconstruct on the Professor instance and on the Subject instance (Subject is the nested Deconstruct)
+					Professor (_, var lastName, var (_, subjectName)) => $"Dr. {lastName}, Professtor of {subjectName}",
+					Student s => $"I'm a student and my name is: {s.Name}",
+					// we know that we have a Person here --> we can use the property pattern to check for property values
+					{ LastName: "Campbell", FirstName: var fn } =>  $"Something funny there, Mr. {fn} {lastName}?"
+				};
+			}
+			
+		- Ranges:
+			var text = text.SubString(1..^1);	// this is a range from 1 to whatever the length is -1.
+			var text = text[1..^1];				// same as above but using the indexer
+			
+			Arrays:
+				Span<int> slice = array[4..8];		// 4, 5, 6, 7 - ranges are end exclusive
+				Span<int> slice = array[4..];		// from 4 to the end
+				Span<int> slice = array[..8];		// from 0 to 8 (0 to 7 index)
+				Span<int> slice = array[..];		// all elements
+
+		- using await: using await (IAsyncDisposable)
+			namespace System
+			{
+				public interface IAsyncDisposable
+				{
+					Task DisposeAsync();
+				}
+			}
+		
+		- foreach await: on IAsyncEnumberable interface implementations
+		
+		- Default interface members
+		
+		- Records: class Person(string First, string Last) 
+			- like kotlin data classes with primary constructors
+			- These are all generated for us:
+				- readonly First, Last properties
+				- Deconstruct function
+				- Equals function that checks every single property one by one with the Other instance
+				- GetHashCode() function implementation
