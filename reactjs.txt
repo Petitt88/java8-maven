@@ -45,6 +45,8 @@ React
 		- Reading DOM properties before an update:
 			- In the above example, componentWillUpdate is used to read the DOM property. However with async rendering, there may be delays between “render” phase lifecycles (like componentWillUpdate and render) and “commit” phase lifecycles (like componentDidUpdate). If the user does something like resize the window during this time, the scrollHeight value read from componentWillUpdate will be stale.
 			- The solution to this problem is to use the new "commit" phase lifecycle, getSnapshotBeforeUpdate. This method gets called immediately before mutations are made (e.g. before the DOM is updated). It can return a value for React to pass as a parameter to componentDidUpdate, which gets called immediately after mutations.
+		- Flux dispatches typically belong inside the originating event handler (Flux dispatch is a side effect)
+		- Manual DOM mutations belong inside componentDidMount or componentDidUpdate
 			
 
 	Components:
@@ -245,6 +247,7 @@ React
 				
 			static getDerivedStateFromProps(nextProps, prevState)
 				- getDerivedStateFromProps is invoked after a component is instantiated as well as when it receives new props. 
+					Fix in 16.4: getDerivedStateFromProps is now called every time a component is rendered, regardless of the cause of the update. Previously, it was only called if the component was re-rendered by its parent, and would not fire as the result of a local setState.
 				- It should return an object to update state, or null to indicate that the new props do not require any state updates.
 				- Together with componentDidUpdate, this new lifecycle should cover all use cases for the legacy componentWillReceiveProps.
 				
