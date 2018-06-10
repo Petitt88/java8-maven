@@ -57,7 +57,14 @@ class WebfluxThymeleafApplication {
 fun main(args: Array<String>) {
 	runApplication<WebfluxThymeleafApplication>(*args)
 
-	//SpringApplicationBuilder(WebfluxThymeleafApplication::class.java).sources(myBeans).build(*args)
+//	SpringApplicationBuilder()
+//		.initializers(beans {
+//			bean {
+//				SpringTransactionManager(ref())
+//			}
+//		})
+//		.sources(WebfluxThymeleafApplication::class.java)
+//		.build(*args)
 }
 
 //val myBeans = beans {
