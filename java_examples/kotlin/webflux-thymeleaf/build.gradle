@@ -1,6 +1,6 @@
 buildscript {
 	ext {
-		kotlinVersion = '1.2.41'
+		kotlinVersion = '1.2.50'
 		springBootVersion = '2.0.2.RELEASE'
 		kotlinCorouteVersion = '0.22.5'
 		gradlewVersion = '4.7.0'
