@@ -629,7 +629,7 @@ Threading:
 	
 	Async-await: 
 	
-		--The framework automatically flows the ExecutionContext. It cannot be turned off, this is by design.
+		- The framework automatically flows the ExecutionContext. It cannot be turned off, this is by design.
 		On the other hand, posting back to the SynchronizationContext.Current can be suppressed via task.ConfigureAwait(false).
 		Note that while ConfigureAwait provides explicit, await-related programming model support for changing behavior related to SynchronizationContext, there is no await-related programming model support for suppressing ExecutionContext flow.  This is on purpose.
 	
@@ -642,6 +642,12 @@ Threading:
 		If a developer doesn’t want this marshaling behavior, it can be controlled by changing the awaitable/awaiter that’s used.  Whereas this behavior is always employed when you await a Task or Task<TResult>, you can instead await the result of calling task.ConfigureAwait(…).  The ConfigureAwait method returns an awaitable that enables this default marshaling behavior to be suppressed.  Whether it’s suppressed is controlled by a Boolean passed to the ConfigureAwait method.  If continueOnCapturedContext is true, then you get the default behavior; if it’s false, the awaiter doesn’t check for a SynchronizationContext, pretending as if there wasn’t one. (Note that when the awaited task completes, regardless of ConfigureAwait, the runtime may check the context that’s current on the resuming thread to determine whether it’s ok to synchronously run the continuation there or whether the continuation must be scheduled asynchronously from that point.)
 		
 		- Note that while ConfigureAwait provides explicit, await-related programming model support for changing behavior related to SynchronizationContext, there is no await-related programming model support for suppressing ExecutionContext flow.  This is on purpose.  ExecutionContext is not something developers writing async code should need to worry about; it’s infrastructure level support that helps to simulate synchronous semantics (i.e. TLS) in an asynchronous world.  Most folks can and should completely ignore that it’s there (and should avoid using the ExecutionContext.SuppressFlow method unless they really know what you’re doing).  In contrast, where code runs is something developers should be cognizant of, and thus SynchronizationContext rises to level of something that does deserve explicit programming model support.  (In fact, as I’ve stated in other posts, most library implementers should consider using ConfigureAwait(false) on every await of a task.)
+		
+		- CallContext: is like an ambient context in .Net Framework: it maintains its state during asynchronous code executions. This can be used to persist data across threads.
+		- AsyncLocal: CallContext does not exist in .Net Core, thus we can use AsyncLocal instead to be able to persist data across threads.
+			- caveats: if A calls B's async method (A --> B) and B sets something into the AsyncLocal, then all codes in B and the ones that B invoke and so on can access this data. 
+						However, when the execution returns from B back to A, then A cannot see this and the AsyncLocal no longers holds the data set by B. 
+						If A wants to access that data, then A must set it - there is no other option - or use scoped dependency injection and propbably this is the best way and leave AsyncLocal alone.
 		
 	Isn’t SynchronizationContext part of ExecutionContext?
 	
