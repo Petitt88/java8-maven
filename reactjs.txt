@@ -20,6 +20,257 @@ React
 		- StrictMode Component
 			StrictMode is a tool for highlighting potential problems in an application. Like Fragment, StrictMode does not render any visible UI. It activates additional checks and warnings for its descendants.
 			StrictMode checks are run in development mode only; they do not impact the production build.
+			
+	v16.4.1 - You Probably Don't Need Derived State:
+		Common bugs when using derived state:
+			- Anti-pattern: Unconditionally copying props to state
+			- Anti-pattern: Erasing state when props change -  updating state whenever props and state don’t match
+		Preferred solutions:
+			- Fully controlled component
+			- Fully uncontrolled component with a key
+				- Recomendation: To reset all internal state, use the key attribute.
+				- Alternative 1: To reset only certain state fields, watch for changes in a special property (e.g. props.userID).
+				- Alternative 2: You can also consider fall back to an imperative instance method using refs.
+			
+		getDerivedStateFromProps exists for only one purpose: it enables a component to update its internal state as the result of changes in props. 
+		
+		The terms “controlled” and “uncontrolled” usually refer to form inputs, but they can also describe where any component’s data lives. 
+			- Data passed in as props can be thought of as controlled (because the parent component controls that data). 
+			- Data that exists only in internal state can be thought of as uncontrolled (because the parent can’t directly change it).
+		The most common mistake with derived state is mixing these two; when a derived state value is also updated by setState calls, there isn’t a single source of truth for the data.
+		
+		- Anti-pattern: Unconditionally copying props to state:
+			A common misconception is that getDerivedStateFromProps and componentWillReceiveProps are only called when props “change”. 
+			These lifecycles are called any time a parent component rerenders, regardless of whether the props are “different” from before. 
+			Because of this, it has always been unsafe to unconditionally override state using either of these lifecycles. Doing so will cause state updates to be lost.
+					class EmailInput extends Component {
+					  state = { email: this.props.email };
+
+					  render() {
+						return <input onChange={this.handleChange} value={this.state.email} />;
+					  }
+
+					  handleChange = event => {
+						this.setState({ email: event.target.value });
+					  };
+
+					  componentWillReceiveProps(nextProps) {
+						// This will erase any local state updates!
+						// Do not do this.
+						this.setState({ email: nextProps.email });
+					  }
+					}
+					
+		- Anti-pattern: Erasing state when props change:
+				class EmailInput extends Component {
+				  state = {
+					email: this.props.email
+				  };
+
+				  componentWillReceiveProps(nextProps) {
+					// Any time props.email changes, update state.
+					if (nextProps.email !== this.props.email) {
+					  this.setState({
+						email: nextProps.email
+					  });
+					}
+				  }
+				  
+				  // ...
+				}
+			There is still a subtle problem. Imagine a password manager app using the above input component. When navigating between details for two accounts with the same email, the input would fail to reset. This is because the prop value passed to the component would be the same for both accounts! This would be a surprise to the user, as an unsaved change to one account would appear to affect other accounts that happened to share the same email. 
+			
+		
+		Fortunately there are two alternatives that work better. The key to both is that for any piece of data, you need to pick a single component that owns it as the source of truth, and avoid duplicating it in other components.
+		
+		Preferred Solutions:
+			- Recommendation: Fully controlled component
+				One way to avoid the problems mentioned above is to remove state from our component entirely. 
+				If the email address only exists as a prop, then we don’t have to worry about conflicts with state. 
+				We could even convert EmailInput to a lighter-weight functional component:
+					function EmailInput(props) {
+					  return <input onChange={props.onChange} value={props.email} />;
+					}
+			- Recommendation: Fully uncontrolled component with a key
+				Another alternative would be for our component to fully own the "draft" email state. 
+				In that case, our component could still accept a prop for the initial value, but it would ignore subsequent changes to that prop:
+					class EmailInput extends Component {
+					  state = { email: this.props.defaultEmail };
+
+					  handleChange = event => {
+						this.setState({ email: event.target.value });
+					  };
+
+					  render() {
+						return <input onChange={this.handleChange} value={this.state.email} />;
+					  }
+					}
+					
+				In order to reset the value when moving to a different item (as in our password manager scenario), we can use the special React attribute called "key". 
+				When a key changes, React will create a new component instance rather than update the current one. 
+				Keys are usually used for dynamic lists but are also useful here. In our case, we could use the user ID to recreate the email input any time a new user is selected:
+					<EmailInput
+					  defaultEmail={this.props.user.email}
+					  key={this.props.user.id}
+					/>
+				Each time the ID changes, the EmailInput will be recreated and its state will be reset to the latest defaultEmail value. 
+				In most cases, this is the best way to handle state that needs to be reset.
+				
+			
+				- Alternative 1: Reset uncontrolled component with an ID prop:
+					If key doesn’t work for some reason (perhaps the component is very expensive to initialize), a workable but cumbersome solution would be to watch for changes to "userID" in getDerivedStateFromProps:
+					class EmailInput extends Component {
+					  state = {
+						email: this.props.defaultEmail,
+						prevPropsUserID: this.props.userID
+					  };
+
+					  static getDerivedStateFromProps(props, state) {
+						// Any time the current user changes,
+						// Reset any parts of state that are tied to that user.
+						// In this simple example, that's just the email.
+						if (props.userID !== state.prevPropsUserID) {
+						  return {
+							prevPropsUserID: props.userID,
+							email: props.defaultEmail
+						  };
+						}
+						return null;
+					  }
+
+					  // ...
+					}
+					
+				- Alternative 2: Reset uncontrolled component with an instance method:
+					class EmailInput extends Component {
+					  state = {
+						email: this.props.defaultEmail
+					  };
+
+					  resetEmailForNewUser(newEmail) {
+						this.setState({ email: newEmail });
+					  }
+
+					  // ...
+					}
+					The parent form component could then use a ref to call this method.
+					Refs can be useful in certain cases like this one, but generally we recommend you use them sparingly, because imperative methods are unideals and two renders will occur instead of one.
+					
+			Recap: 
+				To recap, when designing a component, it is important to decide whether its data will be controlled or uncontrolled. 
+				- Instead of trying to "mirror" a prop value in state, make the component controlled, and consolidate the two diverging values in the state of some parent component.
+				- For uncontrolled components, if you’re trying to reset state when a particular prop (usually an ID) changes, you have a few options:
+					- Recomendation: To reset all internal state, use the key attribute.
+					- Alternative 1: To reset only certain state fields, watch for changes in a special property (e.g. props.userID).
+					- Alternative 2: You can also consider fall back to an imperative instance method using refs.
+					
+		What about memoization?
+			Using derived state for memoization isn’t necessarily bad, but it’s usually not the best solution. 
+				class Example extends Component {
+				  state = {
+					filterText: "",
+				  };
+
+				  // *******************************************************
+				  // NOTE: this example is NOT the recommended approach.
+				  // See the examples below for our recommendations instead.
+				  // *******************************************************
+
+				  static getDerivedStateFromProps(props, state) {
+					// Re-run the filter whenever the list array or filter text change.
+					// Note we need to store prevPropsList and prevFilterText to detect changes.
+					if (
+					  props.list !== state.prevPropsList ||
+					  state.prevFilterText !== state.filterText
+					) {
+					  return {
+						prevPropsList: props.list,
+						prevFilterText: state.filterText,
+						filteredList: props.list.filter(item => item.text.includes(state.filterText))
+					  };
+					}
+					return null;
+				  }
+
+				  handleChange = event => {
+					this.setState({ filterText: event.target.value });
+				  };
+
+				  render() {
+					return (
+					  <Fragment>
+						<input onChange={this.handleChange} value={this.state.filterText} />
+						<ul>{this.state.filteredList.map(item => <li key={item.id}>{item.text}</li>)}</ul>
+					  </Fragment>
+					);
+				  }
+				}
+				
+			This implementation avoids recalculating filteredList more often than necessary. But it is more complicated than it needs to be, because it has to separately track and detect changes in both props and state in order to properly update the filtered list. In this example, we could simplify things by using PureComponent and moving the filter operation into the render method:
+				// PureComponents only rerender if at least one state or prop value changes.
+				// Change is determined by doing a shallow comparison of state and prop keys.
+				class Example extends PureComponent {
+				  // State only needs to hold the current filter text value:
+				  state = {
+					filterText: ""
+				  };
+
+				  handleChange = event => {
+					this.setState({ filterText: event.target.value });
+				  };
+
+				  render() {
+					// The render method on this PureComponent is called only if
+					// props.list or state.filterText has changed.
+					const filteredList = this.props.list.filter(
+					  item => item.text.includes(this.state.filterText)
+					)
+
+					return (
+					  <Fragment>
+						<input onChange={this.handleChange} value={this.state.filterText} />
+						<ul>{filteredList.map(item => <li key={item.id}>{item.text}</li>)}</ul>
+					  </Fragment>
+					);
+				  }
+				}
+				
+				The above approach is much cleaner and simpler than the derived state version. Occasionally, this won’t be good enough—filtering may be slow for large lists, and PureComponent won’t prevent rerenders if another prop were to change. To address both of these concerns, we could add a memoization helper to avoid unnecessarily re-filtering our list:
+				
+			Memoization:
+				import memoize from "memoize-one";
+				class Example extends Component {
+				  // State only needs to hold the current filter text value:
+				  state = { filterText: "" };
+
+				  // Re-run the filter whenever the list array or filter text changes:
+				  filter = memoize(
+					(list, filterText) => list.filter(item => item.text.includes(filterText))
+				  );
+
+				  handleChange = event => {
+					this.setState({ filterText: event.target.value });
+				  };
+
+				  render() {
+					// Calculate the latest filtered list. If these arguments haven't changed
+					// since the last render, `memoize-one` will reuse the last return value.
+					const filteredList = this.filter(this.props.list, this.state.filterText);
+
+					return (
+					  <Fragment>
+						<input onChange={this.handleChange} value={this.state.filterText} />
+						<ul>{filteredList.map(item => <li key={item.id}>{item.text}</li>)}</ul>
+					  </Fragment>
+					);
+				  }
+				}
+				This is much simpler and performs just as well as the derived state version!
+				When using memoization, remember a couple of constraints:
+					1. In most cases, you’ll want to attach the memoized function to a component instance. This prevents multiple instances of a component from resetting each other’s memoized keys.
+					2. Typically you’ll want to use a memoization helper with a limited cache size in order to prevent memory leaks over time. (In the example above, we used memoize-one because it only caches the most recent argument and result.)
+					3. None of the implementations shown in this section will work if props.list is recreated each time the parent component renders. But in most cases, this setup is appropriate.
+			
 		
 	Best practices:
 		- Initializing state: 
