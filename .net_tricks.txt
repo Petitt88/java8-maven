@@ -426,6 +426,12 @@ Reference assmeblies:
 							_logger.LogError(ex, "An unexpected exception occured");
 							return true;
 						}
+						
+		Features: 
+			- the HttpContext.Features property is an IFeatureCollection which identifies what features the current server implementation supports
+			- the Features property of HttpContext provides an interface for getting and setting the available HTTP features for the current request
+			- Since the feature collection is mutable even within the context of a request, middleware can be used to modify the collection and add support for additional features
+				- for example the Microsoft.AspNetCore.WebSockets.WebSocketMiddleware adds support to be able to determine whether an http request is a websocket request or not
 		
 		
 
