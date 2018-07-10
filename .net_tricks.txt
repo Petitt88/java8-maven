@@ -280,6 +280,8 @@ Reference assmeblies:
 				- ASP.NET Core will execute any IHostingStartup implementations in the applications assembly as well as any that are listed in an Environment Variable called ASPNETCORE_HOSTINGSTARTUPASSEMBLIES.
 			- HostBuilder
 				- The IHost implementation is responsible for starting and stopping the IHostedService
+			- IStartupFilter
+				- The IStartupFilter interface allows you to control the middleware pipeline indirectly, by adding services to your DI container. It's used by the ASP.NET Core framework to do things like add IIS middleware to the start of an app's middleware pipeline, or to add diagnostics middleware.
 				
 		Tag helpers:
 			- Tag Helpers enable server-side code to participate in creating and rendering HTML elements in Razor files.
