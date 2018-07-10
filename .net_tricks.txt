@@ -736,6 +736,13 @@ C#:
 		- stackalloc keyword: to allocate reference types on the stack instead of the heap:
 			Span<int> span = stackalloc int[10];
 			
+		- Private Protected: 
+			In C# 7.1 and earlier, the base class developer had to choose between two access modifiers that don’t match this behavior exactly:
+				- protected will make the member visible only to subclasses, but they could be in any assembly. There will be no restriction that they have to be placed in the same assembly.
+				- internal will restrict the visibility of the member to the same assembly, but all classes in that assembly will be able to access it, not only the subclasses of the base class declaring it.
+				- One could use both access modifiers, i.e. protected internal, but that would relax the restrictions even more: the member would be visible to subclasses in any assembly, and additionally also to all classes in the same assembly.
+			C# 7.2 introduces a new access modifier: private protected matches the protectedAndInternal accessibility level – members will only be visible to subclasses in the same assembly. This is particularly useful to library developers who don’t need to choose between exposing protected members outside the library and making internal members available to all classes inside their library.
+			
 	8.0:
 		- Nullable reference types:
 			public string? LastName { get; set; }
