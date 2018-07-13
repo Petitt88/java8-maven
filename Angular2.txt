@@ -1,0 +1,309 @@
+Ionic
+Native Script
+	- Javascript VM-et használ (V8 Adnroid, iOS)
+React native
+	- nincs windows-ra
+	- kb. ReactJS
+	
+	
+--- Angular 2 ---
+Polyfill: A shim that mimics a future API providing fallback functionality to older browsers.
+
+zone.js: provides an execution context for async javascript (setTimeout) tasks - meaning they share the same variables
+
+SystemJS:
+	Angular2 uses SystemJS module-loader which uses ECMAScript 2015 modules
+	http://www.2ality.com/2014/09/es6-modules-final.html
+	System.import: single module import
+	Promise.all: multiple module import at the same time
+
+Directives (@Directive):
+	- Component: @Component
+	- structural directives: alter layout by adding, removing, and replacing elements in DOM.
+		*ngFor, *ngIf, ngSwtich (not asterik here because this directive may contain multiple <template> instances), ...
+	- attribute directives: alter the appearance or behavior of an existing element. In templates they look like regular HTML attributes, hence the name.
+		[(ngModel)], ngClass, ngStyle
+		
+Services:
+	- registered at the root level (app/boot.ts) and the Components receive the same instance
+	- registered at the component level and each newly instantiated components receives a brand new instance
+	
+NgForm vs NgFormModel:
+ - NgForm: angular provides it automatically, gets attached to all <form> in the component's template. 
+	Requires "FORM_DIRECTIVES" to be injected into the Component. Provides zero customization possibility (like custom validation).
+ - NgFormModel: use this when the form needs to be built, thus things like custom validation is possible.
+	When this is attached to a form like <form [ngFormModel]="myForm">, angular skips attaching the NgForm
+ - ngNoForm: provided a <form> with this the ngForm won't get attached
+-------------------------------------------------------------------------------
+Remember:
+
+To create a new ControlGroup and Controls implicitly use:
+ngForm
+and ngControl
+
+But to bind to an existing ControlGroup and Controls use:
+ngFormModel
+and ngFormControl - gives us observable, meaning we can subscibe to value changes for sure:
+	this.sku = this.myForm.controls['sku'];
+    this.sku.valueChanges.subscribe((value: string) => ...)
+    this.myForm.valueChanges.subscribe((value: Object) => ...) 
+-------------------------------------------------------------------------------
+
+#reference sytax:
+	the local reference that is to be created is only visible to sibling and child items. Not to parent items.
+	
+Rx Observables: 
+https://egghead.io/lessons/rxjs-creating-an-observable
+https://egghead.io/lessons/rxjs-rxjs-observables-vs-promises
+	- var source = Rx.Observable.Create
+	- source.subscribe(nextHandler, errorHandler, completionHandler)
+	
+Components:
+http://victorsavkin.com/post/119943127151/angular-2-template-syntax
+	@Component({
+		selector: 'my-app',
+		template:`
+			<h1>{{title}}</h1>
+			<my-hero-detail [hero]="selectedHero"></my-hero-detail>
+		`,
+		templateUrl: "..."
+		styles:[`
+			.heroes {list-style-type: none; margin-left: 1em; padding: 0; width: 10em;}
+			.heroes li { cursor: pointer; position: relative; left: 0; transition: all 0.2s ease; }
+			.selected { background-color: #EEE; color: #369; }
+		`],
+		directives: [HeroDetailComponent],
+		providers: [HeroService],
+		intputs: ["model", "..."],	// attributes that can be set from a view like [model]="..."
+		outputs: ["complete", "..."]		// events (Rx EvetEmitter instances) that can be fired, subscribed like (complete)="..."
+	})
+	export class AppComponent implements OnInit {
+		@Input() model;
+		@Output() complete = new EventEmitter()
+	
+		ngOnInit() {
+			this.getHeroes();
+		}
+	}
+	
+ngClass, ngStyle, ngAttr:
+	<input [attr.title]="myTitle" [class.error]="1 === 1" [style.width.px]="getWidth()" />
+	
+
+Databinding:
+Our intuition is wrong! Our everyday HTML mental model is misleading us. In fact, once we start data binding, 
+we are no longer working with HTML attributes. 
+We aren't setting attributes. We are setting the properties of DOM elements, components, and directives.
+The distinction between an HTML attribute and a DOM property is crucial to understanding how Angular binding works.
+Attributes are defined by HTML. Properties are defined by DOM (the Document Object Model).	
+Attributes initialize DOM properties and then they are done. Property values may change; attribute values don't.
+When the user enters "Sally" into the input box, the DOM element value property becomes "Sally". But the HTML value attribute remains unchanged as we discover if we ask the input element about that attribute: input.getAttribute('value') // returns "Bob"
+The HTML attribute value specifies the initial value; the DOM value property is the current value.
+The HTML attribute and the DOM property are not the same thing even when they have the same name.
+
+This is so important, we’ll say it again.
+Template binding works with properties and events, not attributes.
+
+We can reference a local template variable on the same element, on a sibling element, or on any of its child elements.
+
+Angular invokes the event-handling statement if the event is raised by the current element or one of its child elements.
+
+
+Routing:
+The router replaces route path tokens with corresponding values from the route parameters object. Every parameter not consumed by a route path goes in the query string.
+this._router.navigate(['Heroes',  {id: heroId, foo: 'foo'} ]);
+
+
+Best practices:
+	- move dependency related code out from ctor, to ngOnInit(). This helps testing.
+		The better practice is to limit what the constructor can do. Mostly it should stash parameters in local variables and perform simple instance configuration.
+	- Design thought: minimize initialization effort and consider caching state in a companion service.
+	
+<template> - is becomes a #document-fragment in the DOM (when Angular is NOT in control): https://developer.mozilla.org/en/docs/Web/API/DocumentFragment
+
+
+Dependency Injection:
+View Providers are also only available in components, not in directives. That’s simply because a directive doesn’t have its own view.
+ViewProviders: it only applies to the component's view, meaning when a child component's injector looks up the injector tree it does not
+	see this service, goes forward. This way it can be ensured that a Component gets its required dependency that is specific to it,
+	while child components still get that the others above the Component.
+
+When a component at the bottom requests a dependency, Angular tries to satisfy that dependency with a provider registered in that 
+component's own injector. If the component's injector lacks the provider, it passes the request up to its parent component's 
+injector. If that injector can't satisfy the request, it passes it along to its parent component's injector. 
+The requests keep bubbling up until we find an injector that can handle the request or run out of component ancestors.
+If we run out of ancestors, Angular throws an error.
+There's a third possibililty. An intermediate component can declare that it is the "host" component. 
+The hunt for providers will climb no higher than the injector for this host component.
+We'll reserve discussion of this option for another day.
+	
+Does the new DI still create singletons? The answer is yes.
+useFactory, useClass, useValue, useExisting
+
+http://blog.thoughtram.io/angular/2015/08/20/host-and-visibility-in-angular-2-dependency-injection.html
+http://blog.thoughtram.io/angular/2015/05/18/dependency-injection-in-angular-2.html
+
+@host() injected: tells angular that do not look further up the injectors for this dependency if it cannot resolve until the
+				  host Component (host Component's injector is the last that gets checked)
+				  
+				  // if the <video-player>'s template looks like this, then for
+				  // <play-button> for example the last Component to check is the <video-player>'s injector
+				  <video-screen></video-screen>
+				  <video-controls>
+					<play-button></play-button>
+					<pause-button></pause-button>
+				  </video-controls>
+				  
+@Directive(..., host: [ '(mouseenter)': 'onMouseEnter()', '(mouseleave)': 'onMouseLeave()']): The host property refers to the DOM element that hosts our attribute directive, the <span> in our case.
+@HostBinding(): applied on Directive property: automatically updates the hostElement's property when the value changes
+@HostListener(): applied on Directive function: automatically invokes it when the hostElement fires the event
+@HostBinding(), @HostListener() in case of Components:
+	- the host is always the element which the component's template gets injected to
+	- NOT the one that we use our component in
+	
+	
+Component styling resolution precedence:
+	1. Template styles:			<style>.zippy { background: red; }</style> - this is inside the template
+	2. Style urls:				@Component({styles: [`...`]})
+	3. Component inline styles: @Component({styleUrls: [`zippy.css`]})
+	
+<p [textContent]="interpolate(['Hello'], [name])"></p>
+<div [innerHTML]="'Almafa'"></div>
+
+
+Observables:
+	- they are lazy --> starts the subscriberFunc only if somebody has subscribed previously (unlike promises that starts immediately)
+	- provide events: debounce, throttle, distinctUntilChanged, ...
+	- can be cancelled: by returning a "cancel" function from the subscriberFunc
+	
+@Component({
+	selector: "rg-menu",
+	styleUrls: ["./menu.css"],
+	templateUrl: "./menu.html",
+	host: {
+		"class": "rg-menu",
+		"[class.open]": "isMenuOpen",
+		"(click)": "onHostElementClicked($event)"
+	},
+	directives: [RgMenuItem]
+})
+
+
+Event bubbling and propagation: https://angular.io/docs/ts/latest/guide/template-syntax.html#!#sts=Event%20bubbling%20and%20propagation
+
+Many DOM events, both native and custom, “bubble” events up their ancestor tree of DOM elements until an event handler along the way prevents further propagation.
+EventEmitter events don’t bubble.
+The result of an Event Binding statement determines if event propagation continues or stops with the current element.
+
+Event propagation stops if the binding statement returns a falsey value (as does a method with no return value). Clicking the button in this next example triggers a save; the click doesn't make it to the outer <div> so it's save is not called:
+<div (click)="onSave()">
+  <button (click)="onSave()">Save, no propagation</button>
+</div>
+
+Propagation continues if the statement returns a truthy value. The click is heard both by the button and the outer <div>, causing a double save:
+<div (click)="onSave()">
+  <button (click)="onSave() || true">Save w/ propagation</button>
+</div>
+
+Directives:
+those directives go here that our component wants to use in its template!
+Important that this is only for the template.
+
+Providers:
+those objects, services, values go here that we want to Inject! Has nothing to do with the directives used in the template!
+
+
+OnInit vs ctor:
+ - the view is ready by the time when OnInit gets called while it is not during the ctor period.
+ - example: <button id="aa">click</button>, console.log(document.getElementById("aa")):
+		- prints null in ctor
+		- prints the DOM element from the OnInit
+		
+----------------------		
+@ContentChild, @ContentChildren - use this for retrieving html elements from the Content area in the component
+@ViewChild, @ViewChildren - use this for retrieving html elements from the View area in the component
+
+Example:
+in the view:
+<button #awesome">AAAA</button>
+<button #awesomeList">BBBBB</button>
+<button #awesomeList">CCCCC</button>
+
+in the component:
+@ViewChild("awesome")
+private single_button_aaaa: any;
+
+@ViewChildren("awesomeList")
+private list_buttons: QueryList<any>;
+----------------------
+
+
+
+----------------------
+Router navigation
+Depending on which component we'd like to navigate the arguments to router.navigate differs.
+
+First, when navigating from a Component that is the amongst the 1st level, we have to specify all of the routing components.
+Navigating from a component that is not in the 1st level we must omit the parent from the navigation.
+
+Example:
+@RouteConfig([
+	new Route({ path: `${RouteConstants.loginUrl}`, name: RouteConstants.login, component: LoginCmp, useAsDefault: true }),
+    new Route({ path: `${RouteConstants.customersUrl}/...`, name: RouteConstants.customers, component: CustomerCenterCmp }),
+    new Route({ path: `${RouteConstants.licensesUrl}/...`, name: RouteConstants.licenses, component: LicensesRootComponent }),
+    new Route({ path: `${RouteConstants.inspectionsUrl}`, name: RouteConstants.inspections, component: InspectionListCmp })
+])
+@Component({...})
+export class AppCmp {...}
+
+@RouteConfig([
+    new Route({ path: CustomerRoutes.customerListUrl, name: CustomerRoutes.customerList, component: CustomerListCmp, useAsDefault: true }),
+    new Route({ path: CustomerRoutes.customerDetailsUrl, name: CustomerRoutes.customerDetails, component: CustomerDetailsCmp }),
+	new Route({ path: CustomerRoutes.customerDetailsNewUrl, name: CustomerRoutes.customerDetailsNew, component: CustomerDetailsCmp }),
+	new Route({ path: CustomerRoutes.customerCommentsUrl, name: CustomerRoutes.customerComments, component: CustomerCommentsCmp }),
+    new Route({ path: CustomerRoutes.customerInvociesUrl, name: CustomerRoutes.customerInvocies, component: CustomerInvoicesCmp })
+])
+@Component({...})
+export class CustomerCenterCmp {...}
+
+Navigating from components that are inside the AppCmp (child, content, whatever) BUT not inside the CustomerCenterCmp to components from CustomerCenterCmp works like this:
+this.router.navigate(["Customers", "List", {param1: param1}]);
+
+Navigating from components inside the CustomerCenterCmp (like List, Details) to components from CustomerCenterCmp works liek this:
+this.router.navigate(["List", {param1: param1}]);
+
+Navigating from components inside the CustomerCenterCmp to components outside of it requires this:
+this.router.parent.navigate(["Customers", "List", {param1: param1}]);
+OR this would also work since root is the parent in this case:
+this.router.root.navigate(["Customers", "List", {param1: param1}]);
+
+----------------------
+
+
+----------------------
+Determine the active route:
+http://stackoverflow.com/questions/34323480/in-angular-2-how-do-you-determine-the-active-route
+
+----------------------
+		
+		
+********************************************************************
+****************************** MOBILE ******************************
+********************************************************************
+
+Cordova: lets your build Html 5 hybrid apps for iOS/Android but the app itself doesn't look like a native app 
+		 and in fact it is not native at all, runs in a WebViewControl (slower)
+
+Ionic: fills this gap, uses Cordova under the cover (along with AngularJS 1.X) - builds on top of it - and produces a Html 5 app that feels native
+	- can access camera via Cordova API
+	- but app is still not native
+	- Ionic 2 uses Angular 2
+
+	NPM <--> JSPM: builds on top of SystemJS, can load NPM packages, github resources by default but that can be extended (with bower for example)
+	JSPM:
+		- comes with SystemJS module loader and its builder to create bundles + minify it
+		- contains transpiler (babel, traceur, typescript), it can compile typescript/ES6 js file before loading to browsers
+		- package manager (has its own registry but can import packages from NPM, github (and more)
+			- so both server and client-side packages can come through it
+	Webpack: Really when you look at it, Webpack is JSPM without its SystemJS loader and package management features - it uses CommonJS
+	Browserify: uses CommonJS, but for browsers - out of date, obsolete
