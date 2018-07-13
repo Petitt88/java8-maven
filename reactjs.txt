@@ -6,7 +6,13 @@ React
 		- Error boundaries: use the componentDidCatch method to make a component an error boundary
 			-  Error boundaries are React components that catch JavaScript errors anywhere in their child component tree, log those errors, and display a fallback UI instead of the component tree that crashed.
 		- ReactDOM.createPortal()
-		- setState() can get null --> this causes React not to invoke the render() function
+		- setState:
+			- Calling setState with null no longer triggers an update. This allows you to decide in an updater function if you want to re-render.
+			- Calling setState directly in render always causes an update. This was not previously the case. Regardless, you should not be calling setState from render.
+			- setState callbacks (second argument) now fire immediately after componentDidMount / componentDidUpdate instead of after all components have rendered.
+		- Support for custom DOM attributes: 
+			- Instead of ignoring unrecognized HTML and SVG attributes, React will now pass them through to the DOM. This has the added benefit of allowing us to get rid of most of React’s attribute whitelist, resulting in reduced file sizes.
+		- When replacing <A /> with <B />, B.componentWillMount now always happens before A.componentWillUnmount. Previously, A.componentWillUnmount could fire first in some cases.
 		
 	v16.3 new features: https://reactjs.org/blog/2018/03/29/react-v-16-3.html
 		- deprecating lifecycle hooks: componentWillMount, componentWillReceiveProps, componentWillUpdate
@@ -324,6 +330,27 @@ React
 						</ div>)
 					];
 				}
+				
+		- Default Prop Values: defaultProps property:
+			You can define default values for your props by assigning to the special "defaultProps" property:
+				class Greeting extends React.Component {
+				  render() {
+					return (
+					  <h1>Hello, {this.props.name}</h1>
+					);
+				  }
+				}
+
+				// Specifies the default values for props:
+				Greeting.defaultProps = {
+				  name: 'Stranger'
+				};
+
+				// Renders "Hello, Stranger":
+				ReactDOM.render(
+				  <Greeting />,
+				  document.getElementById('example')
+				);
 		
 	Functional components: 
 		- a function with "props" parameter and a render method. 
