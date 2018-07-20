@@ -435,6 +435,77 @@ Reference assmeblies:
 			- the Features property of HttpContext provides an interface for getting and setting the available HTTP features for the current request
 			- Since the feature collection is mutable even within the context of a request, middleware can be used to modify the collection and add support for additional features
 				- for example the Microsoft.AspNetCore.WebSockets.WebSocketMiddleware adds support to be able to determine whether an http request is a websocket request or not
+				
+		Dependency Injection:
+			- Constructor Injection: Define required dependencies explicitly in the service constructor. Thus, the service can not be constructed without its dependencies.
+				- Assign injected dependency to a read only field/property (to prevent accidentally assigning another value to it inside a method).
+			- Property Injection
+				- ASP.NET Core’s standard dependency injection container does not support property injection.
+				- But there are other containers that do (Castle Windsor, Autofac, Unity)
+				- Use property injection only for optional dependencies. That means your service can properly work without these dependencies provided.
+			- Service Locator
+				// ctor
+				public ProductService(IServiceProvider serviceProvider)
+				{
+					_productRepository = serviceProvider.GetRequiredService<IProductRepository>();
+					_logger = serviceProvider.GetService<ILogger<ProductService>>() ?? NullLogger<ProductService>.Instance;
+				}
+				- ProductService is injecting IServiceProvider and resolving dependencies using it. 
+				- GetRequiredService throws exception if the requested dependency was not registered before. 
+				- On the other hand, GetService just returns null in that case.
+				- Do not use the service locator pattern wherever possible (if the service type is known in the development time). Because it makes the dependencies implicit. That means it’s not possible to see the dependencies easily while creating an instance of the service. This is especially important for unit tests where you may want to mock some dependencies of a service.
+			- Service Life Times: There are three service lifetimes in ASP.NET Core Dependency Injection:
+				1. Transient services are created every time they are injected or requested.
+				2. Scoped services are created per scope. In a web application, every web request creates a new separated service scope. That means scoped services are generally created per web request.
+				3. Singleton services are created per DI container. That generally means that they are created only one time per application and then used for whole the application life time.
+			- DI container keeps track of all resolved services. Services are released and disposed when their lifetime ends:
+				- If the service has dependencies, they are also automatically released and disposed.
+				- If the service implements the IDisposable interface, Dispose method is automatically called on service release.
+			- Good practices:
+				- Register your services as transient wherever possible. Because it’s simple to design transient services. You generally don’t care about multi-threading and memory leaks and you know the service has a short life.
+				- Use scoped service lifetime carefully since it can be tricky if you create child service scopes or use these services from a non-web application.
+				- Use singleton lifetime carefully since then you need to deal with multi-threading and potential memory leak problems.
+				- Do not depend on a transient or scoped service from a singleton service. Because the transient service becomes a singleton instance when a singleton service injects it and that may cause problems if the transient service is not designed to support such a scenario. ASP.NET Core’s default DI container already throws exceptions in such cases.
+			- Resolving Services in a Method Body: In some cases, you may need to resolve another service in a method of your service. In such cases, ensure that you release the service after usage. The best way of ensuring that is to create a service scope. Example:
+				public class PriceCalculator
+				{
+					private readonly IServiceProvider _serviceProvider;
+					public PriceCalculator(IServiceProvider serviceProvider)
+					{
+						_serviceProvider = serviceProvider;
+					}
+					public float Calculate(Product product, int count,
+					  Type taxStrategyServiceType)
+					{
+						using (var scope = _serviceProvider.CreateScope())
+						{
+							var taxStrategy = (ITaxStrategy)scope.ServiceProvider.GetRequiredService(taxStrategyServiceType);
+							var price = product.Price * count;
+							return price + taxStrategy.CalculateTax(price);
+						}
+					}
+				}
+			- Good Practices:
+				- If you are resolving a service in a method body, always create a child service scope to ensure that the resolved services are properly released.
+				- If a method gets IServiceProvider as an argument, then you can directly resolve services from it without care about releasing/disposing. Creating/managing service scope is a responsibility of the code calling your method. Following this principle makes your code cleaner.
+				- Do not hold a reference to a resolved service! Otherwise, it may cause memory leaks and you will access to a disposed service when you use the object reference later (unless the resolved service is singleton).
+			- Singleton Services
+				- Singleton services are generally designed to keep an application state.
+				- A cache is a good example of application states.
+				- If the service holds a state, it should access to that state in a thread-safe manner. Because all requests concurrently uses the same instance of the service. I used ConcurrentDictionary instead of Dictionary to ensure thread safety.
+				- Do not use scoped or transient services from singleton services. Because, transient services might not be designed to be thread safe. If you have to use them, then take care of multi-threading while using these services (use lock for instance).
+			- Scoped Services
+				- Scoped lifetime first seems a good candidate to store per web request data. 
+				- Because ASP.NET Core creates a service scope per web request. 
+				- So, if you register a service as scoped, it can be shared during a web request.
+				- If you register the RequestItemsService as scoped and inject it into two different services, then you can get an item that is added from another service because they will share the same RequestItemsService instance. That’s what we expect from scoped services.
+				- But.. the fact may not be always like that. If you create a child service scope and resolve the RequestItemsService from the child scope, then you will get a new instance of the RequestItemsService and it will not work as you expect. So, scoped service does not always means instance per web request.
+				- Good practices:
+					- A scoped service can be thought as an optimization where it is injected by too many services in a web request. Thus, all these services will use a single instance of the service during the same web request.
+					- Scoped services don’t need to be designed as thread-safe. Because, they should be normally used by a single web-request/thread. But… in that case, you should not share service scopes between different threads!
+					- Be careful if you design a scoped service to share data between other services in a web request (explained above). 
+					- You can store per web request data inside the HttpContext (inject IHttpContextAccessor to access it) which is the safer way of doing that. 
+					- HttpContext’s lifetime is not transient. Actually, it’s not registered to DI at all (that’s why you don’t inject it, but inject IHttpContextAccessor instead). HttpContextAccessor implementation uses AsyncLocal to share the same HttpContext during a web request.
 		
 		
 
