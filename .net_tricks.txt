@@ -288,7 +288,7 @@ Reference assmeblies:
 			- Tag Helpers enable server-side code to participate in creating and rendering HTML elements in Razor files.
 			- Usage:
 				[HtmlTargetElement("email")]									// <email></email>
-				[HtmlTargetElement(Attributes ="myEmail")]						// <div myEmail></div>
+				[HtmlTargetElement(Attributes = "myEmail")]						// <div myEmail></div>
 				[HtmlTargetElement("spec-email", Attributes = "veryEmail")]	// <spec-email veryEmail></spec-email>
 				public class EmailVoidTagHelper : TagHelper {}
 				
