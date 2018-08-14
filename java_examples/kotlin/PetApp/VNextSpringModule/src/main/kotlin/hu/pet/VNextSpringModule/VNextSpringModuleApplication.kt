@@ -1,8 +1,10 @@
 package hu.pet.VNextSpringModule
 
 import hu.pet.utils.BookService
+import org.slf4j.Logger
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.info.BuildProperties
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
@@ -12,7 +14,8 @@ import org.springframework.context.annotation.ComponentScan
 class VNextSpringModuleApplication {
 
 	@Bean
-	fun runner(bookService: BookService) = CommandLineRunner {
+	fun runner(buildProperties: BuildProperties?, logger: Logger, bookService: BookService) = CommandLineRunner {
+		logger.info("Application version is: ${buildProperties?.let { "${buildProperties.group}-${buildProperties.artifact}: ${buildProperties.version}" } ?: "Development"}")
 		bookService.printMagic()
 	}
 }

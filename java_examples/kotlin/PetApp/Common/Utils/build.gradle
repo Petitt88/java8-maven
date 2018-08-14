@@ -1,4 +1,6 @@
-version '1.0-SNAPSHOT'
+bootJar {
+	enabled = false
+}
 
 dependencies {
 	compile project(":Common/Utils.Core")

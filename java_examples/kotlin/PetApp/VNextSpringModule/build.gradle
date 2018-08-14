@@ -1,4 +1,13 @@
-version = '0.0.1-SNAPSHOT'
+bootJar {
+	baseName = 'Spring-Next-Module'
+	exclude("application-dev.yml")
+	version = appVersion
+}
+
+// make the Spring Boot gradle plugin generate build information consumable during runtime
+springBoot {
+	buildInfo()
+}
 
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-webflux')
@@ -7,6 +16,9 @@ dependencies {
 	compile('com.fasterxml.jackson.module:jackson-module-kotlin')
 
 	compile project(":Common/Utils")
+
+	// annotation processing
+	kapt('org.springframework.boot:spring-boot-configuration-processor')
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('io.projectreactor:reactor-test')
