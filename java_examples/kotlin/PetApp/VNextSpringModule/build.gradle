@@ -22,7 +22,6 @@ dependencies {
 	// annotation processing
 	kapt('org.springframework.boot:spring-boot-configuration-processor')
 
-	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('io.projectreactor:reactor-test')
 	testCompile('org.springframework.security:spring-security-test')
 }

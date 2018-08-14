@@ -3,6 +3,7 @@ buildscript {
 		kotlinVersion = '1.2.51'
 		springBootVersion = '2.0.4.RELEASE'
 		appVersion = '1.0.0-SNAPSHOT'
+		gradleVersion = '4.9'
 	}
 	repositories {
 		mavenCentral()
@@ -79,5 +80,5 @@ dependencies {
 }
 
 task wrapper(type: Wrapper) {
-	gradleVersion = '4.9'
+	gradleVersion = gradleVersion
 }
