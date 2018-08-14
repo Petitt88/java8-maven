@@ -25,6 +25,13 @@ allprojects {
 	group 'hu.pet'
 	version = appVersion
 
+	// it is necessary to disable the bootJar task. It works only with Spring Boot projects!
+	// however with library ones, it does not.
+	// so assuming there will be more library projects than actual Spring Boot projects, disable here the bootJar,
+	// reenable the jar task and in each Spring Boot app do the opposite: disable jar and enable bootJar
+	bootJar.enabled = false
+	jar.enabled = true
+
 	repositories {
 		mavenCentral()
 	}

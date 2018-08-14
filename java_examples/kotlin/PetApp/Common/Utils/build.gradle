@@ -1,7 +1,3 @@
-bootJar {
-	enabled = false
-}
-
 dependencies {
 	compile project(":Common/Utils.Core")
 }

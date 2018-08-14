@@ -1,5 +1,7 @@
+jar.enabled = false
 bootJar {
-	baseName = 'Spring-Next-Module'
+	enabled = true
+	baseName = 'SpringNextModule'
 	exclude("application-dev.yml")
 	version = appVersion
 }
