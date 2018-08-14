@@ -1,0 +1,6 @@
+rootProject.name = 'PetApp'
+include 'Common/Utils.Core'
+include 'Common/Utils'
+include 'EVModule'
+include 'SADModule'
+include 'VNextSpringModule'
