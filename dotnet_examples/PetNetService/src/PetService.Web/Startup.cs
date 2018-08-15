@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PetService.Web.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PetService.Web.Data;
 
 namespace PetService.Web
 {
@@ -37,8 +32,8 @@ namespace PetService.Web
             services.AddDbContext<ApplicationDbContext>(options =>
                 //options.UseSqlite(Configuration.GetConnectionString("SqliteConnection"))
                 options.UseSqlServer(Configuration.GetConnectionString("SqlServerConnection"))
-                );
-            
+            );
+
             services.AddDefaultIdentity<IdentityUser>().AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
@@ -47,6 +42,20 @@ namespace PetService.Web
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            var applicationPath = Configuration.GetValue<string>("App:ApplicationPath");
+            
+            /* it seems there are 2 solutions to use a subfolder application path instead of the root:
+             1. just use app.UsePathBase(applicationPath);
+                - this affects both the routing and serving static files
+             
+             2. a) app.UseStaticFiles(applicationPath); 
+                    - for serving static files: request must start with /pet-app --> then Kestrel serves the file from the wwwroot folder
+                b) app.Map(applicationPath, mainApp => { mainApp.UseMvc(); });
+                    - for routing: controller routes must start with /pet-app 
+                
+                app.UsePathBase() is much more likable.
+            */
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -59,17 +68,17 @@ namespace PetService.Web
             }
 
             app.UseHttpsRedirection();
+
+            app.UsePathBase(applicationPath);
+            //app.UseStaticFiles(applicationPath);    // required for the 2nd applicationPath solution
             app.UseStaticFiles();
+            
             app.UseCookiePolicy();
 
             app.UseAuthentication();
 
-            app.UseMvc(routes =>
-            {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
-            });
+            //app.Map(applicationPath, mainApp => { mainApp.UseMvc(); });    // required for the 2nd applicationPath solution
+            app.UseMvc();
         }
     }
 }

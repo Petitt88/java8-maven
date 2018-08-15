@@ -4,13 +4,16 @@ using PetService.Web.Models;
 
 namespace PetService.Web.Controllers
 {
+    [Route("")]
     public class HomeController : Controller
     {
+        [HttpGet]
         public IActionResult Index()
         {
             return View();
         }
 
+        [HttpGet("about")]
         public IActionResult About()
         {
             ViewData["Message"] = "Your application description page.";
@@ -18,6 +21,7 @@ namespace PetService.Web.Controllers
             return View();
         }
 
+        [HttpGet("contact")]
         public IActionResult Contact()
         {
             ViewData["Message"] = "Your contact page.";
@@ -25,11 +29,24 @@ namespace PetService.Web.Controllers
             return View();
         }
 
+        [HttpGet("privacy")]
         public IActionResult Privacy()
         {
             return View();
         }
 
+        [HttpGet("path-info")]
+        public ActionResult PathInfo()
+        {
+            var info = new
+            {
+                Path = HttpContext.Request.Path.Value,
+                PathBase = HttpContext.Request.PathBase.Value
+            };
+            return Json(info);
+        }
+
+        [HttpGet("error")]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
