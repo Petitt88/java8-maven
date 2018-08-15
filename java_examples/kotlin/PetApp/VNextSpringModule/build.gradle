@@ -17,6 +17,9 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-data-redis-reactive')
 	compile('com.fasterxml.jackson.module:jackson-module-kotlin')
 
+	// Jackson datatype to use java 8 time api
+	compile('com.fasterxml.jackson.datatype:jackson-datatype-jsr310')
+
 	compile project(":Common/Utils")
 
 	// annotation processing
