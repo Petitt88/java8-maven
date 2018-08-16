@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using PetService.Web.Data;
@@ -32,6 +33,7 @@ namespace PetService.Web
             services.AddDbContext<ApplicationDbContext>(options =>
                 //options.UseSqlite(Configuration.GetConnectionString("SqliteConnection"))
                 options.UseSqlServer(Configuration.GetConnectionString("SqlServerConnection"))
+                    .ConfigureWarnings(warnings => warnings.Throw(RelationalEventId.QueryClientEvaluationWarning))
             );
 
             services.AddDefaultIdentity<IdentityUser>().AddEntityFrameworkStores<ApplicationDbContext>();
@@ -43,7 +45,7 @@ namespace PetService.Web
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
             var applicationPath = Configuration.GetValue<string>("App:ApplicationPath");
-            
+
             /* it seems there are 2 solutions to use a subfolder application path instead of the root:
              1. just use app.UsePathBase(applicationPath);
                 - this affects both the routing and serving static files
@@ -72,7 +74,7 @@ namespace PetService.Web
             app.UsePathBase(applicationPath);
             //app.UseStaticFiles(applicationPath);    // required for the 2nd applicationPath solution
             app.UseStaticFiles();
-            
+
             app.UseCookiePolicy();
 
             app.UseAuthentication();
