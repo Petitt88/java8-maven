@@ -18,8 +18,8 @@ inline suspend fun <reified T> AsynchronousFileChannel.parseJson(mapper: ObjectM
 			break
 
 		buffer.array()
-				.take(bytesRead)
-				.forEachIndexed { index, value -> bytes[index + pos.toInt()] = value }
+			.take(bytesRead)
+			.forEachIndexed { index, value -> bytes[index + pos.toInt()] = value }
 
 		pos += bytesRead
 		buffer.flip()
