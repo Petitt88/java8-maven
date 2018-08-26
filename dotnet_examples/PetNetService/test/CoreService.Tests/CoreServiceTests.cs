@@ -1,4 +1,5 @@
 ﻿using Xunit;
+using Xunit.Sdk;
 
 namespace CoreService.Tests
 {
@@ -13,7 +14,7 @@ namespace CoreService.Tests
         [Fact]
         public void FailingTest()
         {
-            Assert.Equal(5, Add(2, 2));
+            Assert.Throws<EqualException>(() => Assert.Equal(5, Add(2, 2)));
         }
 
         [Theory]
