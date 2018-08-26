@@ -867,3 +867,16 @@ C#:
 				- Deconstruct function
 				- Equals function that checks every single property one by one with the Other instance
 				- GetHashCode() function implementation
+
+				
+Nuget:
+	- machine wide config location: %appdata%\NuGet\NuGet.Config
+	- user scoped config location: C:\Users\petit\AppData\Roaming\NuGet\NuGet.Config (%ProgramFiles(x86)%\NuGet\Config)
+	
+	config section:
+		globalPackagesFolder (projects using PackageReference only):
+			The location of the default global packages folder. The default is %userprofile%\.nuget\packages (Windows) or ~/.nuget/packages (Mac/Linux). A relative path can be used in project-specific nuget.config files. This setting is overridden by the NUGET_PACKAGES environment variable, which takes precedence.
+
+		repositoryPath (packages.config only):
+			The location in which to install NuGet packages instead of the default $(Solutiondir)/packages folder. A relative path can be used in project-specific nuget.config files. This setting is overridden by the NUGET_PACKAGES environment variable, which takes precedence.
+			
