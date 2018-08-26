@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using CoreService;
 using Microsoft.AspNetCore.Mvc;
 using PetService.Web.Models;
 
@@ -7,9 +8,17 @@ namespace PetService.Web.Controllers
     [Route("")]
     public class HomeController : Controller
     {
+        private readonly TelemetryService _telemetryService;
+
+        public HomeController(TelemetryService telemetryService)
+        {
+            _telemetryService = telemetryService;
+        }
+
         [HttpGet]
         public IActionResult Index()
         {
+            _telemetryService.Collect();
             return View();
         }
 

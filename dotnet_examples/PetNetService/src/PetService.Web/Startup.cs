@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using CoreService;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -39,6 +40,8 @@ namespace PetService.Web
             services.AddDefaultIdentity<IdentityUser>().AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            services.AddTransient<TelemetryService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -61,6 +64,8 @@ namespace PetService.Web
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                // if the EF model and the database schema are out of sync, as soon as a database interaction is made display an error page which
+                // let the user execute the missing migrations
                 app.UseDatabaseErrorPage();
             }
             else
