@@ -1,5 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+    <Import Project="../../build/Build.targets" />
+
     <PropertyGroup>
         <TargetFramework>netcoreapp2.1</TargetFramework>
     </PropertyGroup>
