@@ -10,6 +10,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoreService.Tests", "test\C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PetService.Web", "src\PetService.Web\PetService.Web.csproj", "{60AE86F3-F887-4308-9CD5-29B597197D21}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{7EC79A9B-65AD-4718-89EF-A6C8F1AFE6EE}"
+ProjectSection(SolutionItems) = preProject
+	build\Build.targets = build\Build.targets
+EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
