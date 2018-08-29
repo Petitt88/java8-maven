@@ -1,3 +1,13 @@
+***********Garbage collection***********
+
+LOH: Large object heap: If an object is greater than or equal to 85,000 bytes, it’s considered a large object.
+
+3 generations:
+	- generation 0
+	- generation 1
+	- generation 2
+
+
 ***********How to make a Web App started from VS via IIS Express accessible from a VM's browser***********
 
 0. Open the port of the application for both inbound and outbound rules in the firewall of the host OS
