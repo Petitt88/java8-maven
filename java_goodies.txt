@@ -827,7 +827,7 @@ JConsole: it is a JMX implementation, baked into the java bundle (JVM_HOME/bin f
 
 The Heap is divided into young and old generations as follows:
 	Young Generation: It is place where lived for short period and divided into two spaces:
-		Eden Space (there is 1 of this): When object created using new keyword memory allocated on this space. If the object survives the 1st garbage collection, it goes to the Survivor space.
+		Eden Space (there is 1 of this): When object is created using new keyword memory allocated on this space. If the object survives the 1st garbage collection, it goes to the Survivor space.
 		Survivor Space (there are 2 of this): This is the pool which contains objects which have survived after java garbage collection from Eden space. Objects may stay here for several garbage collection cycle.
 			If the survivor space gets full, it is copied to the other survivor space. Of that one gets full, the longest lived objects goes to the Old Generation.
 		
@@ -968,11 +968,11 @@ Tools:
 	
 Module Types:
 	- Platform modules
-		- the JDK is divided into platform modules
+		- the JDK is divided into platform modules - these are not .jar but .jmod files (the latter is more optimised)
 		- exports packages: explicitly
 	- Application Modules
 		- any JAR containing module-info.class on the module path
-		- Also referred to as “Named Application Modules"
+		- Also referred to as "Named Application Modules"
 		- This is what we are going to create. A lot of our third party dependencies will also be application modules
 		- exports packages: explicitly
 		- can read modules: Platform, Application, Automatic
