@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace PetService.Web.Data
@@ -12,5 +9,8 @@ namespace PetService.Web.Data
             : base(options)
         {
         }
+        
+        public DbSet<Person> Persons { get; set; }
+        public DbSet<Car> Cars { get; set; }
     }
 }
