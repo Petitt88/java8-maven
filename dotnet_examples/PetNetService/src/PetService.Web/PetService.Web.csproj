@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-    <Import Project="../../build/Build.targets" />
-    
+    <Import Project="../../build/Build.targets"/>
+
     <PropertyGroup>
         <TargetFramework>netcoreapp2.1</TargetFramework>
         <UserSecretsId>aspnet-PetService.Web-2EA81EE2-A58F-4A9A-9B16-108BF0A315C1</UserSecretsId>
@@ -9,17 +9,23 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <None Update="app.db" CopyToOutputDirectory="PreserveNewest" />
+        <None Update="app.db" CopyToOutputDirectory="PreserveNewest"/>
+        <Content Update="appsettings.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Update="wwwroot\**">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.App" />
+        <PackageReference Include="Microsoft.AspNetCore.App"/>
         <!--<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.1"/>-->
-        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" PrivateAssets="All"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\CoreService\CoreService.csproj" />
+        <ProjectReference Include="..\CoreService\CoreService.csproj"/>
     </ItemGroup>
 
 </Project>
