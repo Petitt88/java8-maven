@@ -250,6 +250,63 @@ Reference assmeblies:
 	The others:
 		- core-setup: build tools to pull in all of the above and combine it into the .NET Core Runtime
 		- CLI: the .NET Command Line Interface, so you can dotnet whatever as part of the SDK
+		
+	Good to know:
+		- to start a .NET Core app, type: "dotnet MyApp.dll" where MyApp project is the entrypoint. If compiling against .NET Core, creating an exe is meaningless because it could be misleading on Windows because the exe
+		  cannot be executed by double clicking. The only way to execute a .NET Core app is to use the dotnet.exe (which itself is a .NET Core app too) - so even console apps are compiled to .dll files and are started by typing "dotnet xxx.dll"
+		  
+		- A ".NET Core app" is really just a collection of the *.dll files (and a few config files.)
+		
+		- runtimeconfig.json: The runtimeconfig.json file is required for .NET Core applications. The terms "runtime", "shared framework", or "platform" are often used interchangeably, 
+							 but they typically mean the same thing when talking about .NET Core. This JSON file configures options for the runtime.
+							 Basically this tells whether to use "Microsoft.NETCore.App" or "Microsoft.AspNetCore.App" which both are located in C:\Program Files\dotnet\shared folder:
+								- C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\2.1.3
+								- C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.1.3
+			{
+			  "runtimeOptions": {
+				"framework": {
+				  "name": "Microsoft.NETCore.App",
+				  "version": "2.0.0"
+				}
+			  }
+			}
+			Without this file if we were to type "dotnet MyApp.dll" it would fail to start.
+			Unlike .NET Framework, which is machine-wide, there may be multiple .NET Core shared frameworks installed on a machine. dotnet will read the JSON file and look in /usr/local/share/dotnet/shared/$FrameworkName/$Version/ for the required files to run the application.
+		
+		- Dynamic Linking: .NET is a dynamically linked runtime. The compiler adds a reference to Newtonsoft.Json.dll in the Program.dll assembly file, but does not duplicate its code. 
+						    The .NET Core runtime expects to be able to load a file named Newtonsoft.Json.dll when the application is executed.
+			
+		- deps.json: The deps.json file is a dependencies manifest. It can be used to configure dynamic linking to assemblies that come from packages. 
+					  As mentioned above, .NET Core can be configured to dynamically load assemblies from multiple locations. These locations include:
+						- App base directory (in the same folder as the entry point application, no config required)
+						- Package cache folders (NuGet restore cache or NuGet fallback folders)
+						- An optimized package cache or runtime packages store
+						- The servicing index (rarely used. For Windows Update purposes.)
+						- Shared framework (configured via runtimeconfig.json)
+						
+		- shared framework: .NET Core apps run in one of two modes: framework-dependent or self-contained.
+			- dotnet publish --runtime osx-x64 --output bin/self_contained_app/
+			- dotnet publish --output bin/framework_dependent_app/
+			
+			When the app runs, it is functionally equivalent in both modes. So why are there different modes? - framework-dependent deployment relies on the presence of a shared system-wide version of .NET Core
+			[A] self-contained deployment doesn’t rely on the presence of shared components on the target system. All components…are included with the application.
+			
+			To put it simply, a .NET Core shared framework is a folder of assemblies (*.dll files) that are not in the application folder.
+			This folder is one part of the "shared system-wide version of .NET Core", and is usually found in C:/Program Files/dotnet/shared.
+			The .NET Core host reads the *.runtimeconfig.json file to determine which shared framework(s) to load.
+				The shared framework version represents the minimum version. The .NET Core host will never run on a lower version, but it may try to run on a higher one.
+				Version roll-forward: If an app minimum version is 2.1.0, the highest 2.1.* version will be loaded.
+				
+			Shared frameworks: as of .NET Core 2.1 there are 3 ones:
+				Microsoft.NETCore.App		The base runtime. It supports things like System.Object, List<T>, string, memory management, file and network IO, threading, etc.
+				Microsoft.AspNetCore.App	The default web runtime. It imports Microsoft.NETCore.App, and adds API to build an HTTP server using Kestrel, Mvc, SignalR, Razor, and parts of EF Core.
+				Microsoft.AspNetCore.All	Integrations with third-party stuff. It imports Microsoft.AspNetCore.App. It adds support for EF Core + SQLite, extensions that use Redis, config from Azure Key Vault, and more. 
+											(Will be deprecated in 3.0.)
+											
+			The .NET Core SDK adds an implicit package reference to Microsoft.NETCore.App to all projects. ASP.NET Core overrides the default by setting MicrosoftNETPlatformLibrary to "Microsoft.AspNetCore.App".
+			The NuGet package, however, does not provide the shared framework. I repeat, the NuGet package does not provide the shared framework. - It's just like C:\Program Files (x86)\Reference Assemblies:
+			The NuGet package only provides a set of APIs used by the compiler and a few other SDK bits. The shared framework files come from runtime installers found on https://aka.ms/dotnet-download, or bundled in Visual Studio, Docker images, and some Azure services.
+		
 
 
 	.NET Core 2.0:
@@ -269,6 +326,9 @@ Reference assmeblies:
 				- It makes it easy to use the core packages without having to add them to the solution explicitly
 				
 			The AspNetCore.All package is included in .NET Core 2.0’s Runtime Store, and is compiled to native code, rather than IL. This means that all of the libraries included in the AspNetCore.All package are pre-compiled as native binaries for the Operating Systems that .NET Core 2.0 supports.
+			
+		Asp.Net Core 2.1
+			Microsoft.AspNetCore.App metapackage is the recommended instead of Microsoft.AspNetCore.All because the former does not contain 3rd party dependencies (like JSON.NET), only the ones that are maintained by Microsoft.
 			
 		Important interfaces:
 			- IConfiguration
