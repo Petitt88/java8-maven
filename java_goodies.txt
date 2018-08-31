@@ -94,7 +94,7 @@ server.context-path=/champion-portal
 a plugin is a collection of goals with a general common purpose
 
 mvn archetype:generate 
-	- plugin:goal: execute the "generate" goal of the "archetype plugin"
+	- plugin:goal: execute the "generate" goal of the "archetype" plugin
 
 mvn package - Rather than a goal, this is a phase
 	A phase is a step in the build lifecycle, which is an ordered sequence of phases. A phase consists of plugin goals.

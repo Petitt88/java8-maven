@@ -258,7 +258,7 @@ Reference assmeblies:
 		- A ".NET Core app" is really just a collection of the *.dll files (and a few config files.)
 		
 		- runtimeconfig.json: The runtimeconfig.json file is required for .NET Core applications. The terms "runtime", "shared framework", or "platform" are often used interchangeably, 
-							 but they typically mean the same thing when talking about .NET Core. This JSON file configures options for the runtime.
+							 but they typically mean the same thing when talking about .NET Core. This JSON file configures options for the runtime: this tells the host which shared framework to use.
 							 Basically this tells whether to use "Microsoft.NETCore.App" or "Microsoft.AspNetCore.App" which both are located in C:\Program Files\dotnet\shared folder:
 								- C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\2.1.3
 								- C:\Program Files\dotnet\shared\Microsoft.NETCore.App\2.1.3
@@ -289,7 +289,7 @@ Reference assmeblies:
 			- dotnet publish --output bin/framework_dependent_app/
 			
 			When the app runs, it is functionally equivalent in both modes. So why are there different modes? - framework-dependent deployment relies on the presence of a shared system-wide version of .NET Core
-			[A] self-contained deployment doesn’t rely on the presence of shared components on the target system. All components…are included with the application.
+			[A] self-contained deployment doesn’t rely on the presence of shared components on the target system. All components are included with the application.
 			
 			To put it simply, a .NET Core shared framework is a folder of assemblies (*.dll files) that are not in the application folder.
 			This folder is one part of the "shared system-wide version of .NET Core", and is usually found in C:/Program Files/dotnet/shared.
