@@ -5,5 +5,5 @@ import org.springframework.stereotype.Component
 
 @Component
 class CoreService(private val logger: Logger) {
-	fun doFantasticThing(): Unit = logger.info("Magic is happening right now...")
+	fun doFantasticThing(): Unit = InternalCoreService(logger).doFantasticThing()
 }
