@@ -4229,3 +4229,12 @@ Good to know:
 			class TestDatabaseHelper(appDatabaseHelper: AppDatabaseHelper) : DatabaseHelper {
 				override val tablesInOrder = appDatabaseHelper.allTablesInOrder
 			}
+			
+	How to exclude transitive dependencies in build.gradle file:
+		compile(project(":PaymentSolutions")) {
+			exclude(group: 'org.springframework.boot', module: 'spring-boot-starter-web')
+			exclude(group: 'mysql', module: 'mysql-connector-java')
+			exclude(group: 'io.springfox', module: 'springfox-swagger2')
+			exclude(group: 'io.springfox', module: 'springfox-swagger-ui')
+		}
+	
