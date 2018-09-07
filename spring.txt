@@ -4185,6 +4185,7 @@ WebFlux filters:
 In Spring Security the source of truth for reactive applications is Reactor's context.
 
 
+
 Database migrations with Liquibase:
 
 	To execute manually the migrations from code (instead of having Spring Boot to do the work):
@@ -4210,3 +4211,21 @@ Database migrations with Liquibase:
 				}
 			}
 		- or use just what Liquibase offers: liquibase.Liquibase class
+		
+		
+		
+Good to know:
+
+	To override a Bean during testing use either:
+		- @MockBean provided by Spring, and configure it for example in the @BeforeAll method
+			@MockBean
+			private lateinit var adService: AdService
+		- or the @Primary annotation:
+			/**
+			 * This is Primary, so that this will override @see hu.regens.paymentsolutions.paymentservice.infrastructure.database.AppDatabaseHelper
+			 */
+			@Primary
+			@Component
+			class TestDatabaseHelper(appDatabaseHelper: AppDatabaseHelper) : DatabaseHelper {
+				override val tablesInOrder = appDatabaseHelper.allTablesInOrder
+			}
