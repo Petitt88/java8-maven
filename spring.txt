@@ -4183,3 +4183,30 @@ WebFlux filters:
 		})
 		
 In Spring Security the source of truth for reactive applications is Reactor's context.
+
+
+Database migrations with Liquibase:
+
+	To execute manually the migrations from code (instead of having Spring Boot to do the work):
+		- set spring.liquibase.enabled: false - this disables creating the SpringLiquibase bean from LiquibaseAutoConfiguration class --> we have to create it manually, then execute it
+		- use this Bean:
+			@Bean
+			fun databaseMigrationsRunner(dataSource: DataSource): CommandLineRunner = CommandLineRunner {
+				transactionWithSupportedIsolationLevel {
+					val springLiquibase = SpringLiquibase().apply {
+						this.dataSource = dataSource
+						changeLog = liquibaseProperties.changeLog
+						contexts = liquibaseProperties.contexts
+						defaultSchema = liquibaseProperties.defaultSchema
+						isDropFirst = liquibaseProperties.isDropFirst
+						labels = liquibaseProperties.labels
+						// resourceLoader: very important, without this SpringLiquibase fails to run!
+						resourceLoader = applicationContextProvider.context
+						setChangeLogParameters(liquibaseProperties.parameters)
+						setRollbackFile(liquibaseProperties.rollbackFile)
+					}
+					// execute Liquibase migrations
+					springLiquibase.afterPropertiesSet()
+				}
+			}
+		- or use just what Liquibase offers: liquibase.Liquibase class
