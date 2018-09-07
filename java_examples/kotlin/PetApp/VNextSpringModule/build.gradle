@@ -20,7 +20,7 @@ dependencies {
 	// Jackson datatype to use java 8 time api
 	compile('com.fasterxml.jackson.datatype:jackson-datatype-jsr310')
 
-	compile project(":Common/Utils")
+	compile project(":Utils")
 
 	// annotation processing
 	kapt('org.springframework.boot:spring-boot-configuration-processor')
