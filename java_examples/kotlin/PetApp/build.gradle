@@ -81,4 +81,5 @@ dependencies {
 
 task wrapper(type: Wrapper) {
 	gradleVersion = gradleVersion
+	distributionType = Wrapper.DistributionType.ALL
 }
