@@ -1,9 +1,9 @@
 buildscript {
 	ext {
 		kotlinVersion = '1.2.61'
-		springBootVersion = '2.0.4.RELEASE'
+		springBootVersion = '2.0.5.RELEASE'
 		appVersion = '1.0.0-SNAPSHOT'
-		gradleVersion = '4.10'
+		gradleVersion = '4.10.1'
 	}
 	repositories {
 		mavenCentral()
