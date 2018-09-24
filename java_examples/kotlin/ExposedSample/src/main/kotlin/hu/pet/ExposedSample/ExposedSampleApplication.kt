@@ -1,8 +1,7 @@
 package hu.pet.ExposedSample
 
 import hu.pet.ExposedSample.model.*
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.*
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
@@ -84,6 +83,48 @@ class ExposedSampleApplication {
 			filmList.forEach(::println)
 			// does not perform new query
 			films.toList()
+		}
+
+		// DSL with DAO example
+		// query in is DSL, and mapping it to DAO classes
+		transactionWithLogging {
+			val query = Users.innerJoin(UserRatings).innerJoin(StarWarsFilms)
+				.slice(Users.columns)
+				.select {
+					StarWarsFilms.sequelId.eq(8) and UserRatings.value.greaterEq(9L)
+				}.withDistinct()
+
+			val users = User.wrapRows(query).toList()
+			// performs sql
+			val nmberOFUsers = User.wrapRows(query).count()
+
+			users.forEach {
+				// performs query
+				val ratings = it.ratings.toList()
+				// performs query
+				val ratingsCount = it.ratings.count()
+
+				// performs query
+				val ratedFilms = it.ratedFilms.toList()
+				val ratedFilmsCount = it.ratedFilms.count()
+			}
+		}
+
+		transactionWithLogging {
+			fun createQuery(): Query = Users.innerJoin(UserRatings).innerJoin(StarWarsFilms)
+				.select {
+					StarWarsFilms.sequelId.eq(8) and UserRatings.value.greaterEq(9L)
+				}.withDistinct()
+
+			val userQuery = createQuery().adjustSlice { slice(Users.columns) }
+			val userRatingsQuery = createQuery().adjustSlice { slice(UserRatings.columns) }
+			val ratedFilmsQuery = createQuery().adjustSlice { slice(StarWarsFilms.columns) }
+
+			val users = User.wrapRows(userQuery).toList()
+			val userRatings = UserRating.wrapRows(userRatingsQuery).toList()
+			val ratedFilms = StarWarsFilm.wrapRows(ratedFilmsQuery).toList()
+
+			println("Users: ${users.count()}, ratings: ${userRatings.count()}, rated films: ${ratedFilms.count()}")
 		}
 	}
 }
