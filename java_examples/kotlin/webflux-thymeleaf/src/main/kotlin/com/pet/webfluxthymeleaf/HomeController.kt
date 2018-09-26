@@ -4,7 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.pet.webfluxthymeleaf.infrastructure.parseJson
 import com.pet.webfluxthymeleaf.movie.Movie
 import com.pet.webfluxthymeleaf.movie.MovieService
-import kotlinx.coroutines.experimental.Unconfined
+import kotlinx.coroutines.experimental.Dispatchers
+import kotlinx.coroutines.experimental.GlobalScope
 import kotlinx.coroutines.experimental.reactive.awaitFirst
 import kotlinx.coroutines.experimental.reactor.mono
 import kotlinx.coroutines.experimental.time.delay
@@ -18,7 +19,6 @@ import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.result.view.Rendering
 import org.thymeleaf.spring5.context.webflux.ReactiveDataDriverContextVariable
 import reactor.core.publisher.Mono
-import java.lang.Exception
 import java.net.URI
 import java.nio.channels.AsynchronousFileChannel
 import java.nio.file.Paths
@@ -44,7 +44,7 @@ class HomeController(
 //	}
 
 	@GetMapping("/")
-	fun index(): Mono<Rendering> = mono(Unconfined) {
+	fun index(): Mono<Rendering> = GlobalScope.mono(Dispatchers.Unconfined) {
 
 		val movies = movieService.getMoviesFromDb()
 			.collectList()
@@ -65,7 +65,7 @@ class HomeController(
 	}
 
 	@GetMapping("/push", produces = [MediaType.TEXT_EVENT_STREAM_VALUE])
-	fun push(model: Model): Mono<String> = mono(Unconfined) {
+	fun push(model: Model): Mono<String> = GlobalScope.mono(Dispatchers.Unconfined) {
 
 		model["firstSourceTitle"] =
 				"Movies from ReactiveDataDriverContextVariable - Flux must be used. This enables a server pushing model. In this case Thymeleaf itself subscribes to the Flux and renders a section whenever a new data arrives until the Flux gets completed."
@@ -85,7 +85,7 @@ class HomeController(
 	}
 
 	@GetMapping("/long")
-	fun longRunningSimulation(model: Model) = mono {
+	fun longRunningSimulation(model: Model) = GlobalScope.mono {
 
 		model.addAttribute("firstSourceTitle", "Fixed movies from a fix Flux.")
 			.addAttribute("secondSourceTitle", "Movies from an infinite Flux stream. Queried only the first 5, each one took 1 second to get.")
@@ -112,7 +112,7 @@ class HomeController(
 	}
 
 	@GetMapping("/file")
-	fun files(model: Model) = mono {
+	fun files(model: Model) = GlobalScope.mono {
 
 		model.addAttribute("firstSourceTitle", "Movies read asynchronously from external system")
 			.addAttribute("secondSourceTitle", "Movies read asynchronously from the filesystem")
@@ -147,7 +147,7 @@ class HomeController(
 
 	@PostMapping("/")
 	@ResponseBody
-	fun createMovie(@RequestBody @Valid movie: Movie): Mono<ResponseEntity<*>> = mono {
+	fun createMovie(@RequestBody @Valid movie: Movie): Mono<ResponseEntity<*>> = GlobalScope.mono {
 
 		// do NOT put bindingResult: BindingResult in the url because WebFlux cannot provide it and exception will be thrown!
 		// the request is refused (400 becomes the response's status automatically) if the movie is invalid automatically, no need to manually handle it
@@ -166,14 +166,14 @@ class HomeController(
 
 	@GetMapping("/movies")
 	@ResponseBody
-	fun getMovies(): Mono<ResponseEntity<List<Movie>>> = mono {
+	fun getMovies(): Mono<ResponseEntity<List<Movie>>> = GlobalScope.mono {
 		val movies = movieService.getMoviesFromDb().collectList().awaitFirst()
 		ResponseEntity.ok().body(movies)
 	}
 
 	@GetMapping("/movies/{id}")
 	@ResponseBody
-	fun getMovie(@PathVariable id: Int): Mono<Movie> = mono(Unconfined) {
+	fun getMovie(@PathVariable id: Int): Mono<Movie> = GlobalScope.mono(Dispatchers.Unconfined) {
 		val movie = movieService.getMovie(id)
 		movie
 	}

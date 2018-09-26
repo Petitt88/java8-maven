@@ -3,7 +3,8 @@ package com.pet.webfluxthymeleaf
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.pet.webfluxthymeleaf.movie.Movie
 import com.pet.webfluxthymeleaf.movie.MovieRepository
-import kotlinx.coroutines.experimental.Unconfined
+import kotlinx.coroutines.experimental.Dispatchers
+import kotlinx.coroutines.experimental.GlobalScope
 import kotlinx.coroutines.experimental.launch
 import kotlinx.coroutines.experimental.reactive.awaitFirst
 import kotlinx.coroutines.experimental.reactive.awaitFirstOrDefault
@@ -19,7 +20,7 @@ class WebfluxThymeleafApplication {
 
 	@Bean
 	fun runner(mr: MovieRepository) = ApplicationRunner {
-		launch(Unconfined) {
+		GlobalScope.launch(Dispatchers.Unconfined) {
 
 			val count = mr.count().awaitFirst()
 

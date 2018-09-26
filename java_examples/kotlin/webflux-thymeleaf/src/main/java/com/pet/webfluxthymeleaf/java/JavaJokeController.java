@@ -24,11 +24,11 @@ public class JavaJokeController {
 	public String veryBadJoke(Model model) {
 
 		model.addAttribute("firstSourceTitle", "Movies from Java - only the 1st 10. Blocking!")
-				.addAttribute("secondSourceTitle", "Movies from Java - all. Blocking!");
+			.addAttribute("secondSourceTitle", "Movies from Java - all. Blocking!");
 
 		List<Movie> movies = this.movieService.getMoviesFromDb(10L)
-				.collectList()
-				.block();
+			.collectList()
+			.block();
 		model.addAttribute("movies", movies);
 
 		movies = this.movieService.getMoviesFromDb(null).collectList().block();
@@ -41,19 +41,19 @@ public class JavaJokeController {
 	public Mono<String> joke(Model model) {
 
 		model.addAttribute("firstSourceTitle", "Movies from Java - only the 1st 10. Non blocking.")
-				.addAttribute("secondSourceTitle", "Movies from Java - all. Non blocking.");
+			.addAttribute("secondSourceTitle", "Movies from Java - all. Non blocking.");
 
 		Mono<String> viewMono = this.movieService.getMoviesFromDb(10L)
-				.collectList()
-				.flatMap(movies -> {
-					model.addAttribute("movies", movies);
-					return this.movieService.getMoviesFromDb(null)
-							.collectList()
-							.flatMap(movies2 -> {
-								model.addAttribute("superMovies", movies2);
-								return Mono.just("index");
-							});
-				});
+			.collectList()
+			.flatMap(movies -> {
+				model.addAttribute("movies", movies);
+				return this.movieService.getMoviesFromDb(null)
+					.collectList()
+					.flatMap(movies2 -> {
+						model.addAttribute("superMovies", movies2);
+						return Mono.just("index");
+					});
+			});
 
 		return viewMono;
 	}
