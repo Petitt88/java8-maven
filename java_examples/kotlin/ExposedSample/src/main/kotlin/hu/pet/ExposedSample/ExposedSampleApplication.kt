@@ -31,6 +31,8 @@ class ExposedSampleApplication {
 				val user2 = User.new {
 					name = "Academia"
 				}
+				// flush - goes to the database and inserts the record
+				// if not present, insert occurs at the end of the transactionWithLogging block where commit happens
 				user.flush()
 				movie.flush()
 
@@ -47,6 +49,7 @@ class ExposedSampleApplication {
 			val ratings = UserRating.all()
 
 			for (rating in ratings) {
+				// many-to-one
 				val f = rating.film
 				val u = rating.user
 				println("${f.director}, ${u.name}")
@@ -94,9 +97,10 @@ class ExposedSampleApplication {
 					StarWarsFilms.sequelId.eq(8) and UserRatings.value.greaterEq(9L)
 				}.withDistinct()
 
+			// performs sql
 			val users = User.wrapRows(query).toList()
 			// performs sql
-			val nmberOFUsers = User.wrapRows(query).count()
+			val numberOfUsers = User.wrapRows(query).count()
 
 			users.forEach {
 				// performs query
