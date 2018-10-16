@@ -58,6 +58,15 @@ Binding redirects:
 	- Problematic when someone references an older version while your app deploys a higher version
 	- To accept a higher version, your app.config needs to explicitly allow for that by adding a redirect
 	
+Tips and tricks:
+	- Directory.Build.props 
+		- at the solution level
+		- automatically gets imported to all of the projects
+		- good to lock the nuget package versions in one place globally for the app
+	- Directory.Build.targets
+		- you would place packages to reference automatically by certain packages for example
+	- These 2 are not tied to .Net Standard, they are MSBuild feature and available in every kind of .Net projects
+	
 	
 machine.config:
 
