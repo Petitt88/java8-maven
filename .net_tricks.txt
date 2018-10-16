@@ -42,6 +42,21 @@ Assembly loading process:
 			<assemblyIdentity name="Super.Component" publicKeyToken="31bf3856ad364e35" />
 			<bindingRedirect oldVersion="0.0.0.0-1.0.0.0" newVersion="1.1.0.0" />
 		</dependentAssembly>
+		
+		
+Strong naming:
+	- a Guid attached to your assembly name
+	- MyLibrary, Version=1.0.0.0, Culture=neutral, PublicKeyToken=70d3c3735d23454d4		// PublicKeyToken: this is what a strong naming generates
+	- basically it disambiguates assemblies with the same simple name (such as "Calculator")
+		- required for GAC or for loading assembles side-by-side
+	- Strong naming is generally vieral
+		- Strong named assemblies can only reference strong named assemblies
+		
+Binding redirects:
+	- .Net Framework only
+	- Only loads assembles where the referenced version matches the version on disk
+	- Problematic when someone references an older version while your app deploys a higher version
+	- To accept a higher version, your app.config needs to explicitly allow for that by adding a redirect
 	
 	
 machine.config:
@@ -164,7 +179,7 @@ web.config:
 
 Dump files, what assemblies are loaded in runtime:
 	Place a breakpoint somewhere:
-		Debug --> Windows --> Modules: we can check the loaded managed assmeblies here
+		Debug --> Windows --> Modules: we can check the loaded managed assemblies here
 		Debug --> Save Dump As... we can save a dump file of the current state of the memory then load this dumpfile back into Visual Studio. This time we will see even the unmanaged native libraries that got loaded.
 	
 	
@@ -231,7 +246,7 @@ Application Domains (AppDomain)
 	.NET Standard is what you target for your libraries, and the apps that USE your library target a platform.
 
 	
-Reference assmeblies:
+Reference assemblies:
 
 	 The reference dlls just define the various APIs that these platforms (.NET Framework, .NET Core, Mono, etc) must expose for a given version of .NET Standard.
 	 The classes have literally empty method bodies. It will be decided in runtime which implementation will get used.
