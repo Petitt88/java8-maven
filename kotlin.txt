@@ -1339,6 +1339,50 @@ Coroutines:
 				hello.text = "Done!"
 			}
 			
+			
+	Final Coroutine API:
+		- When a coroutine is cancelled using Job.cancel without a cause (job.cancel()), it terminates, but it does not cancel its parent.
+			- Cancelling without cause is a mechanism for parent to cancel its children without cancelling itself.
+			- But when the parent is cancelled, it cancels all of his children as well automatically. 
+			  That's why it is important to use the current coroutineScope.launch/async when creating new children instead of using the GlobalScope - which the parent cannot track, thus cannot cancel either it itself gets cancelled.
+		- If a coroutine encounters exception other than CancellationException, it cancels its parent with that exception. 
+			- This behaviour cannot be overridden and is used to provide stable coroutines hierarchies for structured concurrency which do not depend on CoroutineExceptionHandler implementation.
+			
+		Exception propagation
+			Coroutine builders come in two flavors: propagating exceptions automatically (launch and actor) or exposing them to users (async and produce). 
+			The former treat exceptions as unhandled, similar to Java's Thread.uncaughtExceptionHandler, 
+			while the latter are relying on the user to consume the final exception, for example via await or receive (produce and receive are covered later in Channels section).
+			
+		Supervision
+			As we have studied before, cancellation (due to an exception was thrown (not normal job.cancel() - CancellationException)) is a bidirectional relationship propagating through the whole coroutines hierarchy.
+				- If an exception is raised in the parent or parent gets just canlled (job.cancel()) all the children are cancelled
+				- If an exception is raised in one of the children - the parent and all other children gets cancelled
+					- If a child gets cancelled it does not affect the other children nor the parent
+				- But what if unidirectional cancellation is required (when an exception occurs)? - Supervision job
+			
+			Supervision job
+				For these purposes SupervisorJob can be used. It is similar to a regular Job with the only exception that cancellation is propagated only downwards. 
+				Job: Creates a new job object in an active state. A failure of any child of this job immediately causes this job to fail, too, and cancels the rest of its children.
+					 If parent job is specified, then this job becomes a child job of its parent and is cancelled when its parent fails or is cancelled. All this job’s children are cancelled in this case, too. 
+					 The invocation of cancel with exception (other than CancellationException) on this job also cancels parent.
+				SupervisorJob: Creates a new supervisor job object in an active state. Children of a supervisor job can fail independently of each other.
+					 A failure or cancellation of a child does not cause the supervisor job to fail and does not affect its other children, so a supervisor can implement a custom policy for handling failures of its children:
+						- A failure of a child job that was created using launch can be handled via CoroutineExceptionHandler in the context.
+						- A failure of a child job that was created using async can be handled via Deferred.await on the resulting deferred value.
+					If parent job is specified, then this supervisor job becomes a child job of its parent and is cancelled when its parent fails or is cancelled. All this supervisor’s children are cancelled in this case, too. 
+					The invocation of of cancel with exception (other than CancellationException) on this supervisor job also cancels parent.
+					
+			Supervision scope
+				For scoped concurrency supervisorScope can be used instead of coroutineScope for the same purpose. 
+				It propagates cancellation only in one direction and cancels all children only if it has failed itself. 
+				It also waits for all children before completion just like coroutineScope does.
+				
+			Exceptions in supervised coroutines
+				Another crucial difference between regular and supervisor jobs is exception handling. 
+				Every child should handle its exceptions by itself via exception handling mechanisms. 
+				This difference comes from the fact that child's failure is not propagated to the parent.
+		
+			
 		
 Iterator
 
