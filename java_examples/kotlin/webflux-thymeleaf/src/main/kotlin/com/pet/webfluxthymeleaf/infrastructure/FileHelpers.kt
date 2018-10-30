@@ -1,12 +1,12 @@
 package com.pet.webfluxthymeleaf.infrastructure
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import kotlinx.coroutines.experimental.nio.aRead
+import com.pet.webfluxthymeleaf.infrastructure.kotlin.aRead
 import java.nio.ByteBuffer
 import java.nio.channels.AsynchronousFileChannel
 
 
-inline suspend fun <reified T> AsynchronousFileChannel.parseJson(mapper: ObjectMapper): T {
+suspend inline fun <reified T> AsynchronousFileChannel.parseJson(mapper: ObjectMapper): T {
 
 	val bytes = ByteArray(this.size().toInt())
 	val buffer = ByteBuffer.allocate(4096)

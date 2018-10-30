@@ -1,11 +1,11 @@
 buildscript {
 	ext {
-		kotlinVersion = '1.2.71'
-		springBootVersion = '2.0.5.RELEASE'
-		kotlinCorouteVersion = '0.26.1'
-		gradlewVersion = '4.10.1'
+		kotlinVersion = '1.3.0'
+		kotlinCorouteVersion = '1.0.0'
+		springBootVersion = '2.0.6.RELEASE'
+		gradlewVersion = '4.10.2'
 		swaggerVersion = '2.9.2'
-		exposedVersion = '0.10.5'
+		exposedVersion = '0.11.1'
 	}
 	ext['kotlin.version'] = kotlinVersion
 	repositories {
@@ -58,21 +58,14 @@ dependencies {
 	compile("com.fasterxml.jackson.module:jackson-module-kotlin")
 	compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	compile("org.jetbrains.kotlin:kotlin-reflect")
-	compile("org.jetbrains.kotlinx:kotlinx-coroutines-core:${kotlinCorouteVersion}")
-	compile("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:${kotlinCorouteVersion}")
-	compile("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:${kotlinCorouteVersion}")
-	compile("org.jetbrains.kotlinx:kotlinx-coroutines-nio:${kotlinCorouteVersion}")
-	compile("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:${kotlinCorouteVersion}")
+	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:${kotlinCorouteVersion}"
+	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-reactor:${kotlinCorouteVersion}"
+	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:${kotlinCorouteVersion}"
 
 	kapt("org.springframework.boot:spring-boot-configuration-processor")
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('io.projectreactor:reactor-test')
-}
-kotlin {
-	experimental {
-		coroutines "enable"
-	}
 }
 
 task wrapper(type: Wrapper) {

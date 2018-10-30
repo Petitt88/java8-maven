@@ -4,11 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.pet.webfluxthymeleaf.infrastructure.parseJson
 import com.pet.webfluxthymeleaf.movie.Movie
 import com.pet.webfluxthymeleaf.movie.MovieService
-import kotlinx.coroutines.experimental.Dispatchers
-import kotlinx.coroutines.experimental.GlobalScope
-import kotlinx.coroutines.experimental.reactive.awaitFirst
-import kotlinx.coroutines.experimental.reactor.mono
-import kotlinx.coroutines.experimental.time.delay
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.reactive.awaitFirst
+import kotlinx.coroutines.reactor.mono
+import kotlinx.coroutines.time.delay
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.stereotype.Controller
