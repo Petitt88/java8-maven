@@ -2981,3 +2981,64 @@ Hooks:
 			
 			Note that you can still choose whether to pass the application state down as props (more explicit) or as context (more convenient for very deep updates). 
 			If you use context to pass down the state too, use two different context types — the dispatch context never changes, so components that read it don’t need to rerender unless they also need the application state.
+			
+		- How to read an often-changing value from useCallback?
+			Note: We recommend to pass dispatch down in context rather than individual callbacks in props. The approach below is only mentioned here for completeness and as an escape hatch.
+			
+			In some rare cases you might need to memoize a callback with useCallback but the memoization doesn’t work very well because the inner function has to be re-created too often. 
+			If the function you’re memoizing is an event handler and isn’t used during rendering, you can use ref as an instance variable, and save the last committed value into it manually:
+				function Form() {
+				  const [text, updateText] = useState('');
+				  const textRef = useRef();
+
+				  useEffect(() => {
+					textRef.current = text; // Write it to the ref
+				  });
+
+				  const handleSubmit = useCallback(() => {
+					const currentText = textRef.current; // Read it from the ref
+					alert(currentText);
+				  }, [textRef]); // Don't recreate handleSubmit like [text] would do
+
+				  return (
+					<>
+					  <input value={text} onChange={e => updateText(e.target.value)} />
+					  <ExpensiveTree onSubmit={handleSubmit} />
+					</>
+				  );
+				}
+				
+			This is a rather convoluted pattern but it shows that you can do this escape hatch optimization if you need it. It’s more bearable if you extract it to a custom Hook:
+				function Form() {
+				  const [text, updateText] = useState('');
+				  // Will be memoized even if `text` changes:
+				  const handleSubmit = useEventCallback(() => {
+					alert(text);
+				  }, [text]);
+
+				  return (
+					<>
+					  <input value={text} onChange={e => updateText(e.target.value)} />
+					  <ExpensiveTree onSubmit={handleSubmit} />
+					</>
+				  );
+				}
+
+				function useEventCallback(fn, dependencies) {
+				  const ref = useRef(() => {
+					throw new Error('Cannot call an event handler while rendering.');
+				  });
+
+				  useEffect(() => {
+					ref.current = fn;
+				  }, [fn, ...dependencies]);
+
+				  return useCallback(() => {
+					const fn = ref.current;
+					return fn();
+				  }, [ref]);
+				}
+				
+			In either case, we don’t recommend this pattern and only show it here for completeness. Instead, it is preferable to avoid passing callbacks deep down.
+			
+		
