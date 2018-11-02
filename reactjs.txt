@@ -276,7 +276,49 @@ React
 					1. In most cases, you’ll want to attach the memoized function to a component instance. This prevents multiple instances of a component from resetting each other’s memoized keys.
 					2. Typically you’ll want to use a memoization helper with a limited cache size in order to prevent memory leaks over time. (In the example above, we used memoize-one because it only caches the most recent argument and result.)
 					3. None of the implementations shown in this section will work if props.list is recreated each time the parent component renders. But in most cases, this setup is appropriate.
-			
+	
+	v16.6
+		- React.memo:
+			Class components can bail out from rendering when their input props are the same using PureComponent or shouldComponentUpdate. Now you can do the same with function components by wrapping them in React.memo.
+			const MyComponent = React.memo(function MyComponent(props) {
+			  /* only rerenders if props change */
+			});
+		
+		- React.lazy: Code-Splitting with Suspense
+			You may have seen Dan’s talk about React Suspense at JSConf Iceland. Now you can use the Suspense component to do code-splitting by wrapping a dynamic import in a call to React.lazy().
+				import React, {lazy, Suspense} from 'react';
+				const OtherComponent = lazy(() => import('./OtherComponent'));
+
+				function MyComponent() {
+				  return (
+					<Suspense fallback={<div>Loading...</div>}>
+					  <OtherComponent />
+					</Suspense>
+				  );
+				}
+				
+		- static contextType
+			const MyContext = React.createContext();
+			We’ve heard feedback that adopting the new render prop API can be difficult in class components. So we’ve add a convenience API to consume a context value from within a class component.
+				class MyClass extends React.Component {
+				  static contextType = MyContext;
+				  componentDidMount() {
+					let value = this.context;
+					/* perform a side-effect at mount using the value of MyContext */
+				  }
+				  componentDidUpdate() {
+					let value = this.context;
+					/* ... */
+				  }
+				  componentWillUnmount() {
+					let value = this.context;
+					/* ... */
+				  }
+				  render() {
+					let value = this.context;
+					/* render something based on the value of MyContext */
+				  }
+				}
 		
 	Best practices:
 		- Initializing state: 
@@ -2776,3 +2818,166 @@ Hooks:
 			Prefer the standard useEffect when possible to avoid blocking visual updates.
 			
 			Tip: If you’re migrating code from a class component, useLayoutEffect fires in the same phase as componentDidMount and componentDidUpdate, so if you’re unsure of which effect Hook to use, it’s probably the least risky.
+			
+	FAQ:		
+		- From Classes to Hooks
+			- constructor: Function components don’t need a constructor. You can initialize the state in the useState call. If computing it is expensive, you can pass a function to useState.
+			- getDerivedStateFromProps: Schedule an update while rendering instead.
+			- shouldComponentUpdate: See React.memo below.
+			- render: This is the function component body itself
+			- componentDidMount, componentDidUpdate, componentWillUnmount: The useEffect Hook can express all combinations of these (including less common cases).
+			- componentDidCatch and getDerivedStateFromError: There are no Hook equivalents for these methods yet, but they will be added soon.
+			
+		- Is there something like instance variables?
+			Yes! The useRef() Hook isn’t just for DOM refs. The “ref” object is a generic container whose current property is mutable and can hold any value, similar to an instance property on a class.
+				function Timer() {
+				  const intervalRef = useRef();
+
+				  useEffect(() => {
+					const id = setInterval(() => {
+					  // ...
+					});
+					intervalRef.current = id;
+					return () => {
+					  clearInterval(intervalRef.current);
+					};
+				  });
+
+				  // ...
+				}
+				
+		- How to get the previous props or state?
+			Currently, you can do it manually with a ref:
+			function Counter() {
+			  const [count, setCount] = useState(0);
+
+			  const prevCountRef = useRef();
+			  useEffect(() => {
+				prevCountRef.current = count;
+			  });
+			  const prevCount = prevCountRef.current;
+
+			  return <h1>Now: {count}, before: {prevCount}</h1>;
+			}
+			
+			This might be a bit convoluted but you can extract it into a custom Hook:
+				function Counter() {
+				  const [count, setCount] = useState(0);
+				  const prevCount = usePrevious(count);
+				  return <h1>Now: {count}, before: {prevCount}</h1>;
+				}
+
+				function usePrevious(value) {
+				  const ref = useRef();
+				  useEffect(() => {
+					ref.current = value;
+				  });
+				  return ref.current;
+				}
+				
+			Note how this would work for props, state, or any other calculated value.
+				function Counter() {
+				  const [count, setCount] = useState(0);
+
+				  const calculation = count * 100;
+				  const prevCalculation = usePrevious(calculation);
+				  // ...
+				}
+		
+		- How do I implement getDerivedStateFromProps?
+			While you probably don’t need it, for the rare cases that you do (such as implementing a <Transition> component), you can update the state right during rendering. 
+			React will re-run the component with updated state immediately after exiting the first render so it wouldn’t be expensive.
+			
+			Here, we store the previous value of the row prop in a state variable so that we can compare:
+				function ScrollView({row}) {
+				  let [isScrollingDown, setIsScrollingDown] = useState(false);
+				  let [prevRow, setPrevRow] = useState(null);
+
+				  if (row !== prevRow) {
+					// Row changed since last render. Update isScrollingDown.
+					setIsScrollingDown(prevRow !== null && row > prevRow);
+					setPrevRow(row);
+				  }
+
+				  return `Scrolling down: ${isScrollingDown}`;
+				}
+			This might look strange at first, but an update during rendering is exactly what getDerivedStateFromProps has always been like conceptually.	
+			
+		- How do I implement shouldComponentUpdate?
+			You can wrap a function component with React.memo to shallowly compare its props:
+			const Button = React.memo((props) => {
+			  // your component
+			});
+			
+			It’s not a Hook because it doesn’t compose like Hooks do. React.memo is equivalent to PureComponent, but it only compares props. 
+			(You can also add a second argument to specify a custom comparison function that takes the old and new props. If it returns true, the update is skipped.)
+			
+			React.memo doesn’t compare state because there is no single state object to compare. But you can make children pure too, or even optimize individual children with useMemo.
+			
+		- How to memoize calculations?
+			The useMemo Hook lets you cache calculations between multiple renders by “remembering” the previous computation:
+			
+			const memoizedValue = useMemo(() => computeExpensiveValue(a, b), [a, b]);
+			
+			This code calls computeExpensiveValue(a, b). But if the inputs [a, b] haven’t changed since the last value, useMemo skips calling it a second time and simply reuses the last value it returned.
+			Conveniently, this also lets you skip an expensive re-render of a child:
+				function Parent({ a, b }) {
+				  // Only re-rendered if `a` changes:
+				  const child1 = useMemo(() => <Child1 a={a} />, [a]);
+				  // Only re-rendered if `b` changes:
+				  const child2 = useMemo(() => <Child2 b={b} />, [b]);
+				  return (
+					<>
+					  {child1}
+					  {child2}
+					</>
+				  )
+				}
+				Note that this approach won’t work in a loop because Hook calls can’t be placed inside loops. But you can extract a separate component for the list item, and call useMemo there.
+				
+		- Are Hooks slow because of creating functions in render?
+			In addition, consider that the design of Hooks is more efficient in a couple ways:
+				- Hooks avoid a lot of the overhead that classes require, like the cost of creating class instances and binding event handlers in the constructor.
+				- Idiomatic code using Hooks doesn’t need the deep component tree nesting that is prevalent in codebases that use higher-order components, render props, and context. With smaller component trees, React has less work to do.
+				
+			Traditionally, performance concerns around inline functions in React have been related to how passing new callbacks on each render breaks shouldComponentUpdate optimizations in child components. 
+			Hooks approach this problem from three sides:
+				- The useCallback Hook lets you keep the same callback reference between re-renders so that shouldComponentUpdate continues to work:
+				- The useMemo Hook makes it easier to control when individual children update, reducing the need for pure components.
+				- Finally, the useReducer Hook reduces the need to pass callbacks deeply, as explained below.
+				
+		- How to avoid passing callbacks down?
+			We’ve found that most people don’t enjoy manually passing callbacks through every level of a component tree. Even though it is more explicit, it can feel like a lot of “plumbing”.
+			In large component trees, an alternative we recommend is to pass down a dispatch function from useReducer via context:
+			
+				const TodosDispatch = React.createContext(null);
+
+				function TodosApp() {
+				  // Tip: `dispatch` won't change between re-renders
+				  const [todos, dispatch] = useReducer(todosReducer);
+
+				  return (
+					<TodosDispatch.Provider value={dispatch}>
+					  <DeepTree todos={todos} />
+					</TodosDispatch.Provider>
+				  );
+				}
+			Any child in the tree inside TodosApp can read use the dispatch function to pass actions up to TodosApp:
+				function DeepChild(props) {
+				  // If we want to perform an action, we can get dispatch from context.
+				  const dispatch = useContext(TodosDispatch);
+
+				  function handleClick() {
+					dispatch({ type: 'add', text: 'hello' });
+				  }
+
+				  return (
+					<button onClick={handleClick}>Add todo</button>
+				  );
+				}
+				
+			This is both more convenient from the maintenance perspective (no need to keep forwarding callbacks), and avoids the callback problem altogether. 
+			Passing dispatch down like this is the recommended pattern for deep updates.
+			
+			Note that you can still choose whether to pass the application state down as props (more explicit) or as context (more convenient for very deep updates). 
+			If you use context to pass down the state too, use two different context types — the dispatch context never changes, so components that read it don’t need to rerender unless they also need the application state.
