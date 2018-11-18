@@ -1,9 +1,9 @@
 buildscript {
 	ext {
-		kotlinVersion = '1.3.0'
+		kotlinVersion = '1.3.10'
 		springBootVersion = '2.1.0.RELEASE'
 		gradlewVersion = '4.10.2'
-		exposedVersion = '0.11.1'
+		exposedVersion = '0.11.2'
 	}
 	ext['kotlin.version'] = kotlinVersion
 	repositories {
