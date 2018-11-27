@@ -1,0 +1,20 @@
+From now on, we suppose that you are using Anaconda python distribution.
+
+
+To change python version, creating a new conda environment:	https://conda.io/docs/user-guide/tasks/manage-environments.html#activate-env
+	conda search python - lists available python versions
+	
+	conda create -n py36 python=3.6 anaconda	# py367 becomes the name of the environment
+	conda info --envs							# lists the environments, your current environment is highlighted with an asterisk (*)
+	
+	conda list -n myenv							# If the environment is not activated, in your Terminal window or an Anaconda Prompt
+	conda list									# If the environment is activated, in your Terminal window or an Anaconda Prompt
+	
+	
+	
+To determine the current Python version:
+	1. python --version
+	2. >>> python
+	   >>> import sys
+	   >>> print(sys.version)
+		
