@@ -2,10 +2,10 @@ buildscript {
 	ext {
 		kotlinVersion = '1.3.10'
 		springBootVersion = '2.1.0.RELEASE'
-		gradlewVersion = '4.10.2'
+		gradlewVersion = '5.0'
 		exposedVersion = '0.11.2'
 	}
-	ext['kotlin.version'] = kotlinVersion
+
 	repositories {
 		mavenCentral()
 	}
@@ -43,7 +43,6 @@ repositories {
 	maven { url "https://dl.bintray.com/kotlin/exposed/" }
 }
 
-
 dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -56,7 +55,7 @@ dependencies {
 	testImplementation('org.springframework.boot:spring-boot-starter-test')
 }
 
-task wrapper(type: Wrapper) {
-	gradleVersion = gradlewVersion
+wrapper {
+	version = gradlewVersion
 	distributionType = Wrapper.DistributionType.ALL
 }
