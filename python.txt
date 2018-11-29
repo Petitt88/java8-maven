@@ -1,3 +1,181 @@
+Data science is a way to try and discover hidden patterns in raw data. To achieve this goal, it makes use of several algorithms, machine learning(ML) principles, and scientific methods.
+
+None: it indicates an absence of value
+pass: if implementation will follow later
+
+Naming conventions:
+	1. Use uppercase initials for class names, lowercase for all others.
+	2. Name a private identifier with a leading underscore ( _username)
+	3. Name a strongly private identifier with two leading underscores ( __password)
+	4. Special identifiers by Python end with two leading underscores.
+	
+	
+Types:
+	List: 
+		days = ['Monday','Tuesday',3,4,5,6,7]
+		days = list(['Monday','Tuesday',3,4,5,6,7])
+	Tuples: 
+		subjects = ('Physics','Chemistry','Maths')
+		subjects = set(['Physics','Chemistry','Maths'])
+		A tuple is immutable
+	Dictionaries:
+		person={'city':'Ahmedabad','age':7}
+		person['city']
+	Set:
+		a={1,2,3}
+		It returns only one instance of any value present more than once.
+	Str:
+		converts a value into a string
+		str([1,2,3])
+		
+		
+Local scope, global scope:
+	However, it is bad practice to try to manipulate global values from inside local scopes. Try to pass it as a parameter to the function.
+	
+	Now, what if you wanted to change the global version of ‘a’? We use the ‘global’ keyword in python for this.
+		>>> a=1
+		>>> def counter():
+						global a
+						a=2
+						print(a)    
+		>>> counter()
+		
+		
+	>>> def red():
+					a=1
+					def blue():
+									nonlocal a
+									a=2
+									b=2
+									print(a)
+									print(b)
+					blue()
+					print(a)             
+	>>> red()
+	2
+	2
+	2
+
+Strings:
+	>>> type('Dogs are love')			# <class ‘str’>
+	You can declare a Python string using either single quotes or double quotes.
+	
+	5. Spanning a String Across Lines
+		triple quotes:
+			a="""Hello
+				Welcome"""
+		It preserves newlines too, unlike using a backward slash for the same.
+			>>> a="Hello\
+				Welcome"
+				
+			# Hello      Welcome
+			
+	A string is immutable; it can’t be changed.
+	
+	String Concatenation
+		operator +
+			>>> a='10'
+			>>> print(2*a)
+			1010
+			
+	
+	f-strings
+		>>> name='Ayushi'
+		>>> print(f"It isn't {name}'s birthday")
+		
+	format() method
+		>>> print("I love {0}".format(a))
+		>>> print("I love {a}".format(a='cats'))
+		>>> print("I love {b}".format(b='ferrets'))
+	% operator	
+		>>> print("I love %s and %s" %(a,b))
+		%s is for string
+		%d – for integers
+		%f – for floating-point numbers
+	
+	functions:
+		len()
+		str() - converts any data type into a string
+		.lower() and .upper()
+		.strip()
+		.isdigit()
+		.join()
+			It takes a list as an argument and joins the elements in the list using the string it is applied on.
+			>>> "*".join(['red','green','blue'])
+			‘red*green*blue’
+			
+			
+			
+Functions:
+	Deleting Python function:
+		>>> def func7():
+			print("7")
+		>>> func7()
+		>>> del func7
+		>>> func7()		# error
+			
+			
+			
+	Both bytes() and bytearray() deal with raw data, but bytearray() is mutable, while bytes() is immutable.
+	Python callable() tells us if an object can be called.
+	
+	Python classmethod() returns a class method for a given method.
+		>>> class fruit:
+                def sayhi(self):
+                                print("Hi, I'm a fruit") 
+			   
+		>>> fruit.sayhi=classmethod(fruit.sayhi)
+		>>> fruit.sayhi()
+		
+		When we pass the method sayhi() as an argument to classmethod(), it converts it into a python class method one that belongs to the class. Then, we call it like we would call any static method in python without an object.
+		
+Method vs function:
+	1. While a method is called on an object, a function is generic
+	2. Since we call a method on an object, it is associated with it. Consequently, it is able to access and operate on the data within the class.
+	   A method may alter an object’s state, but Python function usually only operates on it, and then prints something or returns a value.
+	3. A method may alter the state of the object; a function does not, when an object is passed as an argument to it. We have seen this in our tutorial on tuples.
+	
+Magic Methods
+	Such a method is identified by double underscores before and after its name. 
+	A magic method is used to implement functionality that can’t be represented as a normal method.
+		 __init__()
+		 __add__ for +
+		__sub__ for –
+		__mul__ for *
+		__and__ for &
+		
+		
+Lists:
+	slicing: 
+		colors[2:3]=['bronze','silver'] - reassinging only the slice
+	Deleting a few elements
+		del colors[2:4]
+		del colors[0]
+	Concatenation of Python List
+		a,b=[3,1,2],[5,4,6]
+		a+b
+	Negative indices- The indices we mention can be negative as well. A negative index means traversal from the end of the list.
+		indices[:-2]
+			This returns item from the list’s beginning to two items from the end.
+		indices[1:-2]
+			It returns items from the item at index 1 to two items from the end.
+		indices[-2:-1]
+			This returns items from two from the end to one from the end.
+		indices[-1:-2]
+			This returns an empty Python list, because the start is ahead of the stop for the traversal.
+			
+		
+Collections:
+	Counter:
+		c = Counter(["vfg"])
+		c.update(["cds"])
+			Counter({'vfg': 1, 'cds': 1})
+			
+		c = Counter("vfg")
+		c.update("cds")
+			Counter({'v': 1, 'f': 1, 'g': 1, 'c': 1, 'd': 1, 's': 1})
+
+
 From now on, we suppose that you are using Anaconda python distribution.
 
 
