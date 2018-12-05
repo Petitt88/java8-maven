@@ -76,6 +76,6 @@ test {
 }
 
 wrapper {
-	version = gradlewVersion
+	gradleVersion = gradlewVersion
 	distributionType = Wrapper.DistributionType.ALL
 }
