@@ -4,6 +4,7 @@
         <TargetFramework>$(NetCoreVersion)</TargetFramework>
         <!--<TargetFramework>net472</TargetFramework>-->
         <UserSecretsId>aspnet-PetService.Web-2EA81EE2-A58F-4A9A-9B16-108BF0A315C1</UserSecretsId>
+        <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
         <Version>1.1.0</Version>
     </PropertyGroup>
 
@@ -39,7 +40,7 @@
         <!--<PackageReference Include="Microsoft.AspNetCore.Razor.Runtime" Version="2.1.2" />-->
         <!--<PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.1.1" />-->
         <!--<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.2" />-->
-        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.0" PrivateAssets="All" />
+        <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="$(MicrosoftVisualStudioWebCodeGenerationDesignVersion)" PrivateAssets="All" />
         <!--<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="2.1.1"/>-->
     </ItemGroup>
 

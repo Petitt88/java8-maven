@@ -6,5 +6,6 @@
         <XunitVersion>2.4.1</XunitVersion>
         <XunitRunnerVisualstudioVersion>2.4.1</XunitRunnerVisualstudioVersion>
         <MoqVersion>4.10.1</MoqVersion>
+        <MicrosoftVisualStudioWebCodeGenerationDesignVersion>2.2.0</MicrosoftVisualStudioWebCodeGenerationDesignVersion>
     </PropertyGroup>
 </Project>

@@ -13,12 +13,9 @@ namespace PetService.Web
 {
     public class Program
     {
-        public static void Main(string[] args)
-        {
-            CreateWebHostBuilder(args).Build().Run();
-        }
+        public static Task Main(string[] args) => CreateWebHostBuilder(args).Build().RunAsync();
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args)
+        private static IWebHostBuilder CreateWebHostBuilder(string[] args)
         {
             // => WebHost.CreateDefaultBuilder(args).UseStartup<Startup>();
 
@@ -42,7 +39,8 @@ namespace PetService.Web
                     logging.AddFile(settings);
                     logging.AddConsole();
                 })
-                .UseKestrel()
+                .UseKestrel((builderContext, options) => options.Configure(builderContext.Configuration.GetSection("Kestrel")))
+                .UseIIS()
                 .UseIISIntegration()
                 .UseContentRoot(Directory.GetCurrentDirectory())
                 .UseDefaultServiceProvider((context, options) => options.ValidateScopes = context.HostingEnvironment.IsDevelopment())
