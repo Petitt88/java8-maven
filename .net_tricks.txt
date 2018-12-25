@@ -43,30 +43,6 @@ Assembly loading process:
 			<bindingRedirect oldVersion="0.0.0.0-1.0.0.0" newVersion="1.1.0.0" />
 		</dependentAssembly>
 		
-		
-Strong naming:
-	- a Guid attached to your assembly name
-	- MyLibrary, Version=1.0.0.0, Culture=neutral, PublicKeyToken=70d3c3735d23454d4		// PublicKeyToken: this is what a strong naming generates
-	- basically it disambiguates assemblies with the same simple name (such as "Calculator")
-		- required for GAC or for loading assembles side-by-side
-	- Strong naming is generally vieral
-		- Strong named assemblies can only reference strong named assemblies
-		
-Binding redirects:
-	- .Net Framework only
-	- Only loads assembles where the referenced version matches the version on disk
-	- Problematic when someone references an older version while your app deploys a higher version
-	- To accept a higher version, your app.config needs to explicitly allow for that by adding a redirect
-	
-Tips and tricks:
-	- Directory.Build.props 
-		- at the solution level
-		- automatically gets imported to all of the projects
-		- good to lock the nuget package versions in one place globally for the app
-	- Directory.Build.targets
-		- you would place packages to reference automatically by certain packages for example
-	- These 2 are not tied to .Net Standard, they are MSBuild feature and available in every kind of .Net projects
-	
 	
 machine.config:
 
@@ -253,6 +229,47 @@ Application Domains (AppDomain)
 	.NET Standard isn't a runtime or a platform. It's not an operating system choice. .NET Standard is a bunch of APIs.
 	
 	.NET Standard is what you target for your libraries, and the apps that USE your library target a platform.
+	
+	
+Building libraries tricks and tips:
+
+	Multi-targeting best practices:
+		- do start with netstandard2.0
+		- never drop support for the standard
+		- consider targeting multiple frameworks: <TargetFrameworks>
+		- use conditional compilation if code changes on platforms (for example getting the GPS location)
+			- throw PlatformNotSupportedException if the current runtine cannot implement the functionality
+			- provide a bool property "IsSupported" so the consumer can check upfront whether the API can be used and don't have to deal with PlatformNotSupportedException
+		- share your component using a NuGet package
+		
+	Strong naming:
+		- adds an additional piece to the name to make common assembly names unique for example "Calculator"
+			- PublicKeyToken is this piece
+			- use it from the get-go
+		- a Guid attached to your assembly name
+		- MyLibrary, Version=1.0.0.0, Culture=neutral, PublicKeyToken=70d3c3735d23454d4		// PublicKeyToken: this is what a strong naming generates
+		- basically it disambiguates assemblies with the same simple name (such as "Calculator")
+			- required for GAC or for loading assembles side-by-side
+		- Strong naming is generally vieral
+			- Strong named assemblies can only reference strong named assemblies
+			
+	Binding redirects:
+		- Net Framework only
+		- Net Framework assembly loader is very picky: can only load the exact same library version
+			- to accepts a higher version app.config needs to explicitly allow for that by adding a redirect: <assemblyBinding>...
+		- Only loads assembles where the referenced version matches the version on disk
+		- Problematic when someone references an older version while your app deploys a higher version
+		- To accept a higher version, your app.config needs to explicitly allow for that by adding a redirect
+			
+	
+	- Directory.Build.props 
+		- at the solution level
+		- automatically gets imported to all of the projects
+		- good to lock the nuget package versions in one place globally for the app
+	- Directory.Build.targets
+		- you would place packages to reference automatically by certain packages for example
+	- These 2 are not tied to .Net Standard, they are MSBuild feature and available in every kind of .Net projects
+
 
 	
 Reference assemblies:
