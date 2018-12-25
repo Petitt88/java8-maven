@@ -1,0 +1,10 @@
+<Project>
+    <PropertyGroup>
+        <NetCoreVersion>netcoreapp2.2</NetCoreVersion>
+        <MicrosoftExtensionsLoggingVersion>2.2.0</MicrosoftExtensionsLoggingVersion>
+        <SystemComponentModelAnnotationsVersion>4.5.0</SystemComponentModelAnnotationsVersion>
+        <XunitVersion>2.4.1</XunitVersion>
+        <XunitRunnerVisualstudioVersion>2.4.1</XunitRunnerVisualstudioVersion>
+        <MoqVersion>4.10.1</MoqVersion>
+    </PropertyGroup>
+</Project>

@@ -1,0 +1,9 @@
+<Project>
+    
+    <ItemGroup Condition="$(AssemblyName.EndsWith('.Tests'))">
+        <PackageReference Include="Moq" Version="$(MoqVersion)" />
+        <PackageReference Include="xunit" Version="$(XunitVersion)" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="$(XunitRunnerVisualstudioVersion)" />
+    </ItemGroup>
+    
+</Project>

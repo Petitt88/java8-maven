@@ -1,15 +1,5 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
-    <Import Project="../../build/Build.targets" />
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>netcoreapp2.1</TargetFramework>
+        <TargetFramework>$(NetCoreVersion)</TargetFramework>
     </PropertyGroup>
-
-    <ItemGroup>
-      <PackageReference Include="Moq" Version="4.9.0" />
-      <PackageReference Include="xunit" Version="2.4.0" />
-      <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
-    </ItemGroup>
-
 </Project>
