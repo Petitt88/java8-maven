@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.pet.webfluxthymeleaf.app.movie.Movie
 import com.pet.webfluxthymeleaf.app.movie.MovieService
 import com.pet.webfluxthymeleaf.infrastructure.parseJson
+import com.pet.webfluxthymeleaf.infrastructure.web.WebRequestValidator
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactor.mono
@@ -20,7 +21,6 @@ import java.net.URI
 import java.nio.channels.AsynchronousFileChannel
 import java.nio.file.Paths
 import java.time.Duration
-import javax.validation.Validator
 import kotlin.collections.set
 
 class HomeController(
@@ -28,7 +28,7 @@ class HomeController(
 	private val webClient: WebClient,
 	private val mapper: ObjectMapper,
 	private val logger: Logger,
-	private val validator: Validator
+	private val validator: WebRequestValidator
 ) {
 
 //	@GetMapping("/")
@@ -168,8 +168,7 @@ class HomeController(
 	//@PostMapping("/")
 	//@ResponseBody
 	fun createMovie(request: ServerRequest): Mono<ServerResponse> = GlobalScope.mono {
-
-		val movie = request.bodyToMono(Movie::class.java).awaitFirst()
+		val movie = validator.bodyToMono<Movie>(request).awaitFirst()
 
 		// do NOT put bindingResult: BindingResult in the url because WebFlux cannot provide it and exception will be thrown!
 		// the request is refused (400 becomes the response's status automatically) if the movie is invalid automatically, no need to manually handle it

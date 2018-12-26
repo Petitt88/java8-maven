@@ -8,6 +8,8 @@ import com.pet.webfluxthymeleaf.app.HomeController
 import com.pet.webfluxthymeleaf.app.movie.Movie
 import com.pet.webfluxthymeleaf.app.movie.MovieRepository
 import com.pet.webfluxthymeleaf.app.movie.MovieService
+import com.pet.webfluxthymeleaf.infrastructure.web.WebErrorHandler
+import com.pet.webfluxthymeleaf.infrastructure.web.WebRequestValidator
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.awaitFirst
@@ -33,6 +35,8 @@ class Startup {
 			bean {
 				router(homeRoutes(ref()))
 			}
+			bean<WebErrorHandler>()
+			bean<WebRequestValidator>()
 			bean<MovieService>()
 			bean<HomeController>()
 			bean("messageSource") {
