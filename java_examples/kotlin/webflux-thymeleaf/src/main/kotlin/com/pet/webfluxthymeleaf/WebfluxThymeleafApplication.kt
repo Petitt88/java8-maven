@@ -1,98 +1,31 @@
 package com.pet.webfluxthymeleaf
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.pet.webfluxthymeleaf.movie.Movie
-import com.pet.webfluxthymeleaf.movie.MovieRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactive.awaitFirst
-import kotlinx.coroutines.reactive.awaitFirstOrDefault
-import org.springframework.boot.ApplicationRunner
+import com.pet.webfluxthymeleaf.infrastructure.MovieConfig
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.InjectionPoint
+import org.springframework.beans.factory.config.ConfigurableBeanFactory
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
-import org.springframework.web.reactive.function.client.WebClient
-import java.time.LocalDateTime
+import org.springframework.context.annotation.Scope
+import java.lang.reflect.Member
 
 @SpringBootApplication
+@EnableConfigurationProperties(MovieConfig::class)
 class WebfluxThymeleafApplication {
 
 	@Bean
-	fun runner(mr: MovieRepository) = ApplicationRunner {
-		GlobalScope.launch(Dispatchers.Unconfined) {
-
-			val count = mr.count().awaitFirst()
-
-			println("Deleting $count elements...")
-			mr.deleteAll().awaitFirstOrDefault(null)
-
-			val movies = (1..1000).map { Movie(it, "${it}__Movie__${LocalDateTime.now()}") }
-			println("Inserting 1000 elements...")
-
-			mr.saveAll(movies)
-				// without this awaitFirst will fire as soon as the 1st item is inserted. We need all data in the database at the next statement
-				.collectList()
-				.awaitFirst()
-
-			mr.findAll().subscribe(::println)
-		}
-
-//		mr.count().subscribe {
-//			println(it)
-//			mr.deleteAll().subscribe {
-//				mr.saveAll((1..1000).map { Movie(it, "${it}__Movie__${LocalDateTime.now()}") }).subscribe {
-//					mr.findAll().subscribe(::println)
-//				}
-//			}
-//		}
+	@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+	fun getLogger(ip: InjectionPoint): Logger {
+		val member: Member? = ip.member
+		return if (member != null) LoggerFactory.getLogger(member.declaringClass) else LoggerFactory.getLogger(ip.declaredType.name)
 	}
-
-	@Bean
-	fun webClient() = WebClient.create("http://localhost:8081")
-
-	@Bean
-	fun mapper() = ObjectMapper()
 }
 
 fun main(args: Array<String>) {
-	runApplication<WebfluxThymeleafApplication>(*args)
-
-//	SpringApplicationBuilder()
-//		.initializers(beans {
-//			bean {
-//				SpringTransactionManager(ref())
-//			}
-//		})
-//		.sources(WebfluxThymeleafApplication::class.java)
-//		.build(*args)
+	runApplication<WebfluxThymeleafApplication>(*args) {
+		addInitializers(Startup().applicationInitializer)
+	}
 }
-
-//val myBeans = beans {
-//	bean<UserHandler>()
-//	bean<Routes>()
-//	bean<WebHandler>("webHandler") {
-//		RouterFunctions.toWebHandler(
-//			ref<Routes>().router(),
-//			HandlerStrategies.builder().viewResolver(ref()).build()
-//		)
-//	}
-//	bean("messageSource") {
-//		ReloadableResourceBundleMessageSource().apply {
-//			setBasename("messages")
-//			setDefaultEncoding("UTF-8")
-//		}
-//	}
-//	bean {
-//		val prefix = "classpath:/templates/"
-//		val suffix = ".mustache"
-//		val loader = MustacheResourceTemplateLoader(prefix, suffix)
-//		MustacheViewResolver(Mustache.compiler().withLoader(loader)).apply {
-//			setPrefix(prefix)
-//			setSuffix(suffix)
-//		}
-//	}
-//	profile("foo") {
-//		bean<Foo>()
-//	}
-//}

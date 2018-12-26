@@ -1,7 +1,6 @@
-package com.pet.webfluxthymeleaf.movie
+package com.pet.webfluxthymeleaf.app.movie
 
 import kotlinx.coroutines.reactive.awaitSingle
-import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -9,7 +8,6 @@ import reactor.core.publisher.SynchronousSink
 import java.time.Duration
 import java.util.*
 
-@Service
 class MovieService(private val mr: MovieRepository, private val webClient: WebClient) {
 
 	fun getMoviesFromDb(count: Long? = null) = if (count == null) mr.findAll() else mr.findAll().take(count)

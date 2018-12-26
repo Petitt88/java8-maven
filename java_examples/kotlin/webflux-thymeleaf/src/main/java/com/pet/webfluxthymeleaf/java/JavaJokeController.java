@@ -1,7 +1,7 @@
 package com.pet.webfluxthymeleaf.java;
 
-import com.pet.webfluxthymeleaf.movie.Movie;
-import com.pet.webfluxthymeleaf.movie.MovieService;
+import com.pet.webfluxthymeleaf.app.movie.Movie;
+import com.pet.webfluxthymeleaf.app.movie.MovieService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;

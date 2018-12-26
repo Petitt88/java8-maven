@@ -1,4 +1,4 @@
-package com.pet.webfluxthymeleaf.movie
+package com.pet.webfluxthymeleaf.app.movie
 
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository
 

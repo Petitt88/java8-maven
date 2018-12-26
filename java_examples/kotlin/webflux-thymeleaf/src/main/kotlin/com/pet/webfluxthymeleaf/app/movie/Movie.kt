@@ -1,4 +1,4 @@
-package com.pet.webfluxthymeleaf.movie
+package com.pet.webfluxthymeleaf.app.movie
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
@@ -7,8 +7,11 @@ import javax.validation.constraints.Size
 
 @Document
 data class Movie(
-	@Id @get:NotNull val id: Int?,
-	@get:NotNull @get:Size(min = 3) val name: String?
-) {
-	constructor() : this(null, null)
-}
+	@Id
+	@get:NotNull
+	val id: Int? = null,
+
+	@get:NotNull
+	@get:Size(min = 3)
+	val name: String? = null
+)
