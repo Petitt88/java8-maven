@@ -35,12 +35,12 @@ class Startup {
 				bean {
 					router(Router.homeRoutes(ref()))
 				}
-				bean<PlatformTransactionManager> {
-					// a necessary bean to make Exposed work with Spring's transaction management.
-					// instead of @Transactional one can use Exposed's transaction {  } block with explicit commit.
-					// Without the commit statement the transaction gets rolled back automatically at the end of the block.
-					SpringTransactionManager(ref())
-				}
+//				bean<PlatformTransactionManager> {
+//					// a necessary bean to make Exposed work with Spring's transaction management.
+//					// instead of @Transactional one can use Exposed's transaction {  } block with explicit commit.
+//					// Without the commit statement the transaction gets rolled back automatically at the end of the block.
+//					SpringTransactionManager(ref())
+//				}
 				bean<WebErrorHandler>()
 				bean<WebRequestValidator>()
 				bean<MovieService>()
