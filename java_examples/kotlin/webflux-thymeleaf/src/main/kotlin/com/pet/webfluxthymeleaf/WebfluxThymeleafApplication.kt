@@ -26,6 +26,6 @@ class WebfluxThymeleafApplication {
 
 fun main(args: Array<String>) {
 	runApplication<WebfluxThymeleafApplication>(*args) {
-		addInitializers(Startup().applicationInitializer)
+		addInitializers(Startup.initializer)
 	}
 }
