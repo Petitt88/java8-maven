@@ -49,6 +49,8 @@ dependencies {
 	implementation('org.springframework.boot:spring-boot-starter-webflux')
 	implementation('org.springframework.boot:spring-boot-starter-thymeleaf')
 	implementation('org.springframework.boot:spring-boot-starter-data-mongodb-reactive')
+	// embedded mongodb to avoid having it as a docker container
+	implementation('de.flapdoodle.embed:de.flapdoodle.embed.mongo')
 	implementation("io.springfox:springfox-swagger2:${swaggerVersion}")
 	implementation("io.springfox:springfox-swagger-ui:${swaggerVersion}")
 	implementation("org.jetbrains.exposed:exposed:${exposedVersion}")
