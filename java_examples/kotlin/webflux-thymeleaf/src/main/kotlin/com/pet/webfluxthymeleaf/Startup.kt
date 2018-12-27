@@ -14,7 +14,6 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactive.awaitFirstOrDefault
-import org.jetbrains.exposed.spring.SpringTransactionManager
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.boot.ApplicationRunner
@@ -22,7 +21,8 @@ import org.springframework.context.support.BeanDefinitionDsl
 import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.context.support.beans
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
-import org.springframework.transaction.PlatformTransactionManager
+import org.springframework.security.config.web.server.ServerHttpSecurity
+import org.springframework.security.web.server.SecurityWebFilterChain
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.server.RouterFunctionDsl
 import org.springframework.web.reactive.function.server.router
@@ -37,10 +37,14 @@ class Startup {
 				}
 //				bean<PlatformTransactionManager> {
 //					// a necessary bean to make Exposed work with Spring's transaction management.
-//					// instead of @Transactional one can use Exposed's transaction {  } block with explicit commit.
+//					// instead of @Transactional one can use Exposed's transaction { } block with explicit commit.
 //					// Without the commit statement the transaction gets rolled back automatically at the end of the block.
 //					SpringTransactionManager(ref())
 //				}
+				bean {
+					// security config
+					Security.securityWebFilterChain(ref())
+				}
 				bean<WebErrorHandler>()
 				bean<WebRequestValidator>()
 				bean<MovieService>()
@@ -74,6 +78,17 @@ class Startup {
 				}
 			}
 		}
+	}
+}
+
+private class Security {
+	companion object {
+		fun securityWebFilterChain(http: ServerHttpSecurity): SecurityWebFilterChain = http
+			.authorizeExchange()
+			//.pathMatchers(HttpMethod.GET,"/movies/**").permitAll()
+			.anyExchange().permitAll()
+			.and()
+			.build()
 	}
 }
 
