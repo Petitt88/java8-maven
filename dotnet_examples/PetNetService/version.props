@@ -1,5 +1,6 @@
 <Project>
     <PropertyGroup>
+        <NetStandardVersion>netstandard2.0</NetStandardVersion>
         <NetCoreVersion>netcoreapp2.2</NetCoreVersion>
         <MicrosoftExtensionsLoggingVersion>2.2.0</MicrosoftExtensionsLoggingVersion>
         <SystemComponentModelAnnotationsVersion>4.5.0</SystemComponentModelAnnotationsVersion>

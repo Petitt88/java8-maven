@@ -3,7 +3,6 @@
 
     <PropertyGroup>
         <LangVersion>7.3</LangVersion>
-        <TargetFramework>netstandard2.0</TargetFramework>
         <Product>Net service application</Product>
         <Authors>Santa</Authors>
         <Company>Pet Net</Company>
