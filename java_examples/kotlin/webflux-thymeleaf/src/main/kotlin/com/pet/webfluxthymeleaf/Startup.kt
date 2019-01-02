@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.MapperFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.pet.webfluxthymeleaf.app.HomeController
 import com.pet.webfluxthymeleaf.app.movie.Movie
 import com.pet.webfluxthymeleaf.app.movie.MovieRepository
@@ -35,6 +36,8 @@ class Startup {
 				bean {
 					router(Router.homeRoutes(ref()))
 				}
+				// integrate Exposed with Spring's transaction manager. Thus Database.connect(dataSource) is no more necessary and
+				// transaction {} blocks control commit explicitly.
 //				bean<PlatformTransactionManager> {
 //					// a necessary bean to make Exposed work with Spring's transaction management.
 //					// instead of @Transactional one can use Exposed's transaction { } block with explicit commit.
@@ -65,7 +68,13 @@ class Startup {
 				}
 				bean(scope = BeanDefinitionDsl.Scope.PROTOTYPE) {
 					Jackson2ObjectMapperBuilder()
-						.featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+						//.indentOutput(false)
+						//.serializationInclusion(JsonInclude.Include.NON_NULL)
+						.modules(JavaTimeModule())
+						.featuresToDisable(
+							SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,
+							SerializationFeature.FAIL_ON_EMPTY_BEANS
+						)
 						.featuresToEnable(
 							SerializationFeature.WRITE_DATES_WITH_ZONE_ID,
 							JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES,
