@@ -35,6 +35,7 @@ class Startup {
 			beans {
 				bean {
 					router(Router.homeRoutes(ref()))
+						//.and(Router.starRoutes(ref())) - this is how to chain routes for multiple handlers
 				}
 				// integrate Exposed with Spring's transaction manager. Thus Database.connect(dataSource) is no more necessary and
 				// transaction {} blocks control commit explicitly.
