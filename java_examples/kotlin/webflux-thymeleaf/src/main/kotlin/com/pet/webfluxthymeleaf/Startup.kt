@@ -48,7 +48,9 @@ class Startup {
 					// security config
 					Security.securityWebFilterChain(ref())
 				}
+				// global error handler for those exceptions that occur in the request handler (controller)
 				bean<WebErrorHandler>()
+				// WebRequestValidator is to be used when a json request body needs to be mapped to a class and perform a bean validation. BadRequestException is thrown in case of validation error.
 				bean<WebRequestValidator>()
 				bean<MovieService>()
 				bean<HomeController>()

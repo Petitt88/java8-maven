@@ -15,16 +15,17 @@ import org.springframework.web.reactive.result.view.ViewResolver
 import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
 
-class WebErrorHandler(
-	private val logger: Logger,
-	mapper: ObjectMapper,
-	messageWriters: MutableList<HttpMessageWriter<*>>,
-	viewResolvers: List<ViewResolver>
-) : ErrorWebExceptionHandler {
+/**
+ * By implementing {@see ErrorWebExceptionHandler} webflux invokes this in case of any unhandled request handler (controller) exception,
+ * just like @RestControllerAdvice or @ControllerAdvice.
+ */
+class WebErrorHandler(private val logger: Logger, mapper: ObjectMapper, viewResolvers: List<ViewResolver>) : ErrorWebExceptionHandler {
+
+	private val messageWriters: List<HttpMessageWriter<*>>
 
 	init {
-		// messageWriter is empty. Use the EncoderHttpMessageWriter to delegate the task to an Encoder
-		messageWriters.add(0, EncoderHttpMessageWriter(Jackson2JsonEncoder(mapper)))
+		// messageWriter is empty. Use the EncoderHttpMessageWriter to delegate the task to an Encoder.
+		messageWriters = listOf(EncoderHttpMessageWriter(Jackson2JsonEncoder(mapper)))
 	}
 
 	private val context: ServerResponse.Context by lazy {
