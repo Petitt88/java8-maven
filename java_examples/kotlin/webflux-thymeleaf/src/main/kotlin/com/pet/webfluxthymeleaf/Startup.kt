@@ -58,7 +58,7 @@ class Startup {
 				bean("messageSource") {
 					ReloadableResourceBundleMessageSource().apply {
 						setBasename("messages")
-						setDefaultEncoding("UTF-8")
+						setDefaultEncoding(Charsets.UTF_8.name())
 					}
 				}
 				bean {
