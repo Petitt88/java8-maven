@@ -11,6 +11,7 @@ import com.pet.webfluxthymeleaf.app.movie.MovieRepository
 import com.pet.webfluxthymeleaf.app.movie.MovieService
 import com.pet.webfluxthymeleaf.infrastructure.web.WebErrorHandler
 import com.pet.webfluxthymeleaf.infrastructure.web.WebRequestValidator
+import com.pet.webfluxthymeleaf.java.JavaJokeController
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.awaitFirst
@@ -35,7 +36,7 @@ class Startup {
 			beans {
 				bean {
 					router(Router.homeRoutes(ref()))
-						//.and(Router.starRoutes(ref())) - this is how to chain routes for multiple handlers
+						.and(router(Router.jokeJavaRoutes(ref())))
 				}
 				// integrate Exposed with Spring's transaction manager. Thus Database.connect(dataSource) is no more necessary and
 				// transaction {} blocks control commit explicitly.
@@ -55,6 +56,7 @@ class Startup {
 				bean<WebRequestValidator>()
 				bean<MovieService>()
 				bean<HomeController>()
+				bean<JavaJokeController>()
 				bean("messageSource") {
 					ReloadableResourceBundleMessageSource().apply {
 						setBasename("messages")
@@ -144,6 +146,13 @@ private class Router {
 				POST("/", handler::createMovie)
 				GET("/movies", handler::getMovies)
 				GET("/movies/{id}", handler::getMovie)
+			}
+		}
+
+		fun jokeJavaRoutes(handler: JavaJokeController): (RouterFunctionDsl.() -> Unit) = {
+			"/java".nest {
+				GET("/verybadjoke", handler::veryBadJoke)
+				GET("/joke", handler::joke)
 			}
 		}
 	}

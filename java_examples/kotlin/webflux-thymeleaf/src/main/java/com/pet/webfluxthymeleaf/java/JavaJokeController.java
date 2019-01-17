@@ -1,17 +1,13 @@
 package com.pet.webfluxthymeleaf.java;
 
-import com.pet.webfluxthymeleaf.app.movie.Movie;
 import com.pet.webfluxthymeleaf.app.movie.MovieService;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.reactive.function.server.ServerRequest;
+import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-@RequestMapping("/java")
-@Controller
 public class JavaJokeController {
 
 	private final MovieService movieService;
@@ -20,41 +16,40 @@ public class JavaJokeController {
 		this.movieService = movieService;
 	}
 
-	@GetMapping("/verybadjoke")
-	public String veryBadJoke(Model model) {
+	public Mono<ServerResponse> veryBadJoke(ServerRequest request) {
+		Map<String, Object> model = new HashMap<>();
 
-		model.addAttribute("firstSourceTitle", "Movies from Java - only the 1st 10. Blocking!")
-			.addAttribute("secondSourceTitle", "Movies from Java - all. Blocking!");
+		model.put("firstSourceTitle", "Movies from Java - only the 1st 10. Blocking!");
+		model.put("secondSourceTitle", "Movies from Java - all. Blocking!");
 
-		List<Movie> movies = this.movieService.getMoviesFromDb(10L)
-			.collectList()
-			.block();
-		model.addAttribute("movies", movies);
-
-		movies = this.movieService.getMoviesFromDb(null).collectList().block();
-		model.addAttribute("superMovies", movies);
-
-		return "index";
-	}
-
-	@GetMapping("/joke")
-	public Mono<String> joke(Model model) {
-
-		model.addAttribute("firstSourceTitle", "Movies from Java - only the 1st 10. Non blocking.")
-			.addAttribute("secondSourceTitle", "Movies from Java - all. Non blocking.");
-
-		Mono<String> viewMono = this.movieService.getMoviesFromDb(10L)
+		return this.movieService.getMoviesFromDb(10L)
 			.collectList()
 			.flatMap(movies -> {
-				model.addAttribute("movies", movies);
-				return this.movieService.getMoviesFromDb(null)
-					.collectList()
+				model.put("movies", movies);
+				return this.movieService.getMoviesFromDb(null).collectList();
+			})
+			.flatMap(movies -> {
+				model.put("superMovies", movies);
+				return ServerResponse.ok().render("index", model);
+			});
+	}
+
+	public Mono<ServerResponse> joke(ServerRequest request) {
+		Map<String, Object> model = new HashMap<>();
+
+		model.put("firstSourceTitle", "Movies from Java - only the 1st 10. Non blocking.");
+		model.put("secondSourceTitle", "Movies from Java - all. Non blocking.");
+
+		Mono<ServerResponse> viewMono = this.movieService.getMoviesFromDb(10L)
+			.collectList()
+			.flatMap(movies -> {
+				model.put("movies", movies);
+				return this.movieService.getMoviesFromDb(null).collectList()
 					.flatMap(movies2 -> {
-						model.addAttribute("superMovies", movies2);
-						return Mono.just("index");
+						model.put("superMovies", movies2);
+						return ServerResponse.ok().render("index");
 					});
 			});
-
 		return viewMono;
 	}
 }
