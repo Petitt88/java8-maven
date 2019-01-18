@@ -7,6 +7,7 @@ import com.pet.webfluxthymeleaf.infrastructure.parseJson
 import com.pet.webfluxthymeleaf.infrastructure.web.WebRequestValidator
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.reactive.awaitFirst
+import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactor.mono
 import kotlinx.coroutines.time.delay
 import org.slf4j.Logger
@@ -42,6 +43,9 @@ class HomeController(
 
 	//@GetMapping("/")
 	fun index(request: ServerRequest): Mono<ServerResponse> = GlobalScope.mono {
+
+		val user = request.principal().awaitFirstOrNull()
+		logger.info("Current user is: $user")
 
 		val movies = movieService.getMoviesFromDb()
 			.collectList()
