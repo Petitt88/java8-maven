@@ -1027,7 +1027,14 @@ WPF:
 	- Template: a ControlTemplate instance goes here to override the default template of the control
 	- ContentTemplate, ItemTemplate: ContentTemplate instance goes here to override the default template for the content/items which is just invoking a .ToString() on the value.
 	- Binding 
-		- Path, Mode, FallbackValue, TargetNullValue
+		- Path, Mode (OneWay - default, OneTime, TwoWay), FallbackValue, TargetNullValue
 		- Source: StaticResource, x:Static
 		- ElementName
 		- RelativeSource: Mode: Self, TemplatedParent (basically {TemplateBinding}, FindAncestor)
+	- Dependency Property:
+		- can participate in animations, data binding (unless the class of the property implements the INotifiedPropertyChanged interface)
+	- Dependency Property vs Attached Property:
+		- Attached properties are a type of dependency property. The difference is in how they're used.
+		- With an attached property, the property is defined on a class that isn't the same class for which it's being used. This is usually used for layout. Good examples are Panel.ZIndex or Grid.Row - you apply this to a control (ie: Button), but it's actually defined in Panel or Grid. The property is "attached" to the button's instance.
+		- This allows a container, for example, to create properties that can be used on any UIelement.
+		- As for implementation differences - it's basically just a matter of using Register vs. RegisterAttached when you define the property.
