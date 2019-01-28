@@ -991,3 +991,43 @@ Nuget:
 		repositoryPath (packages.config only):
 			The location in which to install NuGet packages instead of the default $(Solutiondir)/packages folder. A relative path can be used in project-specific nuget.config files. This setting is overridden by the NUGET_PACKAGES environment variable, which takes precedence.
 			
+			
+WPF:
+	- Events vs Commands:
+		- in WPF all events are routed: RoutedEvent classes. Bubbles up the control hierarchy.
+		- can be marked as "Handled" to stop bubbling up
+		- Command is more of an MVVM concern: supports disabling/enabling UI based on the CanExecute method
+	- RoutedCommand vs RoutedEvent:
+		- RoutedCommand implements the ICommand interface
+		- RoutedCommand can be handled via CommandBinding on a parent element
+		- They both bubbles up the control hierarchy
+		- The Execute and CanExecute methods on a RoutedCommand do not contain the application logic for the command as is the case with a typical ICommand, but rather, these methods raise events that traverse the element tree looking for an object with a CommandBinding. The event handlers attached to the CommandBinding contain the command logic.
+			The Execute method raises the PreviewExecuted and Executed events. The CanExecute method raises the PreviewCanExecute and CanExecute events.
+		- if you do not want the default behavior of a RoutedCommand, you use implement the ICommand interface and handle the event in the Execute method (for example use an MVVM framework)
+	- RoutedUICommand:
+		- this is a RoutedCommand as well (inherits from it)
+		- placed on ApplicationCommands static class: UI command like Cut, Copy, Paste, Close
+	- CommandBinding:
+		- can be used only on RoutedCommands
+		- a central place on a parent control (tipically the Window itself) catches and handles the fired command
+		- it's like attached event handlers for RoutedEvent instances
+	- Style triggers:
+		- Trigger: set control property values
+		- DataTrigger: supports DataBinding
+		- EventTrigger: execute an animation if an event happens
+	- Style:
+		- implicit styling if x:Key is not specified when the style is defined as a <Control.Resources>
+	- Resources:
+		- can be applied on 3 different level
+		- App.xml for global resources
+		- Ancestor UserControl to have it on the whole page
+		- On a specific UserControl to make it available only items inside this control and for the control itself
+	- ContentPresenter, ItemsPresenter: usually used inside control templates: Content and Items go automatically in it
+	- ContentControl, ItemsControl: compared to their "*Presenter" pair, these controls' Template property can be overridden
+	- Template: a ControlTemplate instance goes here to override the default template of the control
+	- ContentTemplate, ItemTemplate: ContentTemplate instance goes here to override the default template for the content/items which is just invoking a .ToString() on the value.
+	- Binding 
+		- Path, Mode, FallbackValue, TargetNullValue
+		- Source: StaticResource, x:Static
+		- ElementName
+		- RelativeSource: Mode: Self, TemplatedParent (basically {TemplateBinding}, FindAncestor)
