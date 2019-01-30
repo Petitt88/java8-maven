@@ -1035,7 +1035,8 @@ WPF:
 	- Dependency Property:
 		- can participate in animations, data binding (unless the class of the property implements the INotifiedPropertyChanged interface)
 		- can be placed on DependencyObject instances
-	- DependencyObject --> UIElement (instance can be put into the tree hierarchy) --> FrameworkElement
+	- DependencyObject --> UIElement (instance can be put into the tree hierarchy) --> FrameworkElement (provides binding - SetBinding method)
+	- ItemsControl.ItemsPanelTemplate - to override the panel's template - StackPanel, Canvas, Grid, DockPanel, WrapPanel
 	- Dependency Property vs Attached Property:
 		- Attached properties are a type of dependency property. The difference is in how they're used.
 		- With an attached property, the property is defined on a class that isn't the same class for which it's being used. This is usually used for layout. Good examples are Panel.ZIndex or Grid.Row - you apply this to a control (ie: Button), but it's actually defined in Panel or Grid. The property is "attached" to the button's instance.
