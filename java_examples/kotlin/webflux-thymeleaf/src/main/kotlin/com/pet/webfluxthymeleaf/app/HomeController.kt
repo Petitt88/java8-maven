@@ -6,6 +6,7 @@ import com.pet.webfluxthymeleaf.app.movie.MovieService
 import com.pet.webfluxthymeleaf.infrastructure.parseJson
 import com.pet.webfluxthymeleaf.infrastructure.web.WebRequestValidator
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import kotlinx.coroutines.reactor.mono
@@ -46,7 +47,7 @@ class HomeController(
 
 		val user = request.principal().awaitFirstOrNull()
 		logger.info("Current user is: $user")
-
+launch {  }
 		val movies = movieService.getMoviesFromDb()
 			.collectList()
 			.awaitFirst()
