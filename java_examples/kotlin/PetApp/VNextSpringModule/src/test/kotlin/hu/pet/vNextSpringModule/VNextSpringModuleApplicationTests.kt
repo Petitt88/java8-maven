@@ -1,4 +1,4 @@
-package hu.pet.VNextSpringModule
+package hu.pet.vNextSpringModule
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest

@@ -1,4 +1,4 @@
-package hu.pet.VNextSpringModule
+package hu.pet.vNextSpringModule
 
 import hu.pet.utils.BookService
 import org.slf4j.Logger

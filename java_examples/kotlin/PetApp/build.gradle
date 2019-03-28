@@ -3,17 +3,15 @@ buildscript {
 		kotlinVersion = '1.3.21'
 		springBootVersion = '2.1.3.RELEASE'
 		appVersion = '1.0.0-SNAPSHOT'
-		gradlewVersion = '5.2.1'
+		gradlewVersion = '5.3.1'
 	}
+}
 
-	repositories {
-		mavenCentral()
-	}
-	dependencies {
-		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-		classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
-		classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
-	}
+plugins {
+	id 'org.springframework.boot' version '2.1.3.RELEASE'
+	id 'org.jetbrains.kotlin.jvm' version '1.3.21'
+	id 'org.jetbrains.kotlin.plugin.spring' version '1.3.21'
+	id "org.jetbrains.kotlin.kapt" version "1.3.21"
 }
 
 // subprojects {
@@ -75,9 +73,9 @@ repositories {
 }
 
 dependencies {
-	compile project(":EVModule")
-	compile project(":SADModule")
-	compile project(":VNextSpringModule")
+	implementation project(":EVModule")
+	implementation project(":SADModule")
+	implementation project(":VNextSpringModule")
 }
 
 wrapper {

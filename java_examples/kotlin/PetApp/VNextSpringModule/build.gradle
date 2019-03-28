@@ -12,19 +12,19 @@ springBoot {
 }
 
 dependencies {
-	compile('org.springframework.boot:spring-boot-starter-webflux')
-	compile('org.springframework.boot:spring-boot-starter-security')
-	compile('org.springframework.boot:spring-boot-starter-data-redis-reactive')
-	compile('com.fasterxml.jackson.module:jackson-module-kotlin')
+	implementation('org.springframework.boot:spring-boot-starter-webflux')
+	implementation('org.springframework.boot:spring-boot-starter-security')
+	implementation('org.springframework.boot:spring-boot-starter-data-redis-reactive')
+	implementation('com.fasterxml.jackson.module:jackson-module-kotlin')
 
 	// Jackson datatype to use java 8 time api
-	compile('com.fasterxml.jackson.datatype:jackson-datatype-jsr310')
+	implementation('com.fasterxml.jackson.datatype:jackson-datatype-jsr310')
 
-	compile project(":Utils")
+	implementation project(":Utils")
 
 	// annotation processing
 	kapt('org.springframework.boot:spring-boot-configuration-processor')
 
-	testCompile('io.projectreactor:reactor-test')
-	testCompile('org.springframework.security:spring-security-test')
+	testImplementation('io.projectreactor:reactor-test')
+	testImplementation('org.springframework.security:spring-security-test')
 }

@@ -34,11 +34,17 @@ fun main(args: Array<String>) {
 		this.doThis()
 
 		logger.info("Starting background works, thread: ${Thread.currentThread().id}")
-		// workNotAwaited is not suspended and starts its work on a dedicated thread --> runBlocking will wait it
+		// workNotAwaited is not suspended --> doesn't get awaited
+		// and starts its work on a dedicated thread --> starts right after "launch" method in it
+		// does not use GlobalScope --> runBlocking will wait for it
 		workNotAwaited(5000)
 		// workAwaited is suspended --> will be awaited, main execution suspends here
 		workAwaited(1000)
 
+		// workAsync is not awaited here
+		val def = workAsync(1000)
+		// it is awaited here instead
+		def.await()
 //		val child = launch {
 //			throw IOException("help")
 //		}
@@ -77,3 +83,14 @@ suspend fun workAwaited(duration: Long): Unit = withContext(Dispatchers.Default)
 	// Thread.sleep(1000)
 	logger.info("Work -suspended- $duration done, thread: ${Thread.currentThread().id}")
 }
+
+/**
+ * By convention functions returning Deferred<T> shall be named with "Async" postfix.
+ */
+fun CoroutineScope.workAsync(duration: Long): Deferred<Int> {
+	return async {
+		delay(duration)
+		5
+	}
+}
+
