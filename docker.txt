@@ -101,6 +101,9 @@ Docker:
 				-i - keep STDIN open even if not attached
 				-t - allocate a pseudo-TTY
 				
+				example: docker exec -it 1df3ad1024f1 bash
+					- this command will drop you into the console of the container
+				
 		docker network inspector nat
 			- to see what IP addresses the containers are running on
 			
