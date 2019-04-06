@@ -2,4 +2,7 @@
     <PropertyGroup>
         <TargetFramework>$(NetCoreVersion)</TargetFramework>
     </PropertyGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\CoreService\CoreService.csproj" />
+    </ItemGroup>
 </Project>
