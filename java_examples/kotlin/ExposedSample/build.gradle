@@ -1,14 +1,12 @@
 buildscript {
 	ext {
-		kotlinVersion = '1.3.21'
-		springBootVersion = '2.1.3.RELEASE'
+		exposedVersion = '0.13.6'
 		gradlewVersion = '5.3.1'
-		exposedVersion = '0.13.5'
 	}
 }
 
 plugins {
-	id 'org.springframework.boot' version '2.1.3.RELEASE'
+	id 'org.springframework.boot' version '2.1.4.RELEASE'
 	id 'org.jetbrains.kotlin.jvm' version '1.3.21'
 	id 'org.jetbrains.kotlin.plugin.spring' version '1.3.21'
 }

@@ -77,11 +77,12 @@ fun CoroutineScope.workNotAwaited(duration: Long) {
 	}
 }
 
-suspend fun workAwaited(duration: Long): Unit = withContext(Dispatchers.Default) {
+suspend fun workAwaited(duration: Long): Int = withContext(Dispatchers.Default) {
 	logger.info("Work -suspended- starting, thread: ${Thread.currentThread().id}")
 	delay(duration)
 	// Thread.sleep(1000)
 	logger.info("Work -suspended- $duration done, thread: ${Thread.currentThread().id}")
+	100
 }
 
 /**

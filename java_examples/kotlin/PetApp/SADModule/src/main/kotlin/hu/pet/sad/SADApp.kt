@@ -4,7 +4,7 @@ import hu.pet.utils.BookService
 import hu.pet.utils.core.CoreService
 import org.slf4j.LoggerFactory
 
-fun main(args: Array<String>) {
+fun main() {
 	println("SAD module starting...")
 
 	val coreService = CoreService(LoggerFactory.getLogger(CoreService::class.java))

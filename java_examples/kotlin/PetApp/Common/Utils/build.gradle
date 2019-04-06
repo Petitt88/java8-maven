@@ -1,3 +1,3 @@
 dependencies {
-	implementation project(":Utils.Core")
+	compile project(":Utils.Core")
 }
