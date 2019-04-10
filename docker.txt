@@ -97,7 +97,7 @@ Docker:
 		docker ps -- all - list all containers (or just "docker ps -a")
 		
 		docker exec - run a command in a running container
-			docker exec -it [container-id] bash - to be able 
+			docker exec -it [container-id] bash - to be able to get into the console of the container and execute commands there
 				-i - keep STDIN open even if not attached
 				-t - allocate a pseudo-TTY
 				
@@ -400,7 +400,7 @@ Docker Compose
 		docker-compose create - create services
 		docker-compose rm - remove stopped containers
 		docker-compose ps - list running containers
-			docker-compose ps --all - list all containers
+		docker-compose ps --all - list all containers
 		docker-compose port - print the public port for a port binding
 			
 		docker-compose scale - sets the number of containers to run for a service. Numbers are specified as arguments in the form service=num.
