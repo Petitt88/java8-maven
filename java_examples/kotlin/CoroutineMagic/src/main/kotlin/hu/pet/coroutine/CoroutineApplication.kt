@@ -49,9 +49,9 @@ fun main(args: Array<String>) {
 //			throw IOException("help")
 //		}
 
-		// inherits the scope of its caller
-		coroutineScope {
-		}
+		// name compuation is awaited
+		val name = computeNameAsync(4000)
+
 		logger.info("This is the end of {runBlocking}, thread: ${Thread.currentThread().id}")
 //		try {
 //			child.join()
@@ -95,3 +95,13 @@ fun CoroutineScope.workAsync(duration: Long): Deferred<Int> {
 	}
 }
 
+/**
+ * "coroutineScope" builder inherits the scope of the current coroutine and it becomes it "father".
+ */
+suspend fun computeNameAsync(duration: Long): String = coroutineScope {
+	delay(duration)
+	val name = async {
+		"Peter Kongyik"
+	}.await()
+	name
+}

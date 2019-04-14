@@ -47,7 +47,7 @@ class HomeController(
 
 		val user = request.principal().awaitFirstOrNull()
 		logger.info("Current user is: $user")
-launch {  }
+
 		val movies = movieService.getMoviesFromDb()
 			.collectList()
 			.awaitFirst()
