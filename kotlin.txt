@@ -1359,7 +1359,7 @@ Coroutines:
 			
 		Supervision
 			As we have studied before, cancellation (due to an exception was thrown (not normal job.cancel() - CancellationException)) is a bidirectional relationship propagating through the whole coroutines hierarchy.
-				- If an exception is raised in the parent or parent gets just canlled (job.cancel()) all the children are cancelled
+				- If an exception is raised in the parent or parent gets just cancelled (job.cancel()) all the children are cancelled
 				- If an exception is raised in one of the children - the parent and all other children gets cancelled
 					- If a child gets cancelled it does not affect the other children nor the parent
 				- But what if unidirectional cancellation is required (when an exception occurs)? - Supervision job

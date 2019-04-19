@@ -41,6 +41,12 @@ fun main(args: Array<String>) {
 		// workAwaited is suspended --> will be awaited, main execution suspends here
 		workAwaited(1000)
 
+		// parallel execution
+		val works = (1..10).map {
+			async { computeNameAsync(3000) }
+		}
+		works.forEach { it.await() }
+
 		// workAsync is not awaited here
 		val def = workAsync(1000)
 		// it is awaited here instead
@@ -48,9 +54,8 @@ fun main(args: Array<String>) {
 //		val child = launch {
 //			throw IOException("help")
 //		}
-
-		// name compuation is awaited
-		val name = computeNameAsync(4000)
+		// name computation is awaited
+		val name = computeNameAsync(2000)
 
 		logger.info("This is the end of {runBlocking}, thread: ${Thread.currentThread().id}")
 //		try {
@@ -58,6 +63,23 @@ fun main(args: Array<String>) {
 //		} catch (e: CancellationException) {
 //			logger.info("Error: ${e.message}")
 //		}
+
+		// this is how we can create our custom scopes
+		val scope = MainScope()
+		val scope2 = CoroutineScope(Dispatchers.Default)
+		scope.async { 2 }
+		scope2.launch { }
+		scope2.cancel()
+
+		/*
+		withContext(Dispatchers.XXX) {...} vs coroutineScope {...}
+		- both creates new child scope and attaches it to the parent
+			- If an exception is raised in the parent or parent gets just cancelled (job.cancel()) all the children are cancelled
+			- If an exception is raised in one of the children - the parent and all other children gets cancelled
+			- If a child gets cancelled it does not affect the other children nor the parent
+		- coroutineScope inherits the context of its parent but overrides it's job
+		- while withContext must define a new scope: via Dispatchers
+		 */
 	}
 	logger.info("Finished, thread: ${Thread.currentThread().id}")
 }
@@ -88,18 +110,27 @@ suspend fun workAwaited(duration: Long): Int = withContext(Dispatchers.Default) 
 /**
  * By convention functions returning Deferred<T> shall be named with "Async" postfix.
  */
-fun CoroutineScope.workAsync(duration: Long): Deferred<Int> {
-	return async {
-		delay(duration)
-		5
-	}
+fun CoroutineScope.workAsync(duration: Long): Deferred<Int> = async {
+	delay(duration)
+	5
 }
 
 /**
  * "coroutineScope" builder inherits the scope of the current coroutine and it becomes it "father".
+ * The main difference between "runBlocking" and "coroutineScope" builder is that the latter:
+ * - is suspending function
+ *  --> does not block the current thread while awaiting for its execution to complete
+ *  --> can be invoked from another suspending function
  */
 suspend fun computeNameAsync(duration: Long): String = coroutineScope {
 	delay(duration)
+
+	// because coroutineScope is suspending and uses structured concurrency, it will complete only when this launch block completes
+	// however the execution goes forward immediately after invoking "launch" because it is NOT a suspending function - same goes for async
+	launch {
+		delay(duration * 2)
+	}
+
 	val name = async {
 		"Peter Kongyik"
 	}.await()
