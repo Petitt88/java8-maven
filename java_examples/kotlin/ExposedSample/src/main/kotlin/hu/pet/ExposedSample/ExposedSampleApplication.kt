@@ -1,6 +1,8 @@
 package hu.pet.ExposedSample
 
 import hu.pet.ExposedSample.model.*
+import org.jetbrains.exposed.dao.load
+import org.jetbrains.exposed.dao.with
 import org.jetbrains.exposed.sql.*
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -15,7 +17,7 @@ class ExposedSampleApplication {
 	fun databaseSamples(source: DataSource): CommandLineRunner = CommandLineRunner { _ ->
 		Database.connect(source)
 
-		transactionWithLogging {
+		withTransaction {
 			SchemaUtils.drop(UserRatings, Users, StarWarsFilms)
 			SchemaUtils.create(StarWarsFilms, Users, UserRatings)
 
@@ -25,6 +27,12 @@ class ExposedSampleApplication {
 					sequelId = 8
 					director = "Rian Johnson"
 				}
+				val movie2 = StarWarsFilm.new {
+					name = "Rise of the Skywalker"
+					sequelId = 9
+					director = "J. J. Abrams"
+				}
+
 				val user = User.new {
 					name = "Peter"
 				}
@@ -32,7 +40,7 @@ class ExposedSampleApplication {
 					name = "Academia"
 				}
 				// flush - goes to the database and inserts the record
-				// if not present, insert occurs at the end of the transactionWithLogging block where commit happens
+				// if not present, insert occurs at the end of the withTransaction block where commit happens
 				user.flush()
 				movie.flush()
 
@@ -40,7 +48,7 @@ class ExposedSampleApplication {
 					val rating = UserRating.new {
 						value = 10
 						this.user = if (it.rem(2) == 0) user else user2
-						this.film = movie
+						this.film = if (it.rem(2) == 0) movie else movie2
 					}
 					rating.flush()
 				}
@@ -56,7 +64,7 @@ class ExposedSampleApplication {
 			}
 		}
 
-		transactionWithLogging {
+		withTransaction {
 			val ratings = UserRating.all().toList()
 
 			for (rating in ratings) {
@@ -72,7 +80,7 @@ class ExposedSampleApplication {
 			}
 		}
 
-		transactionWithLogging {
+		withTransaction {
 
 			val user = User.find { Users.id.eq(1) }.first()
 			// many-to-many test, does not query yet
@@ -90,7 +98,7 @@ class ExposedSampleApplication {
 
 		// DSL with DAO example
 		// query in is DSL, and mapping it to DAO classes
-		transactionWithLogging {
+		withTransaction {
 			val query = Users.innerJoin(UserRatings).innerJoin(StarWarsFilms)
 				.slice(Users.columns)
 				.select {
@@ -114,7 +122,7 @@ class ExposedSampleApplication {
 			}
 		}
 
-		transactionWithLogging {
+		withTransaction {
 			fun createQuery(): Query = Users.innerJoin(UserRatings).innerJoin(StarWarsFilms)
 				.select {
 					StarWarsFilms.sequelId.eq(8) and UserRatings.value.greaterEq(9L)
@@ -129,6 +137,32 @@ class ExposedSampleApplication {
 			val ratedFilms = StarWarsFilm.wrapRows(ratedFilmsQuery).toList()
 
 			println("Users: ${users.count()}, ratings: ${userRatings.count()}, rated films: ${ratedFilms.count()}")
+		}
+
+		// eager loading
+		withTransaction {
+			/*
+			NOTE: References that are eagerly loaded are stored inside the Transaction Cache,
+			this means that they are not available in other transactions and thus must be loaded and referenced inside the same transaction.
+			*/
+
+			// since Exposed uses the transaction cache, to following "performs 2 queries" are only valid if the
+			// provided DAO statement is the 1st one in this transaction!
+
+			// performs 2 queries (if this is the 1st statement to execute in this transaction)
+			// - SELECT * FROM starwarsfilms WHERE starwarsfilms.id = 1
+			// - SELECT * FROM users INNER JOIN userratings ON userratings.`user` = users.id WHERE userratings.film = 1
+			val filWithRaters = StarWarsFilm.findById(1)?.load(StarWarsFilm::raters)
+
+			// performs 2 queries (if this is the 1st statement to execute in this transaction)
+			// - SELECT * FROM starwarsfilms
+			// - SELECT * FROM users INNER JOIN userratings ON userratings.`user` = users.id WHERE userratings.film IN (1, 2)
+			val filmsWithRaters = StarWarsFilm.all().with(StarWarsFilm::raters)
+
+			// performs 2 queries (if this is the 1st statement to execute in this transaction)
+			// - SELECT * FROM starwarsfilms
+			// - SELECT * FROM userratings WHERE userratings.film IN (1, 2)
+			val filmsWithRatings = StarWarsFilm.all().with(StarWarsFilm::ratings)
 		}
 	}
 }
