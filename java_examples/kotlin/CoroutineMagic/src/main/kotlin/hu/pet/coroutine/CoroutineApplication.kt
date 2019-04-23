@@ -77,8 +77,8 @@ fun main(args: Array<String>) {
 			- If an exception is raised in the parent or parent gets just cancelled (job.cancel()) all the children are cancelled
 			- If an exception is raised in one of the children - the parent and all other children gets cancelled
 			- If a child gets cancelled it does not affect the other children nor the parent
-		- coroutineScope inherits the context of its parent but overrides it's job
-		- while withContext must define a new scope: via Dispatchers
+		- coroutineScope: creates new CoroutineScope and calls the specified suspend block with this scope. The provided scope inherits its coroutineContext from the outer scope, but overrides context's Job.
+		- withContext: Calls the specified suspending block with a given coroutine context (via Dispatchers), suspends until it completes, and returns the result.
 		 */
 	}
 	logger.info("Finished, thread: ${Thread.currentThread().id}")
@@ -120,18 +120,22 @@ fun CoroutineScope.workAsync(duration: Long): Deferred<Int> = async {
  * The main difference between "runBlocking" and "coroutineScope" builder is that the latter:
  * - is suspending function
  *  --> does not block the current thread while awaiting for its execution to complete
+ *      - its execution is complete when all children launched inside get complete
  *  --> can be invoked from another suspending function
  */
 suspend fun computeNameAsync(duration: Long): String = coroutineScope {
-	delay(duration)
-
 	// because coroutineScope is suspending and uses structured concurrency, it will complete only when this launch block completes
 	// however the execution goes forward immediately after invoking "launch" because it is NOT a suspending function - same goes for async
 	launch {
-		delay(duration * 2)
+		logger.info("Starting delay in launch of \"computeNameAsync\"")
+		delay(duration * 4)
+		logger.info("Delay finished in launch \"computeNameAsync\"")
 	}
 
 	val name = async {
+		logger.info("Starting delay in async of \"computeNameAsync\"")
+		delay(duration * 1)
+		logger.info("Delay finished in async \"computeNameAsync\"")
 		"Peter Kongyik"
 	}.await()
 	name
