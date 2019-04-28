@@ -1,6 +1,8 @@
 package hu.pet.coroutine
 
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.produce
+import kotlinx.coroutines.flow.flow
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
@@ -56,6 +58,27 @@ fun main(args: Array<String>) {
 //		}
 		// name computation is awaited
 		val name = computeNameAsync(2000)
+
+		// hot stream: inside block starts immediately, running concurrently with the main code
+		// Channels, just like futures, are synchronization primitives. You shall use a channel when you need to send data from one coroutine to
+		// another coroutine in the same or in a different process, because different coroutines are concurrent and you need synchronization to
+		// work with any data in presence of concurrency⁷.
+		val produceInstance = produce<Int> {
+			while (!isClosedForSend) {
+				delay(1000)
+				send(2)
+			}
+		}
+
+//		if(true){
+//			return@runBlocking
+//			// Oops! Leaked values: Channel is still running!
+//		}
+
+		produceInstance.cancel()
+		// cold stream: inside block does not get executed until somebody invokes .collect() on the Flow<Int> instance.
+		// Unlike channels, flows do not inherently involve any concurrency. They are non-blocking, yet sequential.
+		val flowInstance = flow<Int> { emit(3) }
 
 		logger.info("This is the end of {runBlocking}, thread: ${Thread.currentThread().id}")
 //		try {
