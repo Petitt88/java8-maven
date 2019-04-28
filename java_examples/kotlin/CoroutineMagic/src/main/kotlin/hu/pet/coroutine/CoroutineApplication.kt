@@ -116,7 +116,7 @@ fun CoroutineScope.workAsync(duration: Long): Deferred<Int> = async {
 }
 
 /**
- * "coroutineScope" builder inherits the scope of the current coroutine and it becomes it "father".
+ * "coroutineScope" builder inherits the scope of the current coroutine and it becomes its "father".
  * The main difference between "runBlocking" and "coroutineScope" builder is that the latter:
  * - is suspending function
  *  --> does not block the current thread while awaiting for its execution to complete
