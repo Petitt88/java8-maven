@@ -163,3 +163,44 @@ suspend fun computeNameAsync(duration: Long): String = coroutineScope {
 	}.await()
 	name
 }
+
+/**
+ * Caller decides when to await this.
+ */
+ fun CoroutineScope.computeNameAsync2(duration: Long): Deferred<String> = async {
+	launch {
+		logger.info("Starting delay in launch of \"computeNameAsync\"")
+		delay(duration * 4)
+		logger.info("Delay finished in launch \"computeNameAsync\"")
+	}
+
+	val name = async {
+		logger.info("Starting delay in async of \"computeNameAsync\"")
+		delay(duration * 1)
+		logger.info("Delay finished in async \"computeNameAsync\"")
+		"Peter Kongyik"
+	}.await()
+	name
+}
+
+/**
+ * Same as @see computeNameAsync regarding the await: caller awaits it right off the bat.
+ * However this uses a different context with a different thread (executes on the default dispatcher).
+ */
+suspend fun computeNameAsync3(duration: Long): String = withContext(Dispatchers.Default){
+	// because coroutineScope is suspending and uses structured concurrency, it will complete only when this launch block completes
+	// however the execution goes forward immediately after invoking "launch" because it is NOT a suspending function - same goes for async
+	launch {
+		logger.info("Starting delay in launch of \"computeNameAsync\"")
+		delay(duration * 4)
+		logger.info("Delay finished in launch \"computeNameAsync\"")
+	}
+
+	val name = async {
+		logger.info("Starting delay in async of \"computeNameAsync\"")
+		delay(duration * 1)
+		logger.info("Delay finished in async \"computeNameAsync\"")
+		"Peter Kongyik"
+	}.await()
+	name
+}
