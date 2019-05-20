@@ -81,7 +81,7 @@ class CameraRouteState extends State<CameraRoute> {
       children: <Widget>[
         CameraPreview(_controller),
         Positioned(
-          width: MediaQuery.of(context).size.width,
+          //width: MediaQuery.of(context).size.width,
           child: Container(
             decoration: BoxDecoration(color: Colors.black),
             child: Padding(
