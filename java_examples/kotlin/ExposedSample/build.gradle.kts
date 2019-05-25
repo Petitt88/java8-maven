@@ -17,7 +17,8 @@ java.sourceCompatibility = JavaVersion.VERSION_11
 
 repositories {
 	mavenCentral()
-	maven { url = uri("https://dl.bintray.com/kotlin/exposed/") }
+	maven("https://dl.bintray.com/kotlin/exposed/")
+	//maven { url = uri("https://dl.bintray.com/kotlin/exposed/") }
 }
 
 dependencies {
