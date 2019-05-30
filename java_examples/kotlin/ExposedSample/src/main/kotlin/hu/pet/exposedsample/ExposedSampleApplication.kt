@@ -1,9 +1,11 @@
-package hu.pet.ExposedSample
+package hu.pet.exposedsample
 
-import hu.pet.ExposedSample.model.*
+import hu.pet.exposedsample.model.*
+import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.load
 import org.jetbrains.exposed.dao.with
 import org.jetbrains.exposed.sql.*
+import org.slf4j.LoggerFactory
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
@@ -13,13 +15,19 @@ import javax.sql.DataSource
 @SpringBootApplication
 class ExposedSampleApplication {
 
+	val logger = LoggerFactory.getLogger(ExposedSampleApplication::class.java)
+
 	@Bean
 	fun databaseSamples(source: DataSource): CommandLineRunner = CommandLineRunner { _ ->
 		Database.connect(source)
 
 		withTransaction {
-			SchemaUtils.drop(UserRatings, Users, StarWarsFilms)
-			SchemaUtils.create(StarWarsFilms, Users, UserRatings)
+			SchemaUtils.drop(UserRatings, Users, StarWarsFilms, TariffCodes)
+			SchemaUtils.create(StarWarsFilms, Users, UserRatings, TariffCodes)
+
+			TariffCode.new {
+				code = EntityID("HU", TariffCodes)
+			}
 
 			if (StarWarsFilm.count() == 0) {
 				val movie = StarWarsFilm.new {
@@ -65,6 +73,8 @@ class ExposedSampleApplication {
 		}
 
 		withTransaction {
+			val huCode = TariffCode.findById("HU")
+			logger.info("Hungarian code is: ${huCode?.code ?: "<not found>"}")
 			val ratings = UserRating.all().toList()
 
 			for (rating in ratings) {

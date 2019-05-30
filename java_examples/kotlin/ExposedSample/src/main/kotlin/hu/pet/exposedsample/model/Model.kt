@@ -1,5 +1,8 @@
-package hu.pet.ExposedSample.model
+package hu.pet.exposedsample.model
 
+import hu.pet.exposedsample.StringEntity
+import hu.pet.exposedsample.StringEntityClass
+import hu.pet.exposedsample.StringIdTable
 import org.jetbrains.exposed.dao.EntityID
 import org.jetbrains.exposed.dao.IntEntity
 import org.jetbrains.exposed.dao.IntEntityClass
@@ -55,4 +58,18 @@ class UserRating(id: EntityID<Int>) : IntEntity(id) {
 	var value by UserRatings.value
 	var film by StarWarsFilm referencedOn UserRatings.film // use referencedOn for normal references
 	var user by User referencedOn UserRatings.user
+}
+
+object TariffCodes : StringIdTable(50, columnName = "code") {
+	var code
+		get() = id
+		set(value) {
+			id = value
+		}
+}
+
+class TariffCode(id: EntityID<String>) : StringEntity(id) {
+	companion object : StringEntityClass<TariffCode>(TariffCodes)
+
+	var code by TariffCodes.code
 }

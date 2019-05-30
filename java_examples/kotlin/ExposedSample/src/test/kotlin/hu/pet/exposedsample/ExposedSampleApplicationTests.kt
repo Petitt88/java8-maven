@@ -1,4 +1,4 @@
-package hu.pet.ExposedSample
+package hu.pet.exposedsample
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
