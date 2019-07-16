@@ -1,3 +1,4 @@
+import 'package:cupertino_store/charts/donut_pie_chart.dart';
 import 'package:cupertino_store/product_list_tab.dart';
 import 'package:cupertino_store/search_tab.dart';
 import 'package:cupertino_store/shopping_cart_tab.dart';
@@ -48,6 +49,10 @@ class CupertinoStoreHomePage extends StatelessWidget {
             icon: Icon(CupertinoIcons.shopping_cart),
             title: Text('Cart'),
           ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.bell),
+            title: Text('Charts'),
+          ),
         ],
       ),
       tabBuilder: (context, index) {
@@ -70,7 +75,14 @@ class CupertinoStoreHomePage extends StatelessWidget {
                 child: ShoppingCartTab(),
               );
             });
+          case 3:
+            return CupertinoTabView(builder: (context) {
+              return CupertinoPageScaffold(
+                child: DonutAutoLabelChart.withSampleData(),
+              );
+            });
         }
+        return null;
       },
     );
   }

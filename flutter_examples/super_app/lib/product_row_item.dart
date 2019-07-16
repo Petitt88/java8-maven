@@ -62,7 +62,7 @@ class ProductRowItem extends StatelessWidget {
           CupertinoButton(
             padding: EdgeInsets.zero,
             child: const Icon(
-              CupertinoIcons.plus_circled,
+              CupertinoIcons.add_circled,
               semanticLabel: 'Add',
             ),
             onPressed: () {
