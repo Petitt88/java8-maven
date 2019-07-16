@@ -8,7 +8,7 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="super_app"
+        android:label="Super Cupertino App"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
