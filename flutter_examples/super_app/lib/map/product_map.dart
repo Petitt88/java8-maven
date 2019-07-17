@@ -21,7 +21,7 @@ class _ProductMapState extends State<ProductMap> {
       onMapCreated: _onMapCreated,
       initialCameraPosition: CameraPosition(
         target: _center,
-        zoom: 0.0,
+        zoom: 11,
       ),
     );
   }
