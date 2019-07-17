@@ -1,4 +1,5 @@
 import 'package:cupertino_store/charts/donut_pie_chart.dart';
+import 'package:cupertino_store/map/product_map.dart';
 import 'package:cupertino_store/product_list_tab.dart';
 import 'package:cupertino_store/search_tab.dart';
 import 'package:cupertino_store/shopping_cart_tab.dart';
@@ -53,6 +54,10 @@ class CupertinoStoreHomePage extends StatelessWidget {
             icon: Icon(CupertinoIcons.bell),
             title: Text('Charts'),
           ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.location),
+            title: Text('Map'),
+          ),
         ],
       ),
       tabBuilder: (context, index) {
@@ -79,6 +84,12 @@ class CupertinoStoreHomePage extends StatelessWidget {
             return CupertinoTabView(builder: (context) {
               return CupertinoPageScaffold(
                 child: DonutAutoLabelChart.withSampleData(),
+              );
+            });
+          case 4:
+            return CupertinoTabView(builder: (context) {
+              return CupertinoPageScaffold(
+                child: ProductMap(),
               );
             });
         }
