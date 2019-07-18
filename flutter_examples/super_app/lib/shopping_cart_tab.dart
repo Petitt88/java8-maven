@@ -139,10 +139,9 @@ class _ShoppingCartTabState extends State<ShoppingCartTab> {
     );
   }
 
-  SliverChildBuilderDelegate _buildSliverChildBuilderDelegate(
-      AppStateModel model) {
+  SliverChildBuilderDelegate _buildSliverChildBuilderDelegate(AppStateModel model) {
     return SliverChildBuilderDelegate(
-          (context, index) {
+      (context, index) {
         switch (index) {
           case 0:
             return Padding(
@@ -168,14 +167,12 @@ class _ShoppingCartTabState extends State<ShoppingCartTab> {
             final productIndex = index - 4;
             if (model.productsInCart.length > productIndex) {
               return ShoppingCartItem(
-                product: model.getProductById(
-                    model.productsInCart.keys.toList()[productIndex]),
+                product: model.getProductById(model.productsInCart.keys.toList()[productIndex]),
                 quantity: model.productsInCart.values.toList()[productIndex],
                 lastItem: productIndex == model.productsInCart.length - 1,
                 formatter: _currencyFormat,
               );
-            } else if (model.productsInCart.keys.length == productIndex &&
-                model.productsInCart.isNotEmpty) {
+            } else if (model.productsInCart.keys.length == productIndex && model.productsInCart.isNotEmpty) {
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
@@ -186,7 +183,7 @@ class _ShoppingCartTabState extends State<ShoppingCartTab> {
                       children: <Widget>[
                         Text(
                           'Shipping '
-                              '${_currencyFormat.format(model.shippingCost)}',
+                          '${_currencyFormat.format(model.shippingCost)}',
                           style: Styles.productRowItemPrice,
                         ),
                         const SizedBox(height: 6),
@@ -296,7 +293,7 @@ class ShoppingCartItem extends StatelessWidget {
                     ),
                     Text(
                       '${quantity > 1 ? '$quantity x ' : ''}'
-                          '${formatter.format(product.price)}',
+                      '${formatter.format(product.price)}',
                       style: Styles.productRowItemPrice,
                     )
                   ],

@@ -52,4 +52,3 @@ abstract class Styles {
 
   static const Color searchIconColor = Color.fromRGBO(128, 128, 128, 1);
 }
-

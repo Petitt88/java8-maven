@@ -51,10 +51,8 @@ class ProductRowItem extends StatelessWidget {
                     style: Styles.productRowItemName,
                   ),
                   const Padding(padding: EdgeInsets.only(top: 8)),
-                  Text(
-                    '\$${product.price}',
-                    style: Styles.productRowItemPrice //Theme.of(context).textTheme.button,
-                  )
+                  Text('\$${product.price}', style: Styles.productRowItemPrice //Theme.of(context).textTheme.button,
+                      )
                 ],
               ),
             ),
