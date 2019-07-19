@@ -216,6 +216,9 @@ class _ShoppingCartTabState extends State<ShoppingCartTab> {
           slivers: <Widget>[
             const CupertinoSliverNavigationBar(
               largeTitle: Text('Shopping Cart'),
+              leading: Icon(CupertinoIcons.left_chevron),
+              trailing: Text("Sliver trailing"),
+              middle: Text("Sliver middle"),
             ),
             SliverSafeArea(
               top: false,

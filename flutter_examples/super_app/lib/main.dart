@@ -76,12 +76,22 @@ class CupertinoStoreHomePage extends StatelessWidget {
           case 2:
             return CupertinoTabView(builder: (context) {
               return CupertinoPageScaffold(
+                navigationBar: CupertinoNavigationBar(
+                  leading: Text("Leading text"),
+                  trailing: Icon(CupertinoIcons.shopping_cart),
+                  middle: Text("Middle text"),
+                ),
                 child: ShoppingCartTab(),
               );
             });
           case 3:
             return CupertinoTabView(builder: (context) {
               return CupertinoPageScaffold(
+                navigationBar: CupertinoNavigationBar(
+                  leading: Text("Map"),
+                  trailing: Icon(CupertinoIcons.settings),
+                ),
+                backgroundColor: CupertinoColors.activeGreen,
                 child: DonutAutoLabelChart.withSampleData(),
               );
             });
