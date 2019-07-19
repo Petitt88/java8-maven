@@ -4,6 +4,7 @@ import 'package:cupertino_store/product_list_tab.dart';
 import 'package:cupertino_store/search_tab.dart';
 import 'package:cupertino_store/shopping_cart_tab.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
@@ -77,8 +78,17 @@ class CupertinoStoreHomePage extends StatelessWidget {
             return CupertinoTabView(builder: (context) {
               return CupertinoPageScaffold(
                 navigationBar: CupertinoNavigationBar(
-                  leading: Text("Leading text"),
-                  trailing: Icon(CupertinoIcons.shopping_cart),
+                  leading: CupertinoButton(
+                    child: Icon(CupertinoIcons.left_chevron),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+//                  trailing: CupertinoButton(
+//                    child: Icon(CupertinoIcons.right_chevron),
+//                    onPressed: () => Navigator.of(context).push(CupertinoPageRoute(
+//                        builder: (context) => CupertinoPageScaffold(
+//                              child: ShoppingCartTab(),
+//                            ))),
+//                  ),
                   middle: Text("Middle text"),
                 ),
                 child: ShoppingCartTab(),
